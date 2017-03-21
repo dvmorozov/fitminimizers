@@ -7,19 +7,24 @@
 ------------------------------------------------------------------------------}
 unit SelfCheckedComponentList;
 
+{$IFDEF Lazarus}
 {$MODE Delphi}
+{$ENDIF}
 
 interface
 
 uses
-    LCLIntf,  SysUtils,  Classes, CBRCComponent, Tools;
+{$IFDEF Lazarus}
+    LCLIntf,
+{$ENDIF}
+    SysUtils,  Classes, CBRCComponent, Tools;
 
 type
     ISelfChecked = interface
         ['{E7E7008A-EE1C-4828-B1D6-A53806820A66}']
         procedure IsReady;
         function MyNameIs: string;
-        //методы для установки / получения режима самопроверки
+		//	Setter and getter for self checking mode.
         procedure SetSelfCheckingMode(const AMode: LongInt);
         function GetSelfCheckingMode: LongInt;
     end;
@@ -27,7 +32,7 @@ type
 const SelfCheckedGUID: TGUID = '{E7E7008A-EE1C-4828-B1D6-A53806820A66}';
 
 type
-    //  по-умолчанию сам освобождает хранимые компоненты
+	//	By default release stored components.
     TSelfCheckedComponentList = class(TCBRCComponent, ISelfChecked)
     protected
         List: TList;
@@ -39,7 +44,6 @@ type
 
         procedure SetItem(index: Integer; Item: TComponent);
         procedure SetCapacity(ACapacity: Integer);
-        //  устанавливает связи со вставляемыми компонентами, если необходимо
         procedure LinkItemWithList(const Item: TComponent); virtual;
 
         function GetSelfCheckingMode: LongInt; virtual; abstract;
@@ -51,20 +55,19 @@ type
     public
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
-        //  !!! с XML-потоками не работает !!!
         procedure DefineProperties(Filer: TFiler); override;
 
         procedure IsReady; virtual;
         function MyNameIs: string; virtual;
-        //  устанавливает заданный режим самопроверки на всех
-        //  элементах, поддерживающих интерфейс самопроверки
+		//	Set self-checked mode on all components 
+		//	implementing corresponding interface.
         procedure SetCheckingModeInItems(const AMode: LongInt);
 
         procedure Sort(Compare: TListSortCompare);
         procedure Pack;
         function GetState: LongInt;
         procedure SetState(AState: LongInt);
-        //  выполняется после чтения списка из потока
+
         procedure ActionAfterReading; virtual;
         procedure LinkAllItemsWithList;
 
@@ -98,7 +101,6 @@ implementation
 
 procedure Register;
 begin
-    //RegisterComponents('Common',  [TSelfCheckedComponentList]);
 end;
 
 constructor TSelfCheckedComponentList.Create;
