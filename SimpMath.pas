@@ -7,8 +7,9 @@
 ------------------------------------------------------------------------------}
 unit SimpMath;
 
-//{$mode objfpc}{$H+}
+{$IFDEF Lazarus}
 {$MODE Delphi}
+{$ENDIF}
 
 interface
 
@@ -26,14 +27,14 @@ type
 
     IVector = interface;
 
+	//	Vector space.
     ISpace = interface
-        //  пространство векторов
+		//	Return scalar (inner) product of vectors.
         function GetScalarMul(const Vect1, Vect2: IVector): Double;
-            //  скалярное произведение векторов
     end;
 
+	//	Vector containing real numbers.
     IVector = interface
-        //  вещественный вектор
         function GetSpace: ISpace;
         procedure SetSpace(const ASpace: ISpace);
         function GetNorma: Double;
@@ -55,17 +56,17 @@ type
                 read GetNormComp;
     end;
 
+	//	Vector containing complex number.
     IComplexVector = interface(IVector)
-        //  комплексный вектор
         function GetImComp(index: LongInt): Double;
         procedure SetImComp(index: LongInt; AImComp: Double);
         function GetNormImComp(index: LongInt): Double;
 
+		//	Imaginary parts of vector components.
         property ImComps[index: LongInt]: Double
-            //  мнимые части компонент вектора
                 read GetImComp          write SetImComp;
+		//	Imaginary parts of normalized vector components.
         property NormImComps[index: LongInt]: Double
-            //  мнимые части нормированного комплексного вектора
                 read GetNormImComp;
     end;
 
@@ -117,23 +118,22 @@ type
                 read GetNormImComp;
     end;
 
+    //  Theta must be in interval from 0 to pi; Phi - in interval from -pi to pi.
 procedure ConvertSphericalToDekart(Theta, Phi, R: Double; var x, y, z: Double);
-    //  Theta находится в интервале от 0 до pi; Phi - в интервале от -pi до pi
 procedure ConvertDekartToSpherical(x, y, z: Double; var Theta, Phi, R: Double);
+    //  Convert vector from cartesian coordinates to affine.
+    //  Parameter Alpha isn't used (see conditions below).
 procedure ConvertDekartToAphine(
-    //  преобразование вектора из декартовых координат в афинные;
-    //  Alpha не используется (см. условия ниже)
     const A, B, C, Alpha, Beta, Gamma: Double;
     var Vector: TDoubleVector3);
+    //  Convert vector from affine to cartesian coordinates.
+    //  Parameter Alpha isn't used (see conditions below).
+    //  Conversion is done in following assumptions:
+    //  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians), 
+	//	besides Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3.
+    //  2. Axis e1 of affine coordinate system coincides with the axis e1 of cartesian coordinate system.
+    //  3. Axis e2 of affine coordinate system belongs to the e1e2 plane of cartesian coordinate system.
 procedure ConvertAphineToDekart(
-    //  преобразование вектора из афинных координат в ортонормированную СК;
-    //  Alpha не используется (см. условия ниже)
-    //  преобразования выполняются при следующих предположениях:
-    //  1. Alpha, Beta, Gamma - углы между осями в афинной СК
-    //  (выраженные в радианах), причем Gamma = e1^e2; Beta = e3^e1;
-    //  Alpha = e2^e3;
-    //  2. ось e1 афинной СК совпадает с осью e1 декартовой СК
-    //  3. ось e2 афинной СК лежит в плоскости e1e2 декартовой СК
     const A, B, C, Alpha, Beta, Gamma: Double;
     var Vector: TDoubleVector3);
 
@@ -142,92 +142,78 @@ procedure DecTheta(Dec: Double; var Theta: Double);
 procedure IncPhi(Inc: Double; var Phi: Double);
 procedure IncTheta(Inc: Double; var Theta: Double);
 
+//	Put given value into the interval.
 procedure PutValueIntoInterval(
-    //  помещает переданную величину в заданный числовой интервал
     const MinLimit, MaxLimit: Double;
     var Value: Double);
+//	Return True if Value belongs to the given interval, False otherwise.
 function IsValueIntoInterval(const MinLimit, MaxLimit, Value: Double): Boolean;
-    //  возвращает True, если Value находится в заданном интервале,
-    //  False - в противном случае
-
+//	Return scalar (inner) product in orthonormal coordinate system.
 function GetScalarMul(const Vect1, Vect2: TDoubleVector3): Double;
-    //  скалярное произведение в ортонормированной СК
+//	Return scalar (inner) product in affine coordinate system.
+//	Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetScalarMulA(
-    //  скалярное произведение не в ортонормированной СК;
-    //  углы между векторами базиса, в котором заданы вектора
-    //  (в радианах): Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3
     const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
+//	Return scalar (inner) product in affine coordinate system between normalized vectors.
+//	Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetScalarMulAN(
-    //  скалярное произведение не в ортонормированной СК находится
-    //  между единичными векторами, направленными вдоль исходных векторов;
-    //  углы между векторами базиса, в котором заданы вектора
-    //  (в радианах): Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3
     const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
+//	Return angle between vectors.
 function GetAngle(
-    //  возвращает угол между векторами
     const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
+//	Return cross product in affine coordinate system.	
+//	Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetVectorMulA(
-    //  векторное произведение не в ортонормированной СК;
-    //  углы между векторами базиса, в котором заданы вектора
-    //  (в радианах): Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3
     const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): TDoubleVector3;
-
+//	Return modulus of vector given in cartesian coordinate system.
 function GetVectModule(
-    //  возвращает модуль вектора, заданного в ортонормированной СК
     const Vect: TDoubleVector3): Double;
-
+//	Return modulus of vector given in affine coordinate system.
 function GetVectModuleA(
-    //  возвращает модуль вектора, заданного не в ортонормированной СК
     const Vect: TDoubleVector3;
     const A, B, C, Alpha, Beta, Gamma: Double): Double;
-
-
+//	Calculate unit vector for the vector given in cartesian coordinate system.
 procedure GetUnitVect(
-    //  вычисляет единичный вектор для вектора, заданного в декартовой СК
     const Vect: TDoubleVector3;
     var UnitVect: TDoubleVector3);
-
+//	Calculate unit vector for the vector given in affine coordinate system.
 procedure GetUnitVectA(
-    //  вычисляет единичный вектор для вектора, заданного не в ортонормированной СК
     const Vect: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double; var UnitVect: TDoubleVector3);
-
+//	Return 3 mutual vectors to the given vectors forming basis with given parameters, besides
+//  Vect1 = (1/V)[e2 x e3], |Vect1| = (1/V)|e2||e3|Sin(Alpha),
+//  Vect2 = (1/V)[e3 x e1], |Vect2| = (1/V)|e1||e3|Sin(Beta),
+//  Vect3 = (1/V)[e1 x e2], |Vect3| = (1/V)|e1||e2|Sin(Gamma),
+//  |e1| = A, |e2| = B, |e3| = C,
+//  Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3 (angles are given in radians),
+//  V - volume of the cell built on the basal vectors.
 procedure GetMutualVectors(
-    //  возвращает три вектора, которые представляют собой взаимные вектора
-    //  к векторам, образующим базис с заданными параметрами, причем
-    //  Vect1 = (1/V)[e2 x e3], |Vect1| = (1/V)|e2||e3|Sin(Alpha);
-    //  Vect2 = (1/V)[e3 x e1], |Vect2| = (1/V)|e1||e3|Sin(Beta);
-    //  Vect3 = (1/V)[e1 x e2], |Vect3| = (1/V)|e1||e2|Sin(Gamma);
-    //  |e1| = A, |e2| = B; |e3| = C;
-    //  Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3(углы в радианах);
-    //  V - объем ячейки, построенной на векторах базиса
     const A, B, C, Alpha, Beta, Gamma: Double;
     var Vect1, Vect2, Vect3: TDoubleVector3);
 
 procedure GetMutualVectorsInNewBasis(
+	//	Parameters of initial basis in which all vectors are defined.
     const A, B, C, Alpha, Beta, Gamma: Double;
-        //  параметры исходного базиса, в котором заданы все вектора
+	//	Vectors of new basis (are defined in the initial basis).
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-        //  вектора нового базиса (определены в старом)
+	//	Mutual vectors to the new vectors (are defined in the initial basis).
     var Vect1, Vect2, Vect3: TDoubleVector3
-        //  взаимные вектора к векторам нового базиса (определены в старом)
     );
 
+//	Return volume of the cell built on the basal vectors.
 function GetVolume(const A, B, C, Alpha, Beta, Gamma: Double): Double;
-    //  возвращает объем ячейки, построенной на векторах базиса
-
+//	Return coordinates of vector in new basis.
 function GetVectInNewBasis(
-    //  возвращает координаты вектора относительно нового базиса
+	//	Parameters of initial basis in which all vectors are defined.
     const A, B, C, Alpha, Beta, Gamma: Double;
-        //  параметры исходного базиса, в котором заданы все вектора
+	//	Vectors of new basis (are defined in the initial basis).
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-        //  вектора нового базиса (определены в старом)
+	//	Vector given in the initial basis.
     InitialVect: TDoubleVector3
-        //  вектор в "старом" базисе
     ): TDoubleVector3;
 
 function MulVectByValue(const Vect: TDoubleVector3;
@@ -238,20 +224,20 @@ procedure SetVectModule(var Vect: TDoubleVector3;
 function GetSubVect(Vect1, Vect2: TDoubleVector3): TDoubleVector3;
 function ArcSin(x: Double): Double;
 function ArcCos(x: Double): Double;
+// 	Return decimal order of given number.
 function GetNumberDegree(Number: Double): LongInt;
-    //  возвращает порядок данного числа
 function GetPowerOf10(Power: LongInt): Double;
 function Sign(Number: Double): LongInt;
 
 function Lagrange(
-    PointsArray: TwoDimArray;   //  1 - й - X, 2 - й - Y
+    PointsArray: TwoDimArray;   //  The first - X, the second - Y.
     const X: Double): Double;
 
 function GaussPoint(
-    const A,    //  значение интеграла от этой ф-и по всей области определения
+    const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 function LorentzPoint(
-    const A,    //  значение интеграла от этой ф-и по всей области определения
+    const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 function PseudoVoigtPoint(
     const A, Sigma, Eta, x0, x: Double
@@ -273,7 +259,7 @@ function CalcPolinom2(const A, B, C, x0, x: Double): Double;
 
 implementation
 
-//  вспомогательные функции для работы с векторами
+//  Auxiliary functions to work with vectors.
 function GetD(const Alpha, Beta, Gamma: Double): Double; forward;
 function GetPAlpha(const Alpha, Beta, Gamma: Double): Double; forward;
 function GetPBeta(const Alpha, Beta, Gamma: Double): Double; forward;
@@ -282,9 +268,6 @@ function GetPGamma(const Alpha, Beta, Gamma: Double): Double; forward;
 function ArcSin(x: Double): Double;
 var TempDouble: Double;
 begin
-    //  особенности расчета: если x = 1, то 1 - Sqr(x) видимо
-    //  получается отрицательной, вследствии ошибки расчета Sqr(x),
-    //  в результате при извлечении корня возникает исключение
     TempDouble := 1 - Sqr(x);
     if Abs(TempDouble) < TINY then TempDouble := 0;
         TempDouble := Sqrt(TempDouble);
@@ -295,9 +278,6 @@ end;
 function ArcCos(x: Double): Double;
 var TempDouble: Double;
 begin
-    //  особенности расчета: если x = 1, то 1 - Sqr(x) видимо
-    //  получается отрицательной, вследствии ошибки расчета Sqr(x),
-    //  в результате при извлечении корня возникает исключение
     TempDouble := 1 - Sqr(x);
     if Abs(TempDouble) < TINY then TempDouble := 0;
     if x <> 0 then Result := ArcTan2(Sqrt(TempDouble), x)
@@ -371,7 +351,6 @@ begin
 end;
 
 procedure ConvertSphericalToDekart(Theta, Phi, R: Double; var x, y, z: Double);
-    //  преобразует координаты сферической с.к. в вектор декартовой с.к.
 begin
     x := R * Sin(Theta) * Cos(Phi);
     y := R * Sin(Theta) * Sin(Phi);
@@ -459,7 +438,7 @@ begin
     else Result := -1;
 end;
 
-function Lagrange(PointsArray: TwoDimArray;(*1 - й - X, 2 - й - Y*)
+function Lagrange(PointsArray: TwoDimArray;(*The first - X, the second - Y*)
     const X: Double): Double;
 var Lagr: Double;
     p1, p2: Double;
@@ -489,7 +468,7 @@ end;
 
 //  FWHM = 2 * Sqrt(2 * ln(2)) * Sigma
 function GaussPoint(
-    const A,    //  значение интеграла от этой ф-и по всей области определения
+    const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 begin
     Assert(A >= 0);
@@ -500,7 +479,7 @@ end;
 
 //  FWHM = Sigma
 function LorentzPoint(
-    const A,    //  значение интеграла от этой ф-и по всей области определения
+    const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 begin
     Assert(A >= 0);
@@ -672,8 +651,8 @@ procedure ConvertDekartToAphine(
     var Vector: TDoubleVector3);
 var V1, V2, V3, Result: TDoubleVector3;
 begin
-    //  вычисляются вектора ортонормированной СК, выраженные
-    //  в базисе исходных (афинных) координат
+	//	Vectors of orthonormal coordinate system are calculated
+	//	in the basis of initial affine coordinates.
     V1[1] := 1; V1[2] := 0; V1[3] := 0;
     V2[1] := 0; V2[2] := 1; V2[3] := 0;
     V3 := GetVectorMulA(V1, V2, A, B, C, Alpha, Beta, Gamma);
@@ -681,7 +660,7 @@ begin
     GetUnitVectA(V3, A, B, C, Alpha, Beta, Gamma, V3);
     V2 := GetVectorMulA(V3, V1, A, B, C, Alpha, Beta, Gamma);
     GetUnitVectA(V2, A, B, C, Alpha, Beta, Gamma, V2);
-    //  V1, V2, V3 - ортонормированный базис, построенный в исходном базисе
+    //  V1, V2, V3 - orthonormal basis built in initial basis.
     Result[1] := Vector[1] * V1[1] + Vector[2] * V2[1] + Vector[3] * V3[1];
     Result[2] := Vector[1] * V1[2] + Vector[2] * V2[2] + Vector[3] * V3[2];
     Result[3] := Vector[1] * V1[3] + Vector[2] * V2[3] + Vector[3] * V3[3];

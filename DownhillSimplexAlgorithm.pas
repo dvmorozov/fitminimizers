@@ -7,7 +7,9 @@
 ------------------------------------------------------------------------------}
 unit DownhillSimplexAlgorithm;
 
+{$IFDEF Lazarus}
 {$MODE Delphi}
+{$ENDIF}
 
 interface
 

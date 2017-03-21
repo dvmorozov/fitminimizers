@@ -7,7 +7,9 @@
 ------------------------------------------------------------------------------}
 unit Algorithm;
 
+{$IFDEF Lazarus}
 {$MODE Delphi}
+{$ENDIF}
 
 interface
 

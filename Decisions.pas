@@ -7,7 +7,9 @@
 ------------------------------------------------------------------------------}
 unit Decisions;
 
+{$IFDEF Lazarus}
 {$MODE Delphi}
+{$ENDIF}
 
 interface
 
@@ -207,8 +209,8 @@ function EvalUpSortFunc(Item1, Item2: Pointer): Integer;
 (*sortirovka po vozrastaniyu Evaluation*)
 
 const
-  EvalDownSort: TListSortCompare = @EvalDownSortFunc;
-  EvalUpSort: TListSortCompare = @EvalUpSortFunc;
+  EvalDownSort: TListSortCompare = EvalDownSortFunc;
+  EvalUpSort: TListSortCompare = EvalUpSortFunc;
 
 implementation
 

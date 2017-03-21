@@ -7,7 +7,9 @@
 ------------------------------------------------------------------------------}
 unit CBRCComponent;
 
+{$IFDEF Lazarus}
 {$MODE Delphi}
+{$ENDIF}
 
 interface
 
