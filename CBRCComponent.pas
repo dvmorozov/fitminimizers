@@ -60,13 +60,13 @@ begin
     end;
 end;
 
-function TCBRCComponent._AddRef: Integer;
+function TCBRCComponent._AddRef: Integer; stdcall;
 begin
     Inc(FRefCount);
     Result := RefCount;
 end;
 
-function TCBRCComponent._Release: Integer;
+function TCBRCComponent._Release: Integer; stdcall;
 begin
     Dec(FRefCount);
     Result := RefCount;
