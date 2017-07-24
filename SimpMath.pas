@@ -672,10 +672,9 @@ procedure ConvertAphineToDekart(
     var Vector: TDoubleVector3);
 var V1, V2, V3, Result: TDoubleVector3;
 begin
-    //  взаимные вектора к векторам ортонормированного базиса совпадают
-    //  с самими векторами ортонормированного базиса; координаты вектора
-    //  в новом базисе равны скалярным произведениям вектора на векторы,
-    //  взаимные по отношению к векторам нового базиса
+	//	Mutual vectors to orthonormal basis coincide with vectors themselves.
+	//	Coordinates of vector in new basis are equal to inner products of
+	//	the vector with vectors mutual to vectors of new basis.
     V1[1] := 1; V1[2] := 0; V1[3] := 0;
     V2[1] := 0; V2[2] := 1; V2[3] := 0;
     V3 := GetVectorMulA(V1, V2, A, B, C, Alpha, Beta, Gamma);
@@ -683,15 +682,15 @@ begin
     GetUnitVectA(V3, A, B, C, Alpha, Beta, Gamma, V3);
     V2 := GetVectorMulA(V3, V1, A, B, C, Alpha, Beta, Gamma);
     GetUnitVectA(V2, A, B, C, Alpha, Beta, Gamma, V2);
-    //  V1, V2, V3 - ортонормированный базис, построенный в исходном базисе
+    //  V1, V2, V3 - orthonormal basis built in original basis.
     Result[1] := GetScalarMulA(Vector, V1, A, B, C, Alpha, Beta, Gamma);
     Result[2] := GetScalarMulA(Vector, V2, A, B, C, Alpha, Beta, Gamma);
     Result[3] := GetScalarMulA(Vector, V3, A, B, C, Alpha, Beta, Gamma);
     Vector := Result;
 end;
 
+//	Calculate unit vector for the vector given in Cartesian system.
 procedure GetUnitVect(
-    //  вычисляет единичный вектор для вектора, заданного в декартовой СК
     const Vect: TDoubleVector3;
     var UnitVect: TDoubleVector3);
 var Module: Double;
@@ -709,7 +708,7 @@ begin
 end;
 
 procedure GetUnitVectA(
-    //  вычисляет единичный вектор для вектора, заданного в афинных координатах
+	//	Calculate unit vector for the vector given in affine system.	
     const Vect: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double; var UnitVect: TDoubleVector3);
 var Module: Double;
@@ -793,17 +792,17 @@ begin
 end;
 
 procedure GetMutualVectorsInNewBasis(
+	//	Parameters of the original basis in which all vectors are given.
     const A, B, C, Alpha, Beta, Gamma: Double;
-        //  параметры исходного базиса, в котором заданы все вектора
+	//	Vectors of new basis defined via vectors of old basis.
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-        //  вектора нового базиса (определены в старом)
+	//	Mutual vectors to the vectors of new basis (defined in old basis).
     var Vect1, Vect2, Vect3: TDoubleVector3
-        //  взаимные вектора к векторам нового базиса (определены в старом)}
     );
+	//	Parameters of the new basis.	
 var NewA, NewB, NewC, NewAlpha, NewBeta, NewGamma: Double;
-        //  параметры нового базиса
+	//	Volume of the parallelepiped built on the vectors of new basis.
     NewV: Double;
-        //  объем параллелепипеда, построенного на векторах нового базиса
 begin
     NewA := GetVectModuleA(NewBasisVect1, A, B, C, Alpha, Beta, Gamma);
     NewB := GetVectModuleA(NewBasisVect2, A, B, C, Alpha, Beta, Gamma);
@@ -821,14 +820,14 @@ begin
     Vect3 := MulVectByValue(Vect3, 1 / NewV);
 end;
 
+//	Return coordinates relative to new basis.
 function GetVectInNewBasis(
-    //  возвращает координаты вектора относительно нового базиса
+	//	Parameters of the original basis in which all vectors are given.
     const A, B, C, Alpha, Beta, Gamma: Double;
-        //  параметры исходного базиса, в котором заданы все вектора
+	//	Vectors of new basis defined via vectors of old basis.
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-        //  вектора нового базиса (определены в старом)
+	//	Vector in the old basis.
     InitialVect: TDoubleVector3
-        //  вектор в "старом" базисе
     ): TDoubleVector3;
 var MutVect1, MutVect2, MutVect3: TDoubleVector3;
 begin
@@ -871,10 +870,10 @@ begin
     Result := FNorma;
 end;
 
+//	Recalculated components of vector and unit vector
+//	according to the given value of norma.
 procedure T3DVector.SetNorma(const ANorma: Double);
 begin
-  //    пересчет компонент вектора и нормированного вектора
-  //    в соответствии с заданным значением
 end;
 
 function T3DVector.GetCompsNumber: LongInt;
