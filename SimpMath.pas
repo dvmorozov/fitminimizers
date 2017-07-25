@@ -70,12 +70,9 @@ type
                 read GetNormImComp;
     end;
 
-    E3DVector = class(Exception);    //??? убрать
+    E3DVector = class(Exception);
 
-    T3DVector = class(TCBRCComponent, IVector)  // ??? убрать
-        //  класс - вектор; реализует набор необходимых
-        //  ф - й для работы с 3 - мерным вектором
-        //  !!! не закончен !!!
+    T3DVector = class(TCBRCComponent, IVector)
     protected
         FSpace: ISpace;
         FVector: TDoubleVector3;
@@ -104,9 +101,9 @@ type
                 read GetNormComp;
     end;
 
-    T3DComplexVector = class(T3DVector, IComplexVector)  //??? убрать
+    T3DComplexVector = class(T3DVector, IComplexVector)
     protected
-        FImVector: TDoubleVector3;  //  мнимая часть
+        FImVector: TDoubleVector3;  //  Imaginary part.
 
         function GetImComp(index: LongInt): Double;
         procedure SetImComp(index: LongInt; AImComp: Double);
@@ -118,21 +115,21 @@ type
                 read GetNormImComp;
     end;
 
-    //  Theta must be in interval from 0 to pi; Phi - in interval from -pi to pi.
+//  Theta must be in interval from 0 to pi; Phi - in interval from -pi to pi.
 procedure ConvertSphericalToDekart(Theta, Phi, R: Double; var x, y, z: Double);
 procedure ConvertDekartToSpherical(x, y, z: Double; var Theta, Phi, R: Double);
-    //  Convert vector from cartesian coordinates to affine.
-    //  Parameter Alpha isn't used (see conditions below).
+//  Convert vector from cartesian coordinates to affine.
+//  Parameter Alpha isn't used (see conditions below).
 procedure ConvertDekartToAphine(
     const A, B, C, Alpha, Beta, Gamma: Double;
     var Vector: TDoubleVector3);
-    //  Convert vector from affine to cartesian coordinates.
-    //  Parameter Alpha isn't used (see conditions below).
-    //  Conversion is done in following assumptions:
-    //  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians), 
-	//	besides Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3.
-    //  2. Axis e1 of affine coordinate system coincides with the axis e1 of cartesian coordinate system.
-    //  3. Axis e2 of affine coordinate system belongs to the e1e2 plane of cartesian coordinate system.
+//  Convert vector from affine to cartesian coordinates.
+//  Parameter Alpha isn't used (see conditions below).
+//  Conversion is done in following assumptions:
+//  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians), 
+//	besides Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3.
+//  2. Axis e1 of affine coordinate system coincides with the axis e1 of cartesian coordinate system.
+//  3. Axis e2 of affine coordinate system belongs to the e1e2 plane of cartesian coordinate system.
 procedure ConvertAphineToDekart(
     const A, B, C, Alpha, Beta, Gamma: Double;
     var Vector: TDoubleVector3);
@@ -874,6 +871,7 @@ end;
 //	according to the given value of norma.
 procedure T3DVector.SetNorma(const ANorma: Double);
 begin
+	raise ENotImplemented.Create('T3DVector.SetNorma');
 end;
 
 function T3DVector.GetCompsNumber: LongInt;
@@ -893,7 +891,9 @@ begin
     if (Index < 0) or (index > CompsNumber) then
         raise E3DVector.Create('Invalid index...')
     else FVector[index + 1] := AComp;
-    //  алгоритм вычисления нормы вектора и нормированного вектора
+    
+	//  Calculating components of normalized vector.
+	raise ENotImplemented.Create('T3DVector.SetComp');
 end;
 
 function T3DVector.GetNormComp(index: LongInt): Double;
@@ -905,14 +905,17 @@ end;
 
 function T3DComplexVector.GetImComp(index: LongInt): Double;
 begin
+	raise ENotImplemented.Create('T3DComplexVector.GetImComp');
 end;
 
 procedure T3DComplexVector.SetImComp(index: LongInt; AImComp: Double);
 begin
+	raise ENotImplemented.Create('T3DComplexVector.SetImComp');
 end;
 
 function T3DComplexVector.GetNormImComp(index: LongInt): Double;
 begin
+	raise ENotImplemented.Create('T3DComplexVector.GetNormImComp');
 end;
 
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;

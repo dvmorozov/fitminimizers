@@ -13,29 +13,29 @@ unit Tools;
 
 interface
 
-uses SysUtils, Classes, SimpMath, CBRCComponent;
+uses SysUtils, Classes, SimpMath, CBRCComponent, Windows;
 
 type
+	//	Return value of the parameter 'Param'.
     FParamRequest = function(Param: string): Double of object;
-        //  возвращает значение для параметра Param
     TCharSet = set of Char;
     TVector3Array = array of TDoubleVector3;
 
     ETools = class(Exception);
 
 const
-    //  константы ошибок для процедуры расчета строки
+    //  Error codes.
     CALC_NO_ERRORS          : LongInt = 0;
     CALC_INVALID_PARAMETER  : LongInt = 1;
     CALC_INVALID_EXPRESSION : LongInt = 2;
 
+//	Add vector to the end of vector array.
 procedure AddVectorToArray(
-    //  добавляет вектор к концу массива векторов
     var Arr: TVector3Array;
     const Vector: TDoubleVector3
     );
+//	Insert vector into array at the position 'Index'.
 procedure InsertVectorIntoArray(
-    //  вставляет вектор в массив в позицию Index
     var Arr: TVector3Array;
     const Index: LongInt;
     const Vector: TDoubleVector3
@@ -55,75 +55,71 @@ procedure DeleteItemLongArr(
 procedure InsertItemLongArr(
     var Arr: TLongArray;
     const Index: LongInt;
-    const Item: LongInt     //  вставляемое значение
+    const Item: LongInt     	//  Inserted value.
     );
 procedure AddItemLongArr(
     var Arr: TLongArray;
     const Item: LongInt
     );
 
+//	Check if index of element is admissible otherwise throw an exception.
 procedure CheckArrItemIndex(const MinIndex, MaxIndex, Index: LongInt);
-    //  проверяет допустимость индекса некоторого элемента,
-    //  в случае недопустимости вызывается исключение
 
-//  функции преобразования вектора в строку и обратно
+//  The mask must correspond to format of Str in StringAsDoubleVector3!
 const DoubleVector3EditMask = '!\(0\.0999\,\ 0\.0999\,\ 0\.0999\);1;';
-//  !!! маска должна соответствовать формату Str в StringAsDoubleVector3 !!!
 
+//  Functions for conversion vectors to strings and back.
+//	Result must correspond to the mask!
 function DoubleVector3AsString(const Vect: TDoubleVector3;
-    FixedMode: Boolean; //  True - фиксированное число знаков после запятой
+    FixedMode: Boolean; //  True - fixed number of digits after decimal separator.
     Precision, Digits: LongInt): string;
-        //  !!! возврат должен соответствовать маске !!!
+
 function StringAsDoubleVector3(const Str: string): TDoubleVector3;
 
 function StrToFloatDef(St: string; DefVal: Extended): Extended;
+//	Convert string having format (*.*,*.*,*.*) to vector.
 function StrToVector3(const St: string): TDoubleVector3;
-    //  преобразует строку в формате (*.*,*.*,*.*) в вектор
+//	Convert vector to string having format (*.*,*.*,*.*).
 function Vector3ToStr(const Vector: TDoubleVector3): string;
-    //  преобразует вектор в строку в формате (*.*,*.*,*.*)
 
 function WithGivenAccuracy(
-    Value: Double;      //  число для преобразования
-    Decimals: LongInt   //  требуемое число знаков после запятой
+    Value: Double;      //  Number for conversion.
+    Decimals: LongInt   //  Number of digits after decimal separator.
     ): Double;
+//	Return substring of parameters from executable command line enclosed with "".
+//	If the command line doesn't have any other parameters except path to executable
+//	then empty string is returned.
 function GetCmdLineParameters: string;
-    //  возвращает подстроку параметров из командной строки программы
-    //  обрамленную символами "", если командная строка не содержит других
-    //  параметров кроме пути к программе, то возвращается пустая строка 
+
 function GetRandomWithSign: Double;
 
+//	Calculate expression given by string.
 function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
 function CalculateExpr(var Expression: string; var ErrorCode: LongInt;
-    //  вычисляет значение выражения переданного в строке Expression
     const ParamRequest: FParamRequest): Double;
 
-
+//	Search symbol in the string. Return -1 if the symbol not found.	
 function GetCharPosition(St: string; Ch: Char;
-    //  возарщает -1 если символ не обнаружен
     Direction: ShortInt; StartIndex: LongInt): LongInt;
 function GetCharSetPosition(St: string; ChSet: TCharSet;
-    Direction: ShortInt;    //  Direction = 1 - движение по строке вправо
-                            //  Direction = -1 - движение по строке влево;
-                            //  возвращает -1 - ошибка
+    Direction: ShortInt;    //  Direction =  1 - scan string from the beginning to the end.
+                            //  Direction = -1 - scan string from the end to the beginning.
     StartIndex: LongInt; var Ch: Char): LongInt;
 
+//	Return number of array and index of element in
+//	this array by the through index of an element.
 procedure GetPosInArrays(
-    //  возвращает номер массива и индекс элемента в этом массиве по
-    //  сквозному индексу элемента среди всех массивов
-    const ArraysLengths: array of LongInt;  //  массив длин массивов
-    const Index: LongInt;                   //  "сквозной" индекс элемента
-    var ArrayNumber: LongInt;               //  номер массива, содержащего
-                                            //  нужный элемент
-    var ArrayIndex: LongInt                 //  индекс элемента в этом массиве
+    const ArraysLengths: array of LongInt;  //  Array of array lengths.
+    const Index: LongInt;                   //  Through index of element.
+    var ArrayNumber: LongInt;               //  Number of the array containing the element.
+    var ArrayIndex: LongInt                 //  Index of element in the array.
     );
 
 function ReadComponentByReader(const Reader: TReader): TComponent;
+//	Free object and perform additional actions if necessary.
+//	Use this function to free all the objects.
 procedure UtilizeObject(PtrToObject: TObject);
-    //  функция уничтожения объектов - выполняет дополнительные
-    //  действия, связанные с уничтожением объектов; пока только
-    //  проверка на тип TCBRCComponent и вызов его метода Free
-    //  с помощью этой функции нужно уничтожать все объекты программы
 
 implementation
 
@@ -141,7 +137,7 @@ var i: LongInt;
     Index, PrevIndex: LongInt;
     TempChar: Char;
 begin
-    PrevIndex := 2;     //  символы нумеруются, начиная с 1 ?
+    PrevIndex := 2;
     for i := 1 to 3 do
     begin
         Index := GetCharSetPosition(St, [',', ')'], 1, PrevIndex, TempChar);
@@ -184,7 +180,7 @@ function StringAsDoubleVector3(const Str: string): TDoubleVector3;
 var i, BegIndex, VectIndex: LongInt;
     Str2: string;
     PrevIsDelimiter: Boolean;
-        //  предыдуший символ был среди разделителей ?
+
 begin
     BegIndex := -1; VectIndex := 1; PrevIsDelimiter := False;
     for i := 1 to Length(Str) do
@@ -208,14 +204,12 @@ end;
 function WithGivenAccuracy(Value: Double; Decimals: LongInt): Double;
 var PowerOf10: Double;
     TempLong: LongInt;
-//    St: string;
+
 begin
     PowerOf10 := GetPowerOf10(Decimals);
     Result := Value * PowerOf10;
     TempLong := Round(Result);
     Result := TempLong / PowerOf10;
-//    St := FloatToStrF(Value, ffFixed, 8, Decimals);
-//    Result := StrToFloat(St);
 end;
 
 function GetCmdLineParameters: string;
@@ -223,7 +217,7 @@ var St: string;
     Index: LongInt;
     Index1, Index2: LongInt;
 begin
-    St := '';//???GetCommandLine;
+    St := GetCommandLine;
     Index1 := -1; Index2 := -1;
 
     for Index := Length(St) downto 1 do
@@ -303,8 +297,8 @@ const ParamRequest: FParamRequest): Double;
             begin
                 if (Index = 1) then
                 begin
-                    //  ситуация, когда первое число отрицательное}
-                    //  здесь проходит когда проверяется наличие операций ['+', '-']
+					//	The case when the first number is negative.
+					//	Processing '+', '-' operations.
                     TempIndex := Index;
                     Index := GetCharSetPosition(Expression, OperSet, 1, TempIndex + 1, Oper);
                     if Index = -1 then Exit;
@@ -317,7 +311,7 @@ const ParamRequest: FParamRequest): Double;
 
             if (IndexR = Index + 1) and (Expression[Index + 1] = '-') then
             begin
-                //  ситуация, когда следующее за операцией число отрицательное
+				//	The case when the number following the operation is negative.
                 IndexR := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexR + 1, TempCh);
                 if IndexR = -1 then IndexR := Length(Expression) + 1;
@@ -325,7 +319,7 @@ const ParamRequest: FParamRequest): Double;
 
             if (IndexL = Index - 1) and (Expression[Index] = '-') then
             begin
-                //  ситуация, когда предыдущее операции число отрицательное
+				//	The case when the number preceding the operation is negative.
                 IndexL := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexL - 1, TempCh);
                 if IndexR = -1 then IndexL := 0;
@@ -446,8 +440,8 @@ end;
 procedure GetPosInArrays(
     const ArraysLengths: array of LongInt; const Index: LongInt;
     var ArrayNumber: LongInt; var ArrayIndex: LongInt);
-var TotalNumber: LongInt;   //  полное число элементов
-    LengthsSum: LongInt;    //  сумма длин массивов
+var TotalNumber: LongInt;   //  Total number of items in arrays.
+    LengthsSum: LongInt;    //  Sum of array lengths.
     i: LongInt;
 begin
     if Length(ArraysLengths) = 0 then
@@ -471,7 +465,6 @@ begin
 end;
 
 procedure AddVectorToArray(
-    //  добавляет вектор к концу массива векторов
     var Arr: TVector3Array;
     const Vector: TDoubleVector3
     );
@@ -481,7 +474,6 @@ begin
 end;
 
 procedure InsertVectorIntoArray(
-    //  вставляет вектор в массив в позицию Index
     var Arr: TVector3Array;
     const Index: LongInt;
     const Vector: TDoubleVector3
@@ -542,7 +534,7 @@ end;
 procedure InsertItemLongArr(
     var Arr: TLongArray;
     const Index: LongInt;
-    const Item: LongInt     //  вставляемое значение
+    const Item: LongInt
     );
 var i: LongInt;
 begin

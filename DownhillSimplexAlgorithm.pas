@@ -14,8 +14,8 @@ unit DownhillSimplexAlgorithm;
 interface
 
 uses
-    Classes, SelfCheckedComponentList, Decisions, Algorithm, Tools, MyExceptions,
-    (*Windows  ??? ubrat' ,*) Sysutils(* ??? ubrat' *);
+    Classes, SelfCheckedComponentList, Decisions, Algorithm, Tools,
+    MyExceptions, Windows, Sysutils;
 
 type
     TDownhillSimplexDecision = class(TFloatDecision)
@@ -154,8 +154,8 @@ implementation
 
 procedure Register;
 begin
-    RegisterComponents('Fit', [TDownhillSimplexAlgorithm]);
-    RegisterComponents('Fit', [TDownhillSimplexSAAlgorithm]);
+    RegisterComponents('FitMinimizers', [TDownhillSimplexAlgorithm]);
+    RegisterComponents('FitMinimizers', [TDownhillSimplexSAAlgorithm]);
 end;
 
 procedure TDownhillSimplexAlgorithm.Restart;
@@ -601,12 +601,6 @@ begin
 end;
 
 initialization
-(* ???
-    RegisterClass(TDownhillSimplexAlgorithm);
-    RegisterClass(TDownhillSimplexSAAlgorithm);
-    RegisterClass(TDownhillSimplexDecision);
-    RegisterClass(TDownhillSimplexSADecision);
-*)
 end.
 
 

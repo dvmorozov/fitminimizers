@@ -18,19 +18,16 @@ uses SysUtils, Classes, SelfCheckedComponentList, MyExceptions, SimpMath;
 type
   TAbstractDecision = class(TComponent)
   protected
-    FEvaluation: Double;
-    (*!!! znachenie Evaluation mozhet byt' i otritsatel'nym !!!*)
+    FEvaluation: Double;	//	Value can be negative!
     function GetParametersNumber: LongInt; virtual; abstract;
     procedure SetParametersNumber(
     AParametersNumber: LongInt); virtual; abstract;
   public
+	//	Initialize all the fields of created copy of solution.
     procedure FillCopy(const Copy: TAbstractDecision); virtual; abstract;
-    (*pravil'no zapolnyaet vse polya sozdannoy kopii resheniya*)
     function GetCopy: TAbstractDecision; virtual; abstract;
-    (*!!! obyazatel'no perekryvat' GetCopy i FillCopy u vseh potomkov !!!*)
-    function Coincide(
-    const Decision: TAbstractDecision): Boolean; virtual; abstract;
-    (*vozvraschaet True, esli parametry resheniy sovpadayut*)
+	//	Return True if all values of parameters of solutions coincide.
+    function Coincide(const Decision: TAbstractDecision): Boolean; virtual; abstract;
 
     property Evaluation: Double read FEvaluation write FEvaluation;
     property ParametersNumber: LongInt
@@ -39,55 +36,51 @@ type
 
   TOneDimDecision = class(TAbstractDecision)
   public
+	//	Invert parameter to opposite value.
     procedure InvertParameter(const ParamNum: LongInt); virtual; abstract;
-    (*izmenyaet znachenie parametra na protivopolozhnoe*)
+	//	Swap parameters of solution with give indicies.
     procedure ExchangeParameters(
-    const ParamNum1, ParamNum2: LongInt); virtual; abstract;
-    (*menyaet parametry mestami v predelah resheniya*)
+		const ParamNum1, ParamNum2: LongInt); virtual; abstract;
+	//	Exchanging parameter values with other solution.
     procedure ExchangeWithOuter(const Decision: TAbstractDecision;
-    ParamNum: LongInt); virtual; abstract;
-    (*obmen parametrami s drugim resheniem*)
+		ParamNum: LongInt); virtual; abstract;
+	//	Copy value of parameter into given position.
     procedure CopyParameter(
-    const ParamNum, NewParamNum: LongInt); virtual; abstract;
-    (*kopiruet znachenie parametra v ukazannuyu pozitsiyu
-    !!! staroe znachenie parametra v pozitsii pri etom zatiraetsya !!!*)
+		const ParamNum, NewParamNum: LongInt); virtual; abstract;
   end;
 
+  //  	Abstract component for building solutions with two-dimensional array of parameters.
+  //	Every row of the array represents single gene.
   TTwoDimDecision = class(TAbstractDecision)
-  (*abstraktnyy komponent dlya postroeniya resheniy s dvumernym
-  massivom parametrov; kazhdyy stroka massiva - odin gen*)
   protected
     function GetGenesNumber: LongInt; virtual; abstract;
     procedure SetGenesNumber(AGenesNumber: LongInt); virtual; abstract;
   public
     procedure InvertParameter(const GeneNum,
-    ParamNum: LongInt); virtual; abstract;
+		ParamNum: LongInt); virtual; abstract;
+	//	Change values of parameters on the opposite.
     procedure InvertBlock(const StartGeneNum, EndGeneNum,
-    StartParamNum, EndParamNum: LongInt); virtual;
-    (*izmenyaet znachenie parametra na protivopolozhnoe*)
-
+		StartParamNum, EndParamNum: LongInt); virtual;
+	//	Swap parameters of the solution.
     procedure ExchangeParameters(const GeneNum1, ParamNum1,
-    GeneNum2, ParamNum2: LongInt); virtual; abstract;
-    (*menyaet parametry mestami v predelah resheniya*)
+		GeneNum2, ParamNum2: LongInt); virtual; abstract;
+	//	Exchanging parameter values with other solution.
     procedure ExchangeWithOuter(const Decision: TAbstractDecision;
-    MyGeneNum, OuterGeneNum, ParamNum: LongInt); virtual; abstract;
+		MyGeneNum, OuterGeneNum, ParamNum: LongInt); virtual; abstract;
     procedure ExchangeBlocksWithOuter(
-    const Decision: TAbstractDecision; StartGeneNum, EndGeneNum,
-    StartParamNum, EndParamNum: LongInt); virtual;
-    (*obmen parametrami s drugim resheniem*)
+		const Decision: TAbstractDecision; StartGeneNum, EndGeneNum,
+		StartParamNum, EndParamNum: LongInt); virtual;
 
+	//	Copy values of parameters into given positions.
     procedure CopyParameter(const SrcGeneNum, SrcParamNum,
-    DestGeneNum, DestParamNum: LongInt); virtual; abstract;
+		DestGeneNum, DestParamNum: LongInt); virtual; abstract;
     procedure CopyBlock(const StartGeneNum, EndGeneNum, StartParamNum,
-    EndParamNum, GeneOffset, ParamOffset: LongInt); virtual; abstract;
-    (*kopiruet znachenie parametra v ukazannuyu pozitsi
-    !!! staroe znachenie parametra v pozitsii pri etom zatiraetsya !!!*)
+		EndParamNum, GeneOffset, ParamOffset: LongInt); virtual; abstract;
 
     property GenesNumber: LongInt read GetGenesNumber write SetGenesNumber;
   end;
 
-  (*bazovye komponenty - resheniya dlya raboty s parametrami razlichnyh tipov*)
-
+  //	Base classes to work with different types of solutions.
   EFloatDecision = class(Exception);
 
   TFloatDecision = class(TOneDimDecision)
@@ -128,8 +121,8 @@ type
     procedure FillCopy(const Copy: TAbstractDecision); override;    
     function GetCopy: TAbstractDecision; override;
     function Coincide(const Decision: TAbstractDecision): Boolean; override;
+	//	Invert the byte by means of NOT operation.
     procedure InvertParameter(const ParamNum: LongInt); override;
-    (*invertiruet bayt posredstvom operatsii not*)
     procedure ExchangeParameters(
     const ParamNum1, ParamNum2: LongInt); override;
     procedure ExchangeWithOuter(const Decision: TAbstractDecision;
@@ -143,9 +136,8 @@ type
 
   ETwoDimFloatDecision = class(Exception);
 
+  //	The "gene" corresponds to column of two-dimensional matrix.
   TTwoDimFloatDecision = class(TTwoDimDecision)
-  (*ponyatie "gen" v dannom komponente
-  oznachaet stolbets dvumernoy matritsy*)
   protected
     FParameters: array of array of Double;
     FParametersNumber: LongInt;
@@ -165,19 +157,19 @@ type
     function Coincide(const Decision: TAbstractDecision): Boolean; override;
 
     procedure InvertParameter(const GeneNum,
-    ParamNum: LongInt); override;
+		ParamNum: LongInt); override;
     procedure ExchangeParameters(const GeneNum1, ParamNum1,
-    GeneNum2, ParamNum2: LongInt); override;
+		GeneNum2, ParamNum2: LongInt); override;
     procedure CopyParameter(const SrcGeneNum, SrcParamNum,
-    DestGeneNum, DestParamNum: LongInt); override;
+		DestGeneNum, DestParamNum: LongInt); override;
     procedure ExchangeWithOuter(const Decision: TAbstractDecision;
-    MyGeneNum, OuterGeneNum, ParamNum: LongInt); override;
+		MyGeneNum, OuterGeneNum, ParamNum: LongInt); override;
+	//	EndGeneNum must be >= StartGeneNum, EndParamNum must be >= StartParamNum!
     procedure CopyBlock(const StartGeneNum, EndGeneNum, StartParamNum,
-    EndParamNum, GeneOffset, ParamOffset: LongInt); override;
-    (*!!! EndGeneNum d.b. >= StartGeneNum, EndParamNum d.b. >= StartParamNum !!!*)
+		EndParamNum, GeneOffset, ParamOffset: LongInt); override;
 
     property Parameters[index: LongInt]: Double
-    read GetParameter write SetParameter; default;
+		read GetParameter write SetParameter; default;
     property SelectedGene: LongInt read GetSelectedGene write SetSelectedGene;
   end;
 
@@ -185,28 +177,23 @@ type
 
   TDecisionsList = class(TSelfCheckedComponentList)
   public
+	//	Return solution having maximum estimation value less than UpLimit, starting from 'StartIndex'. 
+	//	Items must be sorted by decreasing of estimating value!
     function GetMaxDecision(
-    const StartIndex: LongInt; UpLimit: Double): TAbstractDecision;
-    (*vozvraschaet reshenie, imeyuschee maksimal'noe znachenie Evaluation
-    sredi teh, u kot. znachenie Evaluation <= UpLimit, nachinaya so StartIndex
-    !!! funktsiya budet rabotat' pravil'no, tol'ko esli elementy spiska
-    otsortirovany po ubyvaniyu Evaluation !!!
-    ??? ne vnesti li sortirovku pryamo v funktsiyu ???*)
+		const StartIndex: LongInt; UpLimit: Double): TAbstractDecision;
+	//	Return solution having minimum estimation value greater than LowLimit, starting from 'StartIndex'.
+	//	Items must be sorted by increasing of estimating value!
     function GetMinDecision(
-    const StartIndex: LongInt; LowLimit: Double): TAbstractDecision;
-    (*vozvraschaet reshenie, imeyuschee minimal'noe znachenie Evaluation
-    sredi teh, u kot. znachenie Evaluation >= LowLimit, nachinaya so StartIndex
-    !!! funktsiya budet rabotat' pravil'no, tol'ko esli elementy spiska
-    otsortirovany po vozrastaniyu Evaluation !!!*)
+		const StartIndex: LongInt; LowLimit: Double): TAbstractDecision;
     function GetAbsoluteMin: TAbstractDecision;
     function GetAbsoluteMax: TAbstractDecision;
     function HasThisDecision(const Decision: TAbstractDecision): Boolean;
   end;
 
+//	Sorting by decrease of estimating value.  
 function EvalDownSortFunc(Item1, Item2: Pointer): Integer;
-(*sortirovka po ubyvaniyu Evaluation*)
+//	Sorting by increase of estimating value.  
 function EvalUpSortFunc(Item1, Item2: Pointer): Integer;
-(*sortirovka po vozrastaniyu Evaluation*)
 
 const
   EvalDownSort: TListSortCompare = EvalDownSortFunc;
@@ -545,7 +532,7 @@ begin
 end;
 
 procedure TTwoDimFloatDecision.ExchangeWithOuter(
-const Decision: TAbstractDecision; MyGeneNum, OuterGeneNum, ParamNum: LongInt);
+	const Decision: TAbstractDecision; MyGeneNum, OuterGeneNum, ParamNum: LongInt);
 var TempDouble: Double;
 begin
   if not (Decision is TTwoDimFloatDecision) then
@@ -561,7 +548,7 @@ begin
 end;
 
 procedure TTwoDimFloatDecision.CopyParameter(
-const SrcGeneNum, SrcParamNum, DestGeneNum, DestParamNum: LongInt);
+	const SrcGeneNum, SrcParamNum, DestGeneNum, DestParamNum: LongInt);
 var TempDouble: Double;
 begin
   SelectedGene := SrcGeneNum;
@@ -571,14 +558,12 @@ begin
 end;
 
 procedure TTwoDimFloatDecision.CopyBlock(const StartGeneNum, EndGeneNum,
-StartParamNum, EndParamNum, GeneOffset, ParamOffset: LongInt);
+	StartParamNum, EndParamNum, GeneOffset, ParamOffset: LongInt);
 var SavedBlock: array of array of Double;
     i, j: LongInt;
     Index1, Index2: LongInt;
 begin
-  (*poskol'ku oblast' naznacheniya mozhet perekryvat'sya s
-  ishodnoy oblast'yu, to nuzhno predvaritel'no sohranit'
-  kopiruemuyu informatsiyu v promezhutochnom massive*)
+  //  Intermediate array is used because destination and source can override.
   SetLength(SavedBlock, EndGeneNum - StartGeneNum + 1);
   for i := 0 to Length(SavedBlock) - 1 do
     SetLength(SavedBlock[i], EndParamNum - StartParamNum + 1);
@@ -613,8 +598,8 @@ begin
 end;
 
 procedure TTwoDimDecision.ExchangeBlocksWithOuter(
-const Decision: TAbstractDecision; StartGeneNum,
-EndGeneNum, StartParamNum, EndParamNum: LongInt);
+	const Decision: TAbstractDecision; StartGeneNum,
+	EndGeneNum, StartParamNum, EndParamNum: LongInt);
 var i, j: LongInt;
 begin
   for i := StartGeneNum to EndGeneNum do
@@ -623,7 +608,7 @@ begin
 end;
 
 procedure TTwoDimDecision.InvertBlock(const StartGeneNum,
-EndGeneNum, StartParamNum, EndParamNum: LongInt);
+	EndGeneNum, StartParamNum, EndParamNum: LongInt);
 var i, j: LongInt;
 begin
   for i := StartGeneNum to EndGeneNum do
@@ -632,9 +617,7 @@ begin
 end;
 
 function TDecisionsList.GetMaxDecision(
-const StartIndex: LongInt; UpLimit: Double): TAbstractDecision;
-(*vozvraschaet reshenie, imeyuschee maksimal'noe znachenie Evaluation
-sredi teh, u kot. znachenie Evaluation <= UpLimit, nachinaya so StartIndex*)
+	const StartIndex: LongInt; UpLimit: Double): TAbstractDecision;
 var i: LongInt;
     Decision: TAbstractDecision;
     Max: Double;
@@ -667,9 +650,7 @@ begin
 end;
 
 function TDecisionsList.GetMinDecision(
-const StartIndex: LongInt; LowLimit: Double): TAbstractDecision;
-(*vozvraschaet reshenie, imeyuschee minimal'noe znachenie Evaluation
-sredi teh, u kot. znachenie Evaluation >= LowLimit, nachinaya so StartIndex*)
+	const StartIndex: LongInt; LowLimit: Double): TAbstractDecision;
 var i: LongInt;
     Decision: TAbstractDecision;
     Min: Double;
@@ -752,7 +733,6 @@ begin
 end;
 
 function EvalUpSortFunc(Item1, Item2: Pointer): Integer;
-(*sortirovka po vozrastaniyu Evaluation*)
 var Decision1: TAbstractDecision absolute Item1;
     Decision2: TAbstractDecision absolute Item2;
 begin
@@ -762,7 +742,6 @@ begin
 end;
 
 function EvalDownSortFunc(Item1, Item2: Pointer): Integer;
-(*sortirovka po ubyvaniyu Evaluation*)
 var Decision1: TAbstractDecision absolute Item1;
     Decision2: TAbstractDecision absolute Item2;
 begin

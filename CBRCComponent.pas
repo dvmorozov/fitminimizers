@@ -16,33 +16,19 @@ interface
 uses Classes;
 
 type
+	//	The object is freed only when reference counter is equal to zero.
+	//	The object isn't freed automatically, the destructor must be called as usual.
+	//	In the case of cyclical references objects will be undestructable.
     TCBRCComponent = class(TComponent)
-        {  the component Controlled By References Counter (CBRC) }
-        //  компонент, уничтожение которого управляется числом ссылок на него
-        //  через интерфейсы; при вызове деструктора компонент уничтожается
-        //  только в том случае, если число ссылок на его интерфейсы равно нулю,
-        //  если же число ссылок стало равно нулю, то компонент не уничтожается
-        //  до тех пор пока не будет вызван деструктор (??? нало ли сделать
-        //  классовый метод, который бы создавал объекты, управляемые только
-        //  числом ссылок и возвращал бы ссылку на IUnknown объекта ???)
-        //  !!! объект не должен давать указатель на свой интерфейс
-        //  никакому из дочерних объектов, в противном случае такой
-        //  объект вообще не сможет уничтожиться !!!
+	{  the component Controlled By References Counter (CBRC) }
     protected
-        FRefCount: LongInt;         //  число ссылок на объект
-        IntControlled: Boolean;     //  признак того, что уничтожение
-                                    //  объекта управляется числом ссылок
-                                    //  устанавливается в методе Free
+        FRefCount: LongInt;         //  Reference counter.
+        IntControlled: Boolean;     
 
         function _AddRef: Integer; virtual; stdcall; 
         function _Release: Integer; virtual; stdcall;
     public
         procedure Free;
-            //  поскольку метод Free не виртуальный, а просто переопределен
-            //  то нельзя присваивать указатель на объект переменной типа -
-            //  предка TCBRCComponent, либо нужно делать явное преобразование
-            //  типа перед вызовом Free
-
         property RefCount: LongInt read FRefCount;
     end;
 
@@ -50,9 +36,6 @@ implementation
 
 procedure TCBRCComponent.Free;
 begin
-    //  Free - метод класса, поэтому может вызываться даже когда
-    //  объект не был распределен в памяти, поэтому перед доступом
-    //  требуется проверка
     if Assigned(Self) then
     begin
         if RefCount = 0 then Destroy

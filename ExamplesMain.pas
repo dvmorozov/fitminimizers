@@ -7,10 +7,15 @@ unit ExamplesMain;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
+  DownhillSimplexAlgorithm;
 
 type
+
+  { TForm1 }
+
   TForm1 = class(TForm)
+    DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
   private
     { private declarations }
   public
