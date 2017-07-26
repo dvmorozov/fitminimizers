@@ -1,1 +1,12 @@
 theme: jekyll-theme-minimal
+gems: 
+  - jekyll-paginate
+  - jekyll-seo-tag
+title: Delphi & Lazarus downhill simplex optimizing components
+description: A couple of components implementing downhill simplex algorithm for Delphi & Lazarus.
+social:
+  name: Dmitry Morozov
+  links:
+    - https://www.facebook.com/profile.php?id=100004082021870
+    - https://ru.linkedin.com/pub/dmitry-morozov/59/90a/794
+    - https://github.com/dvmorozov 
