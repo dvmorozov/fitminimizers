@@ -1,0 +1,45 @@
+package FitMinimizers;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl;
+
+contains
+  Algorithm in 'Algorithm.pas',
+  CBRCComponent in 'CBRCComponent.pas',
+  Decisions in 'Decisions.pas',
+  DownhillSimplexAlgorithm in 'DownhillSimplexAlgorithm.pas',
+  ExamplesMain in 'ExamplesMain.pas',
+  MyExceptions in 'MyExceptions.pas',
+  SelfCheckedComponentList in 'SelfCheckedComponentList.pas',
+  SimpMath in 'SimpMath.pas',
+  Tools in 'Tools.pas';
+
+end.

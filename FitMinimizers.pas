@@ -8,16 +8,23 @@ interface
 
 uses
   Tools, SimpMath, MyExceptions, CBRCComponent, Algorithm, 
-  SelfCheckedComponentList, Decisions, DownhillSimplexAlgorithm, 
-  LazarusPackageIntf;
+  SelfCheckedComponentList, Decisions, DownhillSimplexAlgorithm
+{$ifdef Lazarus}
+  ,LazarusPackageIntf
+{$endif}
+  ;
 
 implementation
 
 procedure Register;
 begin
+{$ifdef Lazarus}
   RegisterUnit('DownhillSimplexAlgorithm', @DownhillSimplexAlgorithm.Register);
+{$endif}
 end;
 
 initialization
+{$ifdef Lazarus}
   RegisterPackage('FitMinimizers', @Register);
+{$endif}
 end.
