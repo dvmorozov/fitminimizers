@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E7F059C2-A9BC-4E6E-8031-89DD9E07C089}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="FitMinimizers.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="FitMinimizers">
+        <MSBuild Projects="FitMinimizers.dproj"/>
+    </Target>
+    <Target Name="FitMinimizers:Clean">
+        <MSBuild Projects="FitMinimizers.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FitMinimizers:Make">
+        <MSBuild Projects="FitMinimizers.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="FitMinimizers"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="FitMinimizers:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="FitMinimizers:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
