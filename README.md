@@ -16,4 +16,4 @@ Downhill simplex algorithm with simulated annealing.
 
 These components are used in following projects  
 [MotifMASTER](http://motifmaster.sourceforge.net/)  
-[Fit](http://fiteasily.townbreath.com/fit/downloads.html)  
+[Fit](https://github.com/dvmorozov/fit)  
