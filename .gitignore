@@ -2,3 +2,13 @@
 *.ppu
 *.compiled
 *.bak
+*.dcu
+*.exe
+*.local
+*.~1~
+*.identcache
+*.~2~
+*.~3~
+*.~4~
+i386-linux
+/Examples

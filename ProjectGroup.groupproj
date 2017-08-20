@@ -1,9 +1,12 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{E7F059C2-A9BC-4E6E-8031-89DD9E07C089}</ProjectGuid>
+        <ProjectGuid>{AF97D0E8-FA67-4766-912D-4356B512BDFD}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <Projects Include="FitMinimizers.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Examples.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -23,14 +26,23 @@
     <Target Name="FitMinimizers:Make">
         <MSBuild Projects="FitMinimizers.dproj" Targets="Make"/>
     </Target>
+    <Target Name="Examples">
+        <MSBuild Projects="Examples.dproj"/>
+    </Target>
+    <Target Name="Examples:Clean">
+        <MSBuild Projects="Examples.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Examples:Make">
+        <MSBuild Projects="Examples.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="FitMinimizers"/>
+        <CallTarget Targets="FitMinimizers;Examples"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="FitMinimizers:Clean"/>
+        <CallTarget Targets="FitMinimizers:Clean;Examples:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="FitMinimizers:Make"/>
+        <CallTarget Targets="FitMinimizers:Make;Examples:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

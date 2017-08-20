@@ -21,6 +21,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
+        <CursorPos X="32" Y="11"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -28,27 +29,27 @@
       <Unit2>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
         <EditorIndex Value="1"/>
-        <CursorPos Y="9"/>
+        <TopLine Value="512"/>
+        <CursorPos X="43" Y="524"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="C:\lazarus\ide\lazarus.pp"/>
         <UnitName Value="Lazarus"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Algorithm.pas"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="3"/>
         <CursorPos Y="9"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="CBRCComponent.pas"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="4"/>
         <CursorPos Y="9"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
@@ -61,34 +62,35 @@
       </Unit6>
       <Unit7>
         <Filename Value="Decisions.pas"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="5"/>
         <CursorPos Y="13"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="MyExceptions.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="10"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="SimpMath.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="14"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="Tools.pas"/>
-        <EditorIndex Value="4"/>
-        <CursorPos Y="13"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="25" Y="17"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit10>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <OtherDefines Count="1">
+      <Define0 Value="Lazarus"/>
+    </OtherDefines>
+    <JumpHistory Count="12" HistoryIndex="11">
       <Position1>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
       </Position1>
@@ -97,11 +99,44 @@
         <Caret Line="9" Column="3"/>
       </Position2>
       <Position3>
-        <Filename Value="C:\lazarus\ide\lazarus.pp"/>
+        <Filename Value="ExamplesMain.pas"/>
       </Position3>
       <Position4>
         <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="6" Column="3"/>
       </Position4>
+      <Position5>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="7" Column="3"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="6" Column="8"/>
+      </Position6>
+      <Position7>
+        <Filename Value="DownhillSimplexAlgorithm.pas"/>
+        <Caret Line="9"/>
+      </Position7>
+      <Position8>
+        <Filename Value="DownhillSimplexAlgorithm.pas"/>
+        <Caret Line="524" Column="43" TopLine="512"/>
+      </Position8>
+      <Position9>
+        <Filename Value="DownhillSimplexAlgorithm.pas"/>
+        <Caret Line="561" Column="53" TopLine="549"/>
+      </Position9>
+      <Position10>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="10" Column="10"/>
+      </Position10>
+      <Position11>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="7" Column="36"/>
+      </Position11>
+      <Position12>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="6" Column="19"/>
+      </Position12>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

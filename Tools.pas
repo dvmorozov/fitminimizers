@@ -13,7 +13,11 @@ unit Tools;
 
 interface
 
-uses SysUtils, Classes, SimpMath, CBRCComponent, Windows;
+uses SysUtils, Classes, SimpMath, CBRCComponent
+{$IFNDEF Lazarus}
+, Windows
+{$ENDIF}
+;
 
 type
 	//	Return value of the parameter 'Param'.
@@ -217,7 +221,7 @@ var St: string;
     Index: LongInt;
     Index1, Index2: LongInt;
 begin
-    St := GetCommandLine;
+    St := ''; //??? GetCommandLine;
     Index1 := -1; Index2 := -1;
 
     for Index := Length(St) downto 1 do

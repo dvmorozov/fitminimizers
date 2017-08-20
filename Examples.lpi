@@ -67,6 +67,12 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dLazarus"/>
+      <OtherDefines Count="1">
+        <Define0 Value="Lazarus"/>
+      </OtherDefines>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">
