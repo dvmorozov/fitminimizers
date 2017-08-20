@@ -15,7 +15,11 @@ interface
 
 uses
     Classes, SelfCheckedComponentList, Decisions, Algorithm, Tools,
-    MyExceptions, Windows, Sysutils;
+    MyExceptions,
+    {$IFNDEF Lazarus}
+    Windows,
+    {$ENDIF}
+    Sysutils;
 
 type
     TDownhillSimplexDecision = class(TFloatDecision)

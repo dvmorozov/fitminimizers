@@ -1,25 +1,24 @@
 unit ExamplesMain;
 
-{$IFDEF Lazarus}
-{$mode objfpc}{$H+}
-{$ENDIF}
-
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  DownhillSimplexAlgorithm;
+  {$IFNDEF Lazarus}
+  Winapi.Windows, Winapi.Messages,
+  System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  {$ELSE}
+  SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs,
+  {$ENDIF}
+  Algorithm, DownhillSimplexAlgorithm;
 
 type
-
-  { TForm1 }
-
   TForm1 = class(TForm)
     DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
   private
-    { private declarations }
+    { Private declarations }
   public
-    { public declarations }
+    { Public declarations }
   end;
 
 var
@@ -27,7 +26,6 @@ var
 
 implementation
 
-{$R *.lfm}
+{$R *.dfm}
 
 end.
-
