@@ -871,7 +871,7 @@ end;
 //	according to the given value of norma.
 procedure T3DVector.SetNorma(const ANorma: Double);
 begin
-	raise ENotImplemented.Create('T3DVector.SetNorma');
+	raise Exception.Create('T3DVector.SetNorma');
 end;
 
 function T3DVector.GetCompsNumber: LongInt;
@@ -893,7 +893,7 @@ begin
     else FVector[index + 1] := AComp;
     
 	//  Calculating components of normalized vector.
-	raise ENotImplemented.Create('T3DVector.SetComp');
+	raise Exception.Create('T3DVector.SetComp');
 end;
 
 function T3DVector.GetNormComp(index: LongInt): Double;
@@ -905,17 +905,17 @@ end;
 
 function T3DComplexVector.GetImComp(index: LongInt): Double;
 begin
-	raise ENotImplemented.Create('T3DComplexVector.GetImComp');
+	raise Exception.Create('T3DComplexVector.GetImComp');
 end;
 
 procedure T3DComplexVector.SetImComp(index: LongInt; AImComp: Double);
 begin
-	raise ENotImplemented.Create('T3DComplexVector.SetImComp');
+	raise Exception.Create('T3DComplexVector.SetImComp');
 end;
 
 function T3DComplexVector.GetNormImComp(index: LongInt): Double;
 begin
-	raise ENotImplemented.Create('T3DComplexVector.GetNormImComp');
+	raise Exception.Create('T3DComplexVector.GetNormImComp');
 end;
 
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;
