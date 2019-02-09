@@ -16,13 +16,15 @@ interface
 uses Classes;
 
 type
-	//	The object is freed only when reference counter is equal to zero.
-	//	The object isn't freed automatically, the destructor must be called as usual.
-	//	In the case of cyclical references objects will be undestructable.
     TCBRCComponent = class(TComponent)
-	{  the component Controlled By References Counter (CBRC) }
+	{ Component Controlled By References Counter (CBRC).
+	  The object is freed only when reference counter is equal to zero.
+	  The object isn't freed automatically, the destructor must be called
+          as usual. In the case of cyclical references objects will be
+          undestructable. }
     protected
-        FRefCount: LongInt;         //  Reference counter.
+        { Reference counter. }
+        FRefCount: LongInt;
         IntControlled: Boolean;     
 
         function _AddRef: Integer; virtual; stdcall; 
