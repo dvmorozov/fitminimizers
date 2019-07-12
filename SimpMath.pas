@@ -919,17 +919,19 @@ end;
 
 function T3DComplexVector.GetImComp(index: LongInt): Double;
 begin
-	raise Exception.Create('T3DComplexVector.GetImComp');
+     Result := 0;
+     raise Exception.Create('T3DComplexVector.GetImComp');
 end;
 
 procedure T3DComplexVector.SetImComp(index: LongInt; AImComp: Double);
 begin
-	raise Exception.Create('T3DComplexVector.SetImComp');
+     raise Exception.Create('T3DComplexVector.SetImComp');
 end;
 
 function T3DComplexVector.GetNormImComp(index: LongInt): Double;
 begin
-	raise Exception.Create('T3DComplexVector.GetNormImComp');
+     Result := 0;
+     raise Exception.Create('T3DComplexVector.GetNormImComp');
 end;
 
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;
