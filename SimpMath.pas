@@ -299,7 +299,11 @@ end;
 function GetScalarMulAN(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
 var V1, V2: TDoubleVector3;
+    i: Integer;
 begin
+    for i := Low(V1) to High(V1) do V1[i] := 0;
+    for i := Low(V2) to High(V2) do V2[i] := 0;
+
     GetUnitVectA(Vect1, A, B, C, Alpha, Beta, Gamma, V1);
     GetUnitVectA(Vect2, A, B, C, Alpha, Beta, Gamma, V2);
 
@@ -827,7 +831,12 @@ function GetVectInNewBasis(
     InitialVect: TDoubleVector3
     ): TDoubleVector3;
 var MutVect1, MutVect2, MutVect3: TDoubleVector3;
+    i: Integer;
 begin
+    for i := Low(MutVect1) to High(MutVect1) do MutVect1[i] := 0;
+    for i := Low(MutVect2) to High(MutVect2) do MutVect2[i] := 0;
+    for i := Low(MutVect3) to High(MutVect3) do MutVect3[i] := 0;
+    
     GetMutualVectorsInNewBasis(A, B, C, Alpha, Beta, Gamma,
     NewBasisVect1, NewBasisVect2, NewBasisVect3,
     MutVect1, MutVect2, MutVect3);
@@ -840,7 +849,12 @@ function GetVectorMulA(
     const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): TDoubleVector3;
 var V1, V2, V3: TDoubleVector3;
+    i: Integer;
 begin
+    for i := Low(V1) to High(V1) do V1[i] := 0;
+    for i := Low(V2) to High(V2) do V2[i] := 0;
+    for i := Low(V3) to High(V3) do V3[i] := 0;
+    
     GetMutualVectors(A, B, C, Alpha, Beta, Gamma, V1, V2, V3);
     V1 := MulVectByValue(V1, Vect1[2] * Vect2[3] - Vect1[3] * Vect2[2]);
     V2 := MulVectByValue(V2, Vect1[3] * Vect2[1] - Vect1[1] * Vect2[3]);
