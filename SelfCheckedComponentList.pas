@@ -265,9 +265,12 @@ begin
     Clear;
 end;
 
+{$hints off}
 procedure TSelfCheckedComponentList.LinkItemWithList(const Item: TComponent);
 begin
+     raise Exception.Create('Method not implemented.');
 end;
+{$hints on}
 
 procedure TSelfCheckedComponentList.IsReady;
 var i: LongInt;
