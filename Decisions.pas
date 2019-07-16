@@ -553,7 +553,8 @@ var TempDouble: Double;
 begin
   SelectedGene := SrcGeneNum;
   TempDouble := Self[SrcParamNum];
-  SelectedGene := DestParamNum;
+  { Selects another item. }
+  SelectedGene := DestGeneNum;
   Self[DestParamNum] := TempDouble;
 end;
 
