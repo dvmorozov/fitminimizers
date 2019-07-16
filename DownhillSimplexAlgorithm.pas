@@ -441,6 +441,7 @@ begin
     end;    //  with DownhillSimplexServer do...
 end;
 
+{$hints off}
 procedure TDownhillSimplexAlgorithm.AlgorithmRealization;
 var Highest, NextHighest, Lowest: LongInt;
     Tolerance, PrevTolerance: Double;
@@ -500,6 +501,7 @@ begin
         EvaluateDecision(Self, BestDecision);
     end;
 end;
+{$hints on}
 
 procedure TDownhillSimplexSAAlgorithm.AlgorithmRealization;
 var Highest, NextHighest, Lowest: LongInt;
