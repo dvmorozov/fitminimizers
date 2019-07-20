@@ -144,6 +144,7 @@ begin
     PrevIndex := 2;
     for i := 1 to 3 do
     begin
+        TempChar := Char(0);
         Index := GetCharSetPosition(St, [',', ')'], 1, PrevIndex, TempChar);
         St2 := Copy(St, PrevIndex, Index - PrevIndex);
         Result[i] := StrToFloat(St2);
@@ -289,8 +290,11 @@ const ParamRequest: FParamRequest): Double;
         Oper, TempCh: Char;
     begin
         repeat
+            Oper := Char(0);
             Index := GetCharSetPosition(Expression, OperSet, 1, 1, Oper);
             if Index = -1 then Exit;
+            
+            TempCh := Char(0);
             IndexL := GetCharSetPosition(Expression,
                 ['*', '/', '+', '-'], -1, Index - 1, TempCh);
             if IndexL = -1 then IndexL := 0;
