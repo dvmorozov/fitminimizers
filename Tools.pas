@@ -144,6 +144,7 @@ begin
     PrevIndex := 2;
     for i := 1 to 3 do
     begin
+        TempChar := Char(0);
         Index := GetCharSetPosition(St, [',', ')'], 1, PrevIndex, TempChar);
         St2 := Copy(St, PrevIndex, Index - PrevIndex);
         Result[i] := StrToFloat(St2);
@@ -158,6 +159,7 @@ begin
                     FloatToStrF(Vector[3], ffGeneral, 6, 4) + ')';
 end;
 
+{$warnings off}
 function DoubleVector3AsString(const Vect: TDoubleVector3;
     FixedMode: Boolean; Precision, Digits: LongInt): string;
 var St: string;
@@ -179,6 +181,7 @@ begin
     {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SavedDecimalSeparator;
     Result := St;
 end;
+{$warnings on}
 
 function StringAsDoubleVector3(const Str: string): TDoubleVector3;
 var i, BegIndex, VectIndex: LongInt;
@@ -275,6 +278,7 @@ begin
     end;
 end;
 
+{$warnings off}
 function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
 const ParamRequest: FParamRequest): Double;
 
@@ -289,8 +293,11 @@ const ParamRequest: FParamRequest): Double;
         Oper, TempCh: Char;
     begin
         repeat
+            Oper := Char(0);
             Index := GetCharSetPosition(Expression, OperSet, 1, 1, Oper);
             if Index = -1 then Exit;
+
+            TempCh := Char(0);
             IndexL := GetCharSetPosition(Expression,
                 ['*', '/', '+', '-'], -1, Index - 1, TempCh);
             if IndexL = -1 then IndexL := 0;
@@ -404,6 +411,7 @@ begin
     end;
     {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SaveDecimalSeparator;
 end;
+{$warnings on}
 
 function CalculateExpr(var Expression: string;
     var ErrorCode: LongInt; const ParamRequest: FParamRequest): Double;
