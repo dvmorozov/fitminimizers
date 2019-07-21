@@ -38,7 +38,6 @@ type
         function GetSpace: ISpace;
         procedure SetSpace(const ASpace: ISpace);
         function GetNorma: Double;
-        procedure SetNorma(const ANorma: Double);
         function GetCompsNumber: LongInt;
         function GetComp(index: LongInt): Double;
         procedure SetComp(index: LongInt; AComp: Double);
@@ -47,7 +46,7 @@ type
         property Space: ISpace
                 read GetSpace           write SetSpace;
         property Norma: Double
-                read GetNorma           write SetNorma;
+                read GetNorma;
         property CompsNumber: LongInt
                 read GetCompsNumber;
         property Comps[index: LongInt]: Double
@@ -82,21 +81,21 @@ type
         function GetSpace: ISpace;
         procedure SetSpace(const ASpace: ISpace);
         function GetNorma: Double;
-        procedure SetNorma(const ANorma: Double);
+        procedure SetNorma(const ANorma: Double); virtual; abstract;
         function GetCompsNumber: LongInt;
         function GetComp(index: LongInt): Double;
-        procedure SetComp(index: LongInt; AComp: Double);
+        procedure SetComp(index: LongInt; AComp: Double); virtual; abstract;
         function GetNormComp(index: LongInt): Double;
 
     public
         property Space: ISpace
                 read GetSpace           write SetSpace;
         property Norma: Double
-                read GetNorma           write SetNorma;
+                read GetNorma;
         property CompsNumber: LongInt
                 read GetCompsNumber;
         property Comps[index: LongInt]: Double
-                read GetComp            write SetComp;
+                read GetComp;
         property NormComps[index: LongInt]: Double
                 read GetNormComp;
     end;
@@ -105,9 +104,9 @@ type
     protected
         FImVector: TDoubleVector3;  //  Imaginary part.
 
-        function GetImComp(index: LongInt): Double;
-        procedure SetImComp(index: LongInt; AImComp: Double);
-        function GetNormImComp(index: LongInt): Double;
+        function GetImComp(index: LongInt): Double; virtual; abstract;
+        procedure SetImComp(index: LongInt; AImComp: Double); virtual; abstract;
+        function GetNormImComp(index: LongInt): Double; virtual; abstract;
     public
         property ImComps[index: LongInt]: Double
                 read GetImComp          write SetImComp;
@@ -300,6 +299,8 @@ function GetScalarMulAN(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
 var V1, V2: TDoubleVector3;
 begin
+    V1[1] := 0; V1[2] := 0; V1[3] := 0;
+    V2[1] := 0; V2[2] := 0; V2[3] := 0;
     GetUnitVectA(Vect1, A, B, C, Alpha, Beta, Gamma, V1);
     GetUnitVectA(Vect2, A, B, C, Alpha, Beta, Gamma, V2);
 
@@ -828,9 +829,12 @@ function GetVectInNewBasis(
     ): TDoubleVector3;
 var MutVect1, MutVect2, MutVect3: TDoubleVector3;
 begin
+    MutVect1[1] := 0; MutVect1[2] := 0; MutVect1[3] := 0;
+    MutVect2[1] := 0; MutVect2[2] := 0; MutVect2[3] := 0;
+    MutVect3[1] := 0; MutVect3[2] := 0; MutVect3[3] := 0;
     GetMutualVectorsInNewBasis(A, B, C, Alpha, Beta, Gamma,
-    NewBasisVect1, NewBasisVect2, NewBasisVect3,
-    MutVect1, MutVect2, MutVect3);
+        NewBasisVect1, NewBasisVect2, NewBasisVect3,
+        MutVect1, MutVect2, MutVect3);
     Result[1] := GetScalarMulA(InitialVect, MutVect1, A, B, C, Alpha, Beta, Gamma);
     Result[2] := GetScalarMulA(InitialVect, MutVect2, A, B, C, Alpha, Beta, Gamma);
     Result[3] := GetScalarMulA(InitialVect, MutVect3, A, B, C, Alpha, Beta, Gamma);
@@ -841,6 +845,9 @@ function GetVectorMulA(
     A, B, C, Alpha, Beta, Gamma: Double): TDoubleVector3;
 var V1, V2, V3: TDoubleVector3;
 begin
+    V1[1] := 0; V1[2] := 0; V1[3] := 0;
+    V2[1] := 0; V2[2] := 0; V2[3] := 0;
+    V3[1] := 0; V3[2] := 0; V3[3] := 0;
     GetMutualVectors(A, B, C, Alpha, Beta, Gamma, V1, V2, V3);
     V1 := MulVectByValue(V1, Vect1[2] * Vect2[3] - Vect1[3] * Vect2[2]);
     V2 := MulVectByValue(V2, Vect1[3] * Vect2[1] - Vect1[1] * Vect2[3]);
@@ -867,13 +874,6 @@ begin
     Result := FNorma;
 end;
 
-//	Recalculated components of vector and unit vector
-//	according to the given value of norma.
-procedure T3DVector.SetNorma(const ANorma: Double);
-begin
-	raise ENotImplemented.Create('T3DVector.SetNorma');
-end;
-
 function T3DVector.GetCompsNumber: LongInt;
 begin
     Result := 3;
@@ -886,36 +886,11 @@ begin
     else Result := FVector[index + 1];
 end;
 
-procedure T3DVector.SetComp(index: LongInt; AComp: Double);
-begin
-    if (Index < 0) or (index > CompsNumber) then
-        raise E3DVector.Create('Invalid index...')
-    else FVector[index + 1] := AComp;
-    
-	//  Calculating components of normalized vector.
-	raise ENotImplemented.Create('T3DVector.SetComp');
-end;
-
 function T3DVector.GetNormComp(index: LongInt): Double;
 begin
     if (Index < 0) or (index > CompsNumber) then
         raise E3DVector.Create('Invalid index...')
     else Result := FNormalizedVector[index + 1];
-end;
-
-function T3DComplexVector.GetImComp(index: LongInt): Double;
-begin
-	raise ENotImplemented.Create('T3DComplexVector.GetImComp');
-end;
-
-procedure T3DComplexVector.SetImComp(index: LongInt; AImComp: Double);
-begin
-	raise ENotImplemented.Create('T3DComplexVector.SetImComp');
-end;
-
-function T3DComplexVector.GetNormImComp(index: LongInt): Double;
-begin
-	raise ENotImplemented.Create('T3DComplexVector.GetNormImComp');
 end;
 
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;
