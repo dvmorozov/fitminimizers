@@ -13,7 +13,7 @@ unit Decisions;
 
 interface
 
-uses SysUtils, Classes, SelfCheckedComponentList, MyExceptions, SimpMath;
+uses SysUtils, Classes, SelfCheckedComponentList, SimpMath;
 
 type
   TAbstractDecision = class(TComponent)
@@ -553,7 +553,7 @@ var TempDouble: Double;
 begin
   SelectedGene := SrcGeneNum;
   TempDouble := Self[SrcParamNum];
-  SelectedGene := DestParamNum;
+  SelectedGene := DestGeneNum;
   Self[DestParamNum] := TempDouble;
 end;
 
