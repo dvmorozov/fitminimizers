@@ -15,7 +15,6 @@ interface
 
 uses
     Classes, SelfCheckedComponentList, Decisions, Algorithm, Tools,
-    MyExceptions,
     {$IFNDEF Lazarus}
     Windows,
     {$ENDIF}
@@ -453,12 +452,15 @@ begin
 
     Start;
     SavedLoEval := GetBestDecision.Evaluation;
+
     PrevTolDefined := False;
+    PrevTolerance := 0;
 
     with DownhillSimplexServer do
     begin
         while not EndOfCalculation(Self) do
         begin
+            Highest := 0; NextHighest := 0; Lowest := 0;
             GetIndicativeDecisions(Highest, NextHighest, Lowest);
 
             EvalHi := TDownhillSimplexDecision(
@@ -520,7 +522,7 @@ begin
     begin
         while not EndOfCalculation(Self) do
         begin
-
+            Highest := 0; NextHighest := 0; Lowest := 0;
             GetIndicativeDecisions(Highest, NextHighest, Lowest);
 
             EvalHi := TDownhillSimplexSADecision(

@@ -411,7 +411,6 @@ begin
     end;
     {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SaveDecimalSeparator;
 end;
-{$warnings on}
 
 function CalculateExpr(var Expression: string;
     var ErrorCode: LongInt; const ParamRequest: FParamRequest): Double;
@@ -440,6 +439,7 @@ begin
     Result := CalculateSimpExpr(Expression, ErrorCode, ParamRequest);
     {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SaveDecimalSeparator;
 end;
+{$warnings on}
 
 function GetRandomWithSign: Double;
 begin

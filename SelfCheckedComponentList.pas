@@ -44,7 +44,7 @@ type
 
         procedure SetItem(index: Integer; Item: TComponent);
         procedure SetCapacity(ACapacity: Integer);
-        procedure LinkItemWithList(const Item: TComponent); virtual;
+        procedure LinkItemWithList(const Item: TComponent); virtual; abstract;
 
         function GetSelfCheckingMode: LongInt; virtual; abstract;
         procedure SetSelfCheckingMode(const AMode: LongInt); virtual; abstract;
@@ -263,10 +263,6 @@ begin
             except Items[i] := nil end;
     end;
     Clear;
-end;
-
-procedure TSelfCheckedComponentList.LinkItemWithList(const Item: TComponent);
-begin
 end;
 
 procedure TSelfCheckedComponentList.IsReady;
