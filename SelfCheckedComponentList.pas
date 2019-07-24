@@ -24,9 +24,6 @@ type
         ['{E7E7008A-EE1C-4828-B1D6-A53806820A66}']
         procedure IsReady;
         function MyNameIs: string;
-		//	Setter and getter for self checking mode.
-        procedure SetSelfCheckingMode(const AMode: LongInt);
-        function GetSelfCheckingMode: LongInt;
     end;
 
 const SelfCheckedGUID: TGUID = '{E7E7008A-EE1C-4828-B1D6-A53806820A66}';
@@ -46,9 +43,6 @@ type
         procedure SetCapacity(ACapacity: Integer);
         procedure LinkItemWithList(const Item: TComponent); virtual; abstract;
 
-        function GetSelfCheckingMode: LongInt; virtual; abstract;
-        procedure SetSelfCheckingMode(const AMode: LongInt); virtual; abstract;
-        
         procedure ReadList(Reader: TReader);
         procedure WriteList(Writer: TWriter);
 
@@ -59,9 +53,6 @@ type
 
         procedure IsReady; virtual;
         function MyNameIs: string; virtual;
-		//	Set self-checked mode on all components 
-		//	implementing corresponding interface.
-        procedure SetCheckingModeInItems(const AMode: LongInt);
 
         procedure Sort(Compare: TListSortCompare);
         procedure Pack;
@@ -271,15 +262,6 @@ var i: LongInt;
 begin
     for i := 0 to Count - 1 do
         if Items[i].GetInterface(SelfCheckedGUID, ISC) then ISC.IsReady;
-end;
-
-procedure TSelfCheckedComponentList.SetCheckingModeInItems(const AMode: LongInt);
-var i: LongInt;
-    ISC: ISelfChecked;
-begin
-    for i := 0 to Count - 1 do
-        if Items[i].GetInterface(SelfCheckedGUID, ISC) then
-            ISC.SetSelfCheckingMode(AMode);
 end;
 
 function TSelfCheckedComponentList.MyNameIs: string;
