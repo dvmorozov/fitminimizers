@@ -41,7 +41,6 @@ type
 
         procedure SetItem(index: Integer; Item: TComponent);
         procedure SetCapacity(ACapacity: Integer);
-        procedure LinkItemWithList(const Item: TComponent); virtual; abstract;
 
         procedure ReadList(Reader: TReader);
         procedure WriteList(Writer: TWriter);
@@ -58,9 +57,6 @@ type
         procedure Pack;
         function GetState: LongInt;
         procedure SetState(AState: LongInt);
-
-        procedure ActionAfterReading; virtual;
-        procedure LinkAllItemsWithList;
 
         procedure Clear;
         procedure ClearAll;
@@ -160,26 +156,9 @@ begin
     List.Capacity := ACapacity;
 end;
 
-procedure TSelfCheckedComponentList.ActionAfterReading;
-begin
-    LinkAllItemsWithList;
-end;
-
-procedure TSelfCheckedComponentList.LinkAllItemsWithList;
-var i: LongInt;
-    TC: TComponent;
-begin
-    for i := 0 to Count - 1 do
-    begin
-        TC := Items[i];
-        LinkItemWithList(TC);
-    end;
-end;
-
 function TSelfCheckedComponentList.Add;
 begin
     Add := List.Add(Item);
-    LinkItemWithList(Item);
 end;
 
 procedure TSelfCheckedComponentList.Sort(Compare: TListSortCompare);
@@ -232,7 +211,6 @@ end;
 procedure TSelfCheckedComponentList.Insert(Index: Integer; Item: TComponent);
 begin
     List.Insert(Index, Item);
-    LinkItemWithList(Item);
 end;
 
 procedure TSelfCheckedComponentList.Pack;
