@@ -24,7 +24,7 @@ uses
 type
     TDownhillSimplexDecision = class(TFloatDecision)
     public
-        function GetCopy: TDownhillSimplexDecision;
+        function GetCopy: TDownhillSimplexDecision; override;
     end;
 
 	//	Component-decision for simulated annealing optimization.
@@ -33,7 +33,7 @@ type
         FFluctEvaluation: Double;
 
     public
-        function GetCopy: TDownhillSimplexSADecision;
+        function GetCopy: TDownhillSimplexSADecision; override;
 
     published
 		//	Value of estimation function with random additive value depending on the "temperature".
@@ -455,6 +455,7 @@ begin
     Start;
     SavedLoEval := GetBestDecision.Evaluation;
     PrevTolDefined := False;
+    PrevTolerance := 0;
 
     with DownhillSimplexServer do
     begin
@@ -522,7 +523,7 @@ begin
     begin
         while not EndOfCalculation(Self) do
         begin
-
+            NextHighest := 0; Highest := 0; Lowest := 0;
             GetIndicativeDecisions(Highest, NextHighest, Lowest);
 
             EvalHi := TDownhillSimplexSADecision(
