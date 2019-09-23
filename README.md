@@ -1,7 +1,7 @@
 # fitminimizers
 Downhill simplex algorithm including variant with simulated annealing for Delphi & Lazarus. 
 
-This software is distributed under MPL 2.0 https://www.mozilla.org/en-US/MPL/2.0/.
+This software is distributed under [MPL 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
 
 ## TDownhillSimplexAlgorithm
 Classical implementation of downhill simplex algorithm.
