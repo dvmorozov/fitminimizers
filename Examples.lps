@@ -2,7 +2,7 @@
 <CONFIG>
   <ProjectSession>
     <PathDelim Value="\"/>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <BuildModes Active="Default"/>
     <Units Count="11">
       <Unit0>
@@ -12,7 +12,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="24"/>
       </Unit0>
       <Unit1>
         <Filename Value="ExamplesMain.pas"/>
@@ -20,9 +20,8 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="32" Y="11"/>
-        <UsageCount Value="20"/>
+        <CursorPos X="14" Y="9"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -31,7 +30,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="512"/>
         <CursorPos X="43" Y="524"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -44,14 +43,14 @@
         <Filename Value="Algorithm.pas"/>
         <EditorIndex Value="3"/>
         <CursorPos Y="9"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="CBRCComponent.pas"/>
         <EditorIndex Value="4"/>
         <CursorPos Y="9"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -64,7 +63,7 @@
         <Filename Value="Decisions.pas"/>
         <EditorIndex Value="5"/>
         <CursorPos Y="13"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
@@ -81,9 +80,10 @@
       </Unit9>
       <Unit10>
         <Filename Value="Tools.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <CursorPos X="25" Y="17"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit10>
     </Units>
