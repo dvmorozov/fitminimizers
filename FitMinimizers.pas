@@ -7,17 +7,17 @@ unit FitMinimizers;
 interface
 
 uses
-  Tools, SimpMath, MyExceptions, CBRCComponent, Algorithm, 
-  SelfCheckedComponentList, Decisions, DownhillSimplexAlgorithm, 
-  LazarusPackageIntf;
+    Tools, SimpMath, MyExceptions, CBRCComponent, Algorithm,
+    SelfCheckedComponentList, Decisions, DownhillSimplexAlgorithm,
+    LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
-  RegisterUnit('DownhillSimplexAlgorithm', @DownhillSimplexAlgorithm.Register);
+    RegisterUnit('DownhillSimplexAlgorithm', @DownhillSimplexAlgorithm.Register);
 end;
 
 initialization
-  RegisterPackage('FitMinimizers', @Register);
+    RegisterPackage('FitMinimizers', @Register);
 end.
