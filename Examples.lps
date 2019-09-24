@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="11">
+    <Units Count="13">
       <Unit0>
         <Filename Value="Examples.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -12,7 +12,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="25"/>
       </Unit0>
       <Unit1>
         <Filename Value="ExamplesMain.pas"/>
@@ -20,17 +20,16 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <CursorPos X="14" Y="9"/>
-        <UsageCount Value="24"/>
+        <CursorPos X="30" Y="26"/>
+        <UsageCount Value="25"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="512"/>
+        <EditorIndex Value="5"/>
         <CursorPos X="43" Y="524"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -41,16 +40,17 @@
       </Unit3>
       <Unit4>
         <Filename Value="Algorithm.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="7"/>
         <CursorPos Y="9"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="CBRCComponent.pas"/>
-        <EditorIndex Value="4"/>
-        <CursorPos Y="9"/>
-        <UsageCount Value="12"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="33"/>
+        <CursorPos X="32" Y="29"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -61,36 +61,52 @@
       </Unit6>
       <Unit7>
         <Filename Value="Decisions.pas"/>
-        <EditorIndex Value="5"/>
-        <CursorPos Y="13"/>
-        <UsageCount Value="12"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="729"/>
+        <CursorPos X="33" Y="733"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="MyExceptions.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="2"/>
         <CursorPos Y="10"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="SimpMath.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="4"/>
         <CursorPos Y="14"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="Tools.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <CursorPos X="25" Y="17"/>
-        <UsageCount Value="12"/>
+        <EditorIndex Value="6"/>
+        <CursorPos X="104" Y="9"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="FitMinimizers.pas"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="28" Y="7"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="SelfCheckedComponentList.pas"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit12>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
     </OtherDefines>
-    <JumpHistory Count="12" HistoryIndex="11">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
       </Position1>
@@ -137,6 +153,18 @@
         <Filename Value="ExamplesMain.pas"/>
         <Caret Line="6" Column="19"/>
       </Position12>
+      <Position13>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="9" Column="20"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Decisions.pas"/>
+        <Caret Line="13"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Decisions.pas"/>
+        <Caret Line="761" TopLine="729"/>
+      </Position15>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>

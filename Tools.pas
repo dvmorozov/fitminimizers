@@ -21,7 +21,7 @@ uses SysUtils, Classes, SimpMath, CBRCComponent
 ;
 
 type
-	//	Return value of the parameter 'Param'.
+    //  Return value of the parameter 'Param'.
     FParamRequest = function(Param: string): Double of object;
     TCharSet = set of Char;
     TVector3Array = array of TDoubleVector3;
@@ -34,12 +34,12 @@ const
     CALC_INVALID_PARAMETER  : LongInt = 1;
     CALC_INVALID_EXPRESSION : LongInt = 2;
 
-//	Add vector to the end of vector array.
+//  Add vector to the end of vector array.
 procedure AddVectorToArray(
     var Arr: TVector3Array;
     const Vector: TDoubleVector3
     );
-//	Insert vector into array at the position 'Index'.
+//  Insert vector into array at the position 'Index'.
 procedure InsertVectorIntoArray(
     var Arr: TVector3Array;
     const Index: LongInt;
@@ -60,21 +60,21 @@ procedure DeleteItemLongArr(
 procedure InsertItemLongArr(
     var Arr: TLongArray;
     const Index: LongInt;
-    const Item: LongInt     	//  Inserted value.
+    const Item: LongInt         //  Inserted value.
     );
 procedure AddItemLongArr(
     var Arr: TLongArray;
     const Item: LongInt
     );
 
-//	Check if index of element is admissible otherwise throw an exception.
+//  Check if index of element is admissible otherwise throw an exception.
 procedure CheckArrItemIndex(const MinIndex, MaxIndex, Index: LongInt);
 
 //  The mask must correspond to format of Str in StringAsDoubleVector3!
 const DoubleVector3EditMask = '!\(0\.0999\,\ 0\.0999\,\ 0\.0999\);1;';
 
 //  Functions for conversion vectors to strings and back.
-//	Result must correspond to the mask!
+//  Result must correspond to the mask!
 function DoubleVector3AsString(const Vect: TDoubleVector3;
     FixedMode: Boolean; //  True - fixed number of digits after decimal separator.
     Precision, Digits: LongInt): string;
@@ -82,29 +82,29 @@ function DoubleVector3AsString(const Vect: TDoubleVector3;
 function StringAsDoubleVector3(const Str: string): TDoubleVector3;
 
 function StrToFloatDef(St: string; DefVal: Extended): Extended;
-//	Convert string having format (*.*,*.*,*.*) to vector.
+//  Convert string having format (*.*,*.*,*.*) to vector.
 function StrToVector3(const St: string): TDoubleVector3;
-//	Convert vector to string having format (*.*,*.*,*.*).
+//  Convert vector to string having format (*.*,*.*,*.*).
 function Vector3ToStr(const Vector: TDoubleVector3): string;
 
 function WithGivenAccuracy(
     Value: Double;      //  Number for conversion.
     Decimals: LongInt   //  Number of digits after decimal separator.
     ): Double;
-//	Return substring of parameters from executable command line enclosed with "".
-//	If the command line doesn't have any other parameters except path to executable
-//	then empty string is returned.
+//  Return substring of parameters from executable command line enclosed with "".
+//  If the command line doesn't have any other parameters except path to executable
+//  then empty string is returned.
 function GetCmdLineParameters: string;
 
 function GetRandomWithSign: Double;
 
-//	Calculate expression given by string.
+//  Calculate expression given by string.
 function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
 function CalculateExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
 
-//	Search symbol in the string. Return -1 if the symbol not found.	
+//  Search symbol in the string. Return -1 if the symbol not found. 
 function GetCharPosition(St: string; Ch: Char;
     Direction: ShortInt; StartIndex: LongInt): LongInt;
 function GetCharSetPosition(St: string; ChSet: TCharSet;
@@ -112,8 +112,8 @@ function GetCharSetPosition(St: string; ChSet: TCharSet;
                             //  Direction = -1 - scan string from the end to the beginning.
     StartIndex: LongInt; var Ch: Char): LongInt;
 
-//	Return number of array and index of element in
-//	this array by the through index of an element.
+//  Return number of array and index of element in
+//  this array by the through index of an element.
 procedure GetPosInArrays(
     const ArraysLengths: array of LongInt;  //  Array of array lengths.
     const Index: LongInt;                   //  Through index of element.
@@ -122,8 +122,8 @@ procedure GetPosInArrays(
     );
 
 function ReadComponentByReader(const Reader: TReader): TComponent;
-//	Free object and perform additional actions if necessary.
-//	Use this function to free all the objects.
+//  Free object and perform additional actions if necessary.
+//  Use this function to free all the objects.
 procedure UtilizeObject(PtrToObject: TObject);
 
 implementation
@@ -309,8 +309,8 @@ const ParamRequest: FParamRequest): Double;
             begin
                 if (Index = 1) then
                 begin
-					//	The case when the first number is negative.
-					//	Processing '+', '-' operations.
+                    //  The case when the first number is negative.
+                    //  Processing '+', '-' operations.
                     TempIndex := Index;
                     Index := GetCharSetPosition(Expression, OperSet, 1, TempIndex + 1, Oper);
                     if Index = -1 then Exit;
@@ -323,7 +323,7 @@ const ParamRequest: FParamRequest): Double;
 
             if (IndexR = Index + 1) and (Expression[Index + 1] = '-') then
             begin
-				//	The case when the number following the operation is negative.
+                //  The case when the number following the operation is negative.
                 IndexR := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexR + 1, TempCh);
                 if IndexR = -1 then IndexR := Length(Expression) + 1;
@@ -331,7 +331,7 @@ const ParamRequest: FParamRequest): Double;
 
             if (IndexL = Index - 1) and (Expression[Index] = '-') then
             begin
-				//	The case when the number preceding the operation is negative.
+                //  The case when the number preceding the operation is negative.
                 IndexL := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexL - 1, TempCh);
                 if IndexR = -1 then IndexL := 0;
