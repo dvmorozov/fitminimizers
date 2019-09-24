@@ -47,7 +47,9 @@ type
 
         property Space: ISpace read GetSpace write SetSpace;
         property Norma: Double read GetNorma;
+        //  Returns number of vector coordinates.
         property CompsNumber: LongInt read GetCompsNumber;
+        //  Gets/sets value of vector coordinate. Index is zero-based.
         property Comps[index: LongInt]: Double read GetComp write SetComp;
         property NormComps[index: LongInt]: Double read GetNormComp;
     end;
@@ -80,14 +82,15 @@ type
         procedure SetNorma(const ANorma: Double); virtual; abstract;
         function GetCompsNumber: LongInt;
         function GetComp(index: LongInt): Double;
-        procedure SetComp(index: LongInt; AComp: Double); virtual; abstract;
+        //  TODO: normalized vector should be recomputed.
+        procedure SetComp(index: LongInt; AComp: Double);
         function GetNormComp(index: LongInt): Double;
 
     public
         property Space: ISpace read GetSpace write SetSpace;
         property Norma: Double read GetNorma;
         property CompsNumber: LongInt read GetCompsNumber;
-        property Comps[index: LongInt]: Double read GetComp;
+        property Comps[index: LongInt]: Double read GetComp write SetComp;
         property NormComps[index: LongInt]: Double read GetNormComp;
     end;
 
@@ -905,15 +908,23 @@ end;
 
 function T3DVector.GetComp(index: LongInt): Double;
 begin
-    if (Index < 0) or (index > CompsNumber) then
+    if (Index < 0) or (index >= CompsNumber) then
         raise E3DVector.Create('Invalid index...')
     else
         Result := FVector[index + 1];
 end;
 
+procedure T3DVector.SetComp(index: LongInt; AComp: Double);
+begin
+    if (Index < 0) or (index >= CompsNumber) then
+        raise E3DVector.Create('Invalid index...')
+    else
+        FVector[index + 1] := AComp;
+end;
+
 function T3DVector.GetNormComp(index: LongInt): Double;
 begin
-    if (Index < 0) or (index > CompsNumber) then
+    if (Index < 0) or (index >= CompsNumber) then
         raise E3DVector.Create('Invalid index...')
     else
         Result := FNormalizedVector[index + 1];
