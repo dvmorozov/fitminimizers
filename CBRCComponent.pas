@@ -18,9 +18,9 @@ uses Classes;
 
 type
     TCBRCComponent = class(TComponent)
-        { Component Controlled By References Counter (CBRC).
-          The object is freed only when reference counter is equal to zero.
-          The object isn't freed automatically, the destructor must be called
+    { Component Controlled By References Counter (CBRC).
+      The object is freed only when reference counter is equal to zero.
+      The object isn't freed automatically, the destructor must be called
           as usual. In the case of cyclical references objects will be
           undestructable. }
     protected
@@ -28,7 +28,7 @@ type
         FRefCount: LongInt;
         IntControlled: Boolean;
 
-        function _AddRef: Integer; virtual; stdcall;
+        function _AddRef: Integer; virtual; stdcall; 
         function _Release: Integer; virtual; stdcall;
     public
         procedure Free;
@@ -41,10 +41,8 @@ procedure TCBRCComponent.Free;
 begin
     if Assigned(Self) then
     begin
-        if RefCount = 0 then
-            Destroy
-        else
-            IntControlled := True;
+        if RefCount = 0 then Destroy
+        else IntControlled := True;
     end;
 end;
 
@@ -58,10 +56,10 @@ function TCBRCComponent._Release: Integer; stdcall;
 begin
     Dec(FRefCount);
     Result := RefCount;
-    if IntControlled and (Result = 0) then
-        Free;
+    if IntControlled and (Result = 0) then Free;
 end;
 
 initialization
     RegisterClass(TCBRCComponent);
 end.
+
