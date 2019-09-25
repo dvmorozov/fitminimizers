@@ -17,7 +17,7 @@ type
     { TForm1 }
 
     TForm1 = class(TForm)
-      BitBtn1: TBitBtn;
+        BitBtn1: TBitBtn;
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         procedure BitBtn1Click(Sender: TObject);
     private
@@ -25,8 +25,21 @@ type
         { Minimum bounding box problem. }
         { Set of random points. }
         PointCloud: TComponentList;
+        { Unit vector displaying box orientation. }
+        BoxOrientation: TDoubleVector3;
+        { Vector displaying position of center of the box. }
+        BoxPosition:  TDoubleVector3;
+        { Sizes of the box. }
+        A, B, C: Double;
 
         procedure GenerateRandomPointCloud;
+        procedure InitializeVariableParameters;
+
+        function ComputeCenterOfMass: TDoubleVector3;
+        { Retuns triplet of max coordinates (actually not a vector). }
+        function ComputeMaxCoordinates: TDoubleVector3;
+        { Retuns triplet of min coordinates (actually not a vector). }
+        function ComputeMinCoordinates: TDoubleVector3;
     public
         { Public declarations }
     end;
@@ -71,6 +84,88 @@ begin
         Point.Comps[2] := MinZ + Random * (MaxZ - MinZ);
 
         PointCloud.Add(Point);
+    end;
+end;
+
+function TForm1.ComputeCenterOfMass: TDoubleVector3;
+var i: LongInt;
+    X, Y, Z: Double;
+    Point: T3DVector;
+begin
+    Assert(PointCloud.Count <> 0);
+
+    X := 0; Y := 0; Z := 0;
+    for i := 0 to PointCloud.Count - 1 do
+    begin
+        Point := T3DVector(PointCloud[i]);
+        X := X + Point.Comps[0];
+        Y := Y + Point.Comps[1];
+        Z := Z + Point.Comps[2];
+    end;
+
+    X := X / PointCloud.Count;
+    Y := Y / PointCloud.Count;
+    Z := Z / PointCloud.Count;
+    Result[1] := X;
+    Result[2] := Y;
+    Result[3] := Z;
+end;
+
+procedure TForm1.InitializeVariableParameters;
+var MaxCoords, MinCoords: TDoubleVector3;
+begin
+    BoxPosition := ComputeCenterOfMass;
+    BoxOrientation[1] := 1; BoxOrientation[2] := 0; BoxOrientation[3] := 0;
+    MaxCoords := ComputeMaxCoordinates;
+    MinCoords := ComputeMinCoordinates;
+    A := MaxCoords[1] - MinCoords[1];
+    B := MaxCoords[2] - MinCoords[2];
+    C := MaxCoords[3] - MinCoords[3];
+end;
+
+function TForm1.ComputeMaxCoordinates: TDoubleVector3;
+var i: LongInt;
+    Point: T3DVector;
+begin
+    Assert(PointCloud.Count <> 0);
+
+    Point := T3DVector(PointCloud[0]);
+    Result[1] := Point.Comps[0];
+    Result[2] := Point.Comps[1];
+    Result[3] := Point.Comps[2];
+
+    for i := 1 to PointCloud.Count - 1 do
+    begin
+        Point := T3DVector(PointCloud[i]);
+        if Point.Comps[0] > Result[1] then
+            Result[1] := Point.Comps[0];
+        if Point.Comps[1] > Result[2] then
+            Result[2] := Point.Comps[1];
+        if Point.Comps[2] > Result[3] then
+            Result[3] := Point.Comps[2];
+    end;
+end;
+
+function TForm1.ComputeMinCoordinates: TDoubleVector3;
+var i: LongInt;
+    Point: T3DVector;
+begin
+    Assert(PointCloud.Count <> 0);
+
+    Point := T3DVector(PointCloud[0]);
+    Result[1] := Point.Comps[0];
+    Result[2] := Point.Comps[1];
+    Result[3] := Point.Comps[2];
+
+    for i := 1 to PointCloud.Count - 1 do
+    begin
+        Point := T3DVector(PointCloud[i]);
+        if Point.Comps[0] < Result[1] then
+            Result[1] := Point.Comps[0];
+        if Point.Comps[1] < Result[2] then
+            Result[2] := Point.Comps[1];
+        if Point.Comps[2] < Result[3] then
+            Result[3] := Point.Comps[2];
     end;
 end;
 
