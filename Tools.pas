@@ -16,11 +16,12 @@ interface
 
 uses SysUtils, Classes, SimpMath, CBRCComponent
 {$IFNDEF Lazarus}
-    , Windows
-{$ENDIF};
+, Windows
+{$ENDIF}
+;
 
 type
-    //    Return value of the parameter 'Param'.
+	//	Return value of the parameter 'Param'.
     FParamRequest = function(Param: string): Double of object;
     TCharSet = set of Char;
     TVector3Array = array of TDoubleVector3;
@@ -29,104 +30,114 @@ type
 
 const
     //  Error codes.
-    CALC_NO_ERRORS: LongInt = 0;
-    CALC_INVALID_PARAMETER: LongInt = 1;
-    CALC_INVALID_EXPRESSION: LongInt = 2;
+    CALC_NO_ERRORS          : LongInt = 0;
+    CALC_INVALID_PARAMETER  : LongInt = 1;
+    CALC_INVALID_EXPRESSION : LongInt = 2;
 
-//    Add vector to the end of vector array.
-procedure AddVectorToArray(var Arr: TVector3Array;
-    const Vector: TDoubleVector3);
-//    Insert vector into array at the position 'Index'.
-procedure InsertVectorIntoArray(var Arr: TVector3Array;
-    const Index: LongInt; const Vector: TDoubleVector3);
-procedure DeleteVectorFromArray(var Arr: TVector3Array; const Index: LongInt);
+//	Add vector to the end of vector array.
+procedure AddVectorToArray(
+    var Arr: TVector3Array;
+    const Vector: TDoubleVector3
+    );
+//	Insert vector into array at the position 'Index'.
+procedure InsertVectorIntoArray(
+    var Arr: TVector3Array;
+    const Index: LongInt;
+    const Vector: TDoubleVector3
+    );
+procedure DeleteVectorFromArray(
+    var Arr: TVector3Array;
+    const Index: LongInt
+    );
 
 type
     TLongArray = array of LongInt;
 
-procedure DeleteItemLongArr(var Arr: TLongArray; const Index: LongInt);
-procedure InsertItemLongArr(var Arr: TLongArray; const Index: LongInt;
-    const Item: LongInt         //  Inserted value.
+procedure DeleteItemLongArr(
+    var Arr: TLongArray;
+    const Index: LongInt
     );
-procedure AddItemLongArr(var Arr: TLongArray; const Item: LongInt);
+procedure InsertItemLongArr(
+    var Arr: TLongArray;
+    const Index: LongInt;
+    const Item: LongInt     	//  Inserted value.
+    );
+procedure AddItemLongArr(
+    var Arr: TLongArray;
+    const Item: LongInt
+    );
 
-//    Check if index of element is admissible otherwise throw an exception.
+//	Check if index of element is admissible otherwise throw an exception.
 procedure CheckArrItemIndex(const MinIndex, MaxIndex, Index: LongInt);
 
 //  The mask must correspond to format of Str in StringAsDoubleVector3!
-const
-    DoubleVector3EditMask = '!\(0\.0999\,\ 0\.0999\,\ 0\.0999\);1;';
+const DoubleVector3EditMask = '!\(0\.0999\,\ 0\.0999\,\ 0\.0999\);1;';
 
 //  Functions for conversion vectors to strings and back.
-//    Result must correspond to the mask!
-function DoubleVector3AsString(const Vect: TDoubleVector3; FixedMode: Boolean;
-    //  True - fixed number of digits after decimal separator.
+//	Result must correspond to the mask!
+function DoubleVector3AsString(const Vect: TDoubleVector3;
+    FixedMode: Boolean; //  True - fixed number of digits after decimal separator.
     Precision, Digits: LongInt): string;
 
 function StringAsDoubleVector3(const Str: string): TDoubleVector3;
 
 function StrToFloatDef(St: string; DefVal: Extended): Extended;
-//    Convert string having format (*.*,*.*,*.*) to vector.
+//	Convert string having format (*.*,*.*,*.*) to vector.
 function StrToVector3(const St: string): TDoubleVector3;
-//    Convert vector to string having format (*.*,*.*,*.*).
+//	Convert vector to string having format (*.*,*.*,*.*).
 function Vector3ToStr(const Vector: TDoubleVector3): string;
 
-function WithGivenAccuracy(Value: Double;      //  Number for conversion.
+function WithGivenAccuracy(
+    Value: Double;      //  Number for conversion.
     Decimals: LongInt   //  Number of digits after decimal separator.
     ): Double;
-//    Return substring of parameters from executable command line enclosed with "".
-//    If the command line doesn't have any other parameters except path to executable
-//    then empty string is returned.
+//	Return substring of parameters from executable command line enclosed with "".
+//	If the command line doesn't have any other parameters except path to executable
+//	then empty string is returned.
 function GetCmdLineParameters: string;
 
 function GetRandomWithSign: Double;
 
-//    Calculate expression given by string.
+//	Calculate expression given by string.
 function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
 function CalculateExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
 
-//    Search symbol in the string. Return -1 if the symbol not found.
-function GetCharPosition(St: string; Ch: Char; Direction: ShortInt;
-    StartIndex: LongInt): LongInt;
-function GetCharSetPosition(St: string; ChSet: TCharSet; Direction: ShortInt;
-    //  Direction =  1 - scan string from the beginning to the end.
-    //  Direction = -1 - scan string from the end to the beginning.
+//	Search symbol in the string. Return -1 if the symbol not found.	
+function GetCharPosition(St: string; Ch: Char;
+    Direction: ShortInt; StartIndex: LongInt): LongInt;
+function GetCharSetPosition(St: string; ChSet: TCharSet;
+    Direction: ShortInt;    //  Direction =  1 - scan string from the beginning to the end.
+                            //  Direction = -1 - scan string from the end to the beginning.
     StartIndex: LongInt; var Ch: Char): LongInt;
 
-//    Return number of array and index of element in
-//    this array by the through index of an element.
-procedure GetPosInArrays(const ArraysLengths: array of LongInt;
-    //  Array of array lengths.
+//	Return number of array and index of element in
+//	this array by the through index of an element.
+procedure GetPosInArrays(
+    const ArraysLengths: array of LongInt;  //  Array of array lengths.
     const Index: LongInt;                   //  Through index of element.
-    var ArrayNumber: LongInt;
-    //  Number of the array containing the element.
+    var ArrayNumber: LongInt;               //  Number of the array containing the element.
     var ArrayIndex: LongInt                 //  Index of element in the array.
     );
 
 function ReadComponentByReader(const Reader: TReader): TComponent;
-//    Free object and perform additional actions if necessary.
-//    Use this function to free all the objects.
+//	Free object and perform additional actions if necessary.
+//	Use this function to free all the objects.
 procedure UtilizeObject(PtrToObject: TObject);
 
 implementation
 
 function StrToFloatDef(St: string; DefVal: Extended): Extended;
-var
-    Temp: Extended;
+var Temp: Extended;
 begin
-    try
-        Temp := StrToFloat(St);
-    except
-        Temp := DefVal;
-    end;
+    try Temp := StrToFloat(St);
+    except Temp := DefVal; end;
     Result := Temp;
 end;
 
 function StrToVector3(const St: string): TDoubleVector3;
-var
-    i: LongInt;
+var i: LongInt;
     St2: string;
     Index, PrevIndex: LongInt;
     TempChar: Char;
@@ -145,56 +156,39 @@ end;
 function Vector3ToStr(const Vector: TDoubleVector3): string;
 begin
     Result := '(' + FloatToStrF(Vector[1], ffGeneral, 6, 4) + ',' +
-        FloatToStrF(Vector[2], ffGeneral, 6, 4) + ',' +
-        FloatToStrF(Vector[3], ffGeneral, 6, 4) + ')';
+                    FloatToStrF(Vector[2], ffGeneral, 6, 4) + ',' +
+                    FloatToStrF(Vector[3], ffGeneral, 6, 4) + ')';
 end;
 
-function DoubleVector3AsString(const Vect: TDoubleVector3; FixedMode: Boolean;
-    Precision, Digits: LongInt): string;
-var
-    St: string;
+function DoubleVector3AsString(const Vect: TDoubleVector3;
+    FixedMode: Boolean; Precision, Digits: LongInt): string;
+var St: string;
     SavedDecimalSeparator: Char;
 begin
-    SavedDecimalSeparator :=
-{$IFNDEF Lazarus}
-        FormatSettings.
-{$ENDIF}
-        DecimalSeparator;
-    {$IFNDEF Lazarus}
-    FormatSettings.
-{$ENDIF}
-        DecimalSeparator := '.';
+    SavedDecimalSeparator := {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator;
+    {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := '.';
     St := '(';
-    if FixedMode then
-    begin
+    if FixedMode then begin
         St := St + FloatToStrF(Vect[1], ffFixed, Precision, Digits) + ', ';
         St := St + FloatToStrF(Vect[2], ffFixed, Precision, Digits) + ', ';
         St := St + FloatToStrF(Vect[3], ffFixed, Precision, Digits);
-    end
-    else
-    begin
+    end else begin
         St := St + FloatToStr(Vect[1]) + ', ';
         St := St + FloatToStr(Vect[2]) + ', ';
         St := St + FloatToStr(Vect[3]);
     end;
     St := St + ')';
-    {$IFNDEF Lazarus}
-    FormatSettings.
-{$ENDIF}
-        DecimalSeparator := SavedDecimalSeparator;
+    {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SavedDecimalSeparator;
     Result := St;
 end;
 
 function StringAsDoubleVector3(const Str: string): TDoubleVector3;
-var
-    i, BegIndex, VectIndex: LongInt;
+var i, BegIndex, VectIndex: LongInt;
     Str2: string;
     PrevIsDelimiter: Boolean;
 
 begin
-    BegIndex := -1;
-    VectIndex := 1;
-    PrevIsDelimiter := False;
+    BegIndex := -1; VectIndex := 1; PrevIsDelimiter := False;
     for i := 1 to Length(Str) do
         if IsDelimiter('() ,_', Str, i) then
         begin
@@ -206,18 +200,15 @@ begin
                 BegIndex := -1;
             end;
             PrevIsDelimiter := True;
-        end
-        else
+        end else
         begin
-            if PrevIsDelimiter then
-                BegIndex := i;
+            if PrevIsDelimiter then BegIndex := i;
             PrevIsDelimiter := False;
         end;
 end;
 
 function WithGivenAccuracy(Value: Double; Decimals: LongInt): Double;
-var
-    PowerOf10: Double;
+var PowerOf10: Double;
     TempLong: LongInt;
 
 begin
@@ -228,120 +219,70 @@ begin
 end;
 
 function GetCmdLineParameters: string;
-var
-    St: string;
+var St: string;
     Index: LongInt;
     Index1, Index2: LongInt;
 begin
     St := ''; //??? GetCommandLine;
-    Index1 := -1;
-    Index2 := -1;
+    Index1 := -1; Index2 := -1;
 
     for Index := Length(St) downto 1 do
-        if IsDelimiter('"', St, Index) then
-        begin
-            Index2 := Index;
-            Break;
-        end;
+        if IsDelimiter('"', St, Index) then begin Index2 := Index; Break end;
     for Index := Index2 - 1 downto 1 do
-        if IsDelimiter('"', St, Index) then
-        begin
-            Index1 := Index;
-            Break;
-        end;
+        if IsDelimiter('"', St, Index) then begin Index1 := Index; Break end;
 
-    if (Index1 = -1) or (Index2 = -1) then
-    begin
-        Result := '';
-        Exit;
-    end;
+    if (Index1 = -1) or (Index2 = -1) then begin Result := ''; Exit end;
     St := Copy(St, Index1 + 1, Index2 - Index1 - 1);
-    if UpperCase(ST) = UpperCase(ParamStr(0)) then
-        St := '';
+    if UpperCase(ST) = UpperCase(ParamStr(0)) then St := '';
     Result := St;
 end;
 
-function GetCharPosition(St: string; Ch: Char; Direction: ShortInt;
-    StartIndex: LongInt): LongInt;
-var
-    i: LongInt;
+function GetCharPosition(St: string; Ch: Char;
+    Direction: ShortInt; StartIndex: LongInt): LongInt;
+var i: LongInt;
 begin
-    if StartIndex > Length(St) then
-    begin
-        Result := -1;
-        Exit;
-    end;
+    if StartIndex > Length(St) then begin Result := -1; Exit end;
     case Direction of
-        1:
-        begin
+        1 : begin
             for i := StartIndex to Length(St) do
-                if St[i] = Ch then
-                begin
-                    Result := i;
-                    Exit;
-                end;
+                if St[i] = Ch then begin Result := i; Exit end;
             Result := -1;
         end;
-        -1:
-        begin
+        -1 : begin
             for i := StartIndex downto 1 do
-                if St[i] = Ch then
-                begin
-                    Result := i;
-                    Exit;
-                end;
+                if St[i] = Ch then begin Result := i; Exit end;
             Result := -1;
         end;
-        else
-            Result := -1;
+        else Result := -1;
     end;
 end;
 
-function GetCharSetPosition(St: string; ChSet: TCharSet; Direction: ShortInt;
-    StartIndex: LongInt; var Ch: Char): LongInt;
-var
-    i: LongInt;
+function GetCharSetPosition(St: string; ChSet: TCharSet;
+    Direction: ShortInt; StartIndex: LongInt; var Ch: Char): LongInt;
+var i: LongInt;
 begin
-    if StartIndex > Length(St) then
-    begin
-        Result := -1;
-        Exit;
-    end;
+    if StartIndex > Length(St) then begin Result := -1; Exit end;
     case Direction of
-        1:
-        begin
+        1 : begin
             for i := StartIndex to Length(St) do
-                if St[i] in ChSet then
-                begin
-                    Result := i;
-                    Ch := St[i];
-                    Exit;
-                end;
+                if St[i] in ChSet then begin Result := i; Ch := St[i]; Exit end;
             Result := -1;
         end;
-        -1:
-        begin
+        -1 : begin
             for i := StartIndex downto 1 do
-                if St[i] in ChSet then
-                begin
-                    Result := i;
-                    Ch := St[i];
-                    Exit;
-                end;
+                if St[i] in ChSet then begin Result := i; Ch := St[i]; Exit end;
             Result := -1;
         end;
-        else
-            Result := -1;
+        else Result := -1;
     end;
 end;
 
 function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
-    const ParamRequest: FParamRequest): Double;
+const ParamRequest: FParamRequest): Double;
 
     procedure MakeAllOper(var Expression: string; OperSet: TCharSet;
-    var ErrorCode: LongInt; const ParamRequest: FParamRequest);
-    var
-        Index, IndexL, IndexR: LongInt;
+        var ErrorCode: LongInt; const ParamRequest: FParamRequest);
+    var Index, IndexL, IndexR: LongInt;
         ArgStrL, ArgStrR: string;
         ArgL, ArgR: Double;
         Value: Double;
@@ -352,55 +293,45 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
         repeat
             Oper := Char(0);
             Index := GetCharSetPosition(Expression, OperSet, 1, 1, Oper);
-            if Index = -1 then
-                Exit;
-
+            if Index = -1 then Exit;
+            
             TempCh := Char(0);
             IndexL := GetCharSetPosition(Expression,
                 ['*', '/', '+', '-'], -1, Index - 1, TempCh);
-            if IndexL = -1 then
-                IndexL := 0;
+            if IndexL = -1 then IndexL := 0;
             IndexR := GetCharSetPosition(Expression,
                 ['*', '/', '+', '-'], 1, Index + 1, TempCh);
-            if IndexR = -1 then
-                IndexR := Length(Expression) + 1;
+            if IndexR = -1 then IndexR := Length(Expression) + 1;
             if (Expression[1] = '-') then
             begin
                 if (Index = 1) then
                 begin
-                    //    The case when the first number is negative.
-                    //    Processing '+', '-' operations.
+					//	The case when the first number is negative.
+					//	Processing '+', '-' operations.
                     TempIndex := Index;
-                    Index := GetCharSetPosition(Expression, OperSet,
-                        1, TempIndex + 1, Oper);
-                    if Index = -1 then
-                        Exit;
+                    Index := GetCharSetPosition(Expression, OperSet, 1, TempIndex + 1, Oper);
+                    if Index = -1 then Exit;
                     IndexR := GetCharSetPosition(Expression,
                         ['*', '/', '+', '-'], 1, Index + 1, TempCh);
-                    if IndexR = -1 then
-                        IndexR := Length(Expression) + 1;
+                    if IndexR = -1 then IndexR := Length(Expression) + 1;
                     IndexL := 0;
-                end
-                else
-                    IndexL := 0;    //  ['*', '/']
+                end else IndexL := 0    //  ['*', '/']
             end;
 
             if (IndexR = Index + 1) and (Expression[Index + 1] = '-') then
             begin
-                //    The case when the number following the operation is negative.
+				//	The case when the number following the operation is negative.
                 IndexR := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexR + 1, TempCh);
-                if IndexR = -1 then
-                    IndexR := Length(Expression) + 1;
+                if IndexR = -1 then IndexR := Length(Expression) + 1;
             end;
 
             if (IndexL = Index - 1) and (Expression[Index] = '-') then
             begin
-                //    The case when the number preceding the operation is negative.
+				//	The case when the number preceding the operation is negative.
                 IndexL := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexL - 1, TempCh);
-                if IndexR = -1 then
-                    IndexL := 0;
+                if IndexR = -1 then IndexL := 0;
             end;
 
             ArgStrL := Copy(Expression, IndexL + 1, Index - IndexL - 1);
@@ -408,60 +339,45 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
             Delete(Expression, IndexL + 1, IndexR - IndexL - 1);
             if ArgStrL <> '' then
             begin
-                try
-                    ArgL := StrToFloat(ArgStrL);
+                try ArgL := StrToFloat(ArgStrL);
                 except
                     if Assigned(ParamRequest) then
                     begin
                         if ArgStrL[1] in ['-', '+'] then
                             case ArgStrL[1] of
-                                '-': ArgL :=
-                                        (-1) * ParamRequest(Copy(ArgStrL,
-                                        2, Length(ArgStrL) - 1));
-                                '+': ArgL :=
-                                        ParamRequest(Copy(ArgStrL, 2, Length(ArgStrL) - 1));
+                                '-': ArgL := (-1) * ParamRequest(Copy(
+                                    ArgStrL, 2, Length(ArgStrL) - 1));
+                                '+': ArgL := ParamRequest(Copy(ArgStrL, 2,
+                                    Length(ArgStrL) - 1));
                             end
-                        else
-                            ArgL := ParamRequest(ArgStrL);
+                        else ArgL := ParamRequest(ArgStrL)
                     end{if Assigned(ParamRequest) then...}
-                    else
-                    begin
-                        ErrorCode := CALC_INVALID_PARAMETER;
-                        Exit;
-                    end;
+                    else begin ErrorCode := CALC_INVALID_PARAMETER; Exit end;
                 end;{except...}
             end{if ArgStrL <> '' then...}
-            else
-                ArgL := 0;
+            else ArgL := 0;
 
-            try
-                ArgR := StrToFloat(ArgStrR);
+            try ArgR := StrToFloat(ArgStrR);
             except
                 if Assigned(ParamRequest) then
                 begin
                     if ArgStrR[1] in ['-', '+'] then
                         case ArgStrR[1] of
-                            '-': ArgR :=
-                                    (-1) * ParamRequest(Copy(ArgStrR,
-                                    2, Length(ArgStrR) - 1));
-                            '+': ArgR :=
-                                    ParamRequest(Copy(ArgStrR, 2, Length(ArgStrR) - 1));
+                            '-': ArgR := (-1) * ParamRequest(Copy(
+                                ArgStrR, 2, Length(ArgStrR) - 1));
+                            '+': ArgR := ParamRequest(Copy(ArgStrR, 2,
+                                Length(ArgStrR) - 1));
                         end
-                    else
-                        ArgR := ParamRequest(ArgStrR);
+                    else ArgR := ParamRequest(ArgStrR)
                 end
-                else
-                begin
-                    ErrorCode := CALC_INVALID_PARAMETER;
-                    Exit;
-                end;
+                else begin ErrorCode := CALC_INVALID_PARAMETER; Exit end;
             end;
 
             case Oper of
-                '*': Value := ArgL * ArgR;
-                '/': Value := ArgL / ArgR;
-                '+': Value := ArgL + ArgR;
-                '-': Value := ArgL - ArgR;
+                '*' : Value := ArgL * ArgR;
+                '/' : Value := ArgL / ArgR;
+                '+' : Value := ArgL + ArgR;
+                '-' : Value := ArgL - ArgR;
             end;
 
             St := FloatToStrF(Value, ffGeneral, 6, 4);
@@ -469,69 +385,42 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
         until Index = -1;
     end;{MakeAllOper}
 
-var
-    SaveDecimalSeparator: Char;
+var SaveDecimalSeparator: Char;
 begin
     ErrorCode := CALC_NO_ERRORS;
-    SaveDecimalSeparator :=
-{$IFNDEF Lazarus}
-        FormatSettings.
-{$ENDIF}
-        DecimalSeparator;
-    {$IFNDEF Lazarus}
-    FormatSettings.
-{$ENDIF}
-        DecimalSeparator := '.';
+    SaveDecimalSeparator := {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator;
+    {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := '.';
     MakeAllOper(Expression, ['*', '/'], ErrorCode, ParamRequest);
     MakeAllOper(Expression, ['+', '-'], ErrorCode, ParamRequest);
-    try
-        Result := StrToFloat(Expression);
+    try Result := StrToFloat(Expression);
     except
         if Assigned(ParamRequest) then
         begin
             if Expression[1] in ['-', '+'] then
                 case Expression[1] of
-                    '-': Result :=
-                            (-1) * ParamRequest(Copy(Expression, 2,
-                            Length(Expression) - 1));
-                    '+': Result :=
-                            ParamRequest(Copy(Expression, 2, Length(Expression) - 1));
+                    '-': Result := (-1) * ParamRequest(Copy(
+                        Expression, 2, Length(Expression) - 1));
+                    '+': Result := ParamRequest(Copy(
+                        Expression, 2, Length(Expression) - 1));
                 end
-            else
-                Result := ParamRequest(Expression);
+            else Result := ParamRequest(Expression)
         end
-        else
-        begin
-            Result := 0;
-            ErrorCode := CALC_INVALID_PARAMETER;
-            Exit;
-        end;
+        else begin Result := 0; ErrorCode := CALC_INVALID_PARAMETER; Exit end;
     end;
-    {$IFNDEF Lazarus}
-    FormatSettings.
-{$ENDIF}
-        DecimalSeparator := SaveDecimalSeparator;
+    {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SaveDecimalSeparator;
 end;
 
-function CalculateExpr(var Expression: string; var ErrorCode: LongInt;
-    const ParamRequest: FParamRequest): Double;
-var
-    Index, Index2: LongInt;
+function CalculateExpr(var Expression: string;
+    var ErrorCode: LongInt; const ParamRequest: FParamRequest): Double;
+var Index, Index2: LongInt;
     SExpr: string;
     Value: Double;
     St: string;
     SaveDecimalSeparator: Char;
 begin
     ErrorCode := CALC_NO_ERRORS;
-    SaveDecimalSeparator :=
-{$IFNDEF Lazarus}
-        FormatSettings.
-{$ENDIF}
-        DecimalSeparator;
-    {$IFNDEF Lazarus}
-    FormatSettings.
-{$ENDIF}
-        DecimalSeparator := '.';
+    SaveDecimalSeparator := {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator;
+    {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := '.';
     repeat
         Index := GetCharPosition(Expression, ')', 1, 1);
         if Index <> -1 then
@@ -540,20 +429,13 @@ begin
             SExpr := Copy(Expression, Index2 + 1, Index - Index2 - 1);
             Delete(Expression, Index2, Index - Index2 + 1);
             Value := CalculateSimpExpr(SExpr, ErrorCode, ParamRequest);
-            if ErrorCode <> 0 then
-            begin
-                Result := 0;
-                Exit;
-            end;
+            if ErrorCode <> 0 then begin Result := 0; Exit end;
             St := FloatToStrF(Value, ffGeneral, 6, 4);
             Insert(St, Expression, Index2);
         end;
     until Index = -1;
     Result := CalculateSimpExpr(Expression, ErrorCode, ParamRequest);
-    {$IFNDEF Lazarus}
-    FormatSettings.
-{$ENDIF}
-        DecimalSeparator := SaveDecimalSeparator;
+    {$IFNDEF Lazarus}FormatSettings.{$ENDIF}DecimalSeparator := SaveDecimalSeparator;
 end;
 
 function GetRandomWithSign: Double;
@@ -564,10 +446,10 @@ begin
     end;
 end;
 
-procedure GetPosInArrays(const ArraysLengths: array of LongInt;
-    const Index: LongInt; var ArrayNumber: LongInt; var ArrayIndex: LongInt);
-var
-    TotalNumber: LongInt;   //  Total number of items in arrays.
+procedure GetPosInArrays(
+    const ArraysLengths: array of LongInt; const Index: LongInt;
+    var ArrayNumber: LongInt; var ArrayIndex: LongInt);
+var TotalNumber: LongInt;   //  Total number of items in arrays.
     LengthsSum: LongInt;    //  Sum of array lengths.
     i: LongInt;
 begin
@@ -587,46 +469,47 @@ begin
             ArrayNumber := i;
             ArrayIndex := Index - LengthsSum;
             Exit;
-        end
-        else
-            LengthsSum := LengthsSum + ArraysLengths[i];
+        end else LengthsSum := LengthsSum + ArraysLengths[i];
     end;
 end;
 
-procedure AddVectorToArray(var Arr: TVector3Array;
-    const Vector: TDoubleVector3);
+procedure AddVectorToArray(
+    var Arr: TVector3Array;
+    const Vector: TDoubleVector3
+    );
 begin
     SetLength(Arr, Length(Arr) + 1);
     Arr[Length(Arr) - 1] := Vector;
 end;
 
-procedure InsertVectorIntoArray(var Arr: TVector3Array;
-    const Index: LongInt; const Vector: TDoubleVector3);
-var
-    i: LongInt;
+procedure InsertVectorIntoArray(
+    var Arr: TVector3Array;
+    const Index: LongInt;
+    const Vector: TDoubleVector3
+    );
+var i: LongInt;
 begin
     if (Index < 0) or (Index >= Length(Arr)) then
         raise ETools.Create('Invalid array index...');
     SetLength(Arr, Length(Arr) + 1);
-    for i := Length(Arr) - 2 downto Index do
-        Arr[i + 1] := Arr[i];
+    for i := Length(Arr) - 2 downto Index do Arr[i + 1] := Arr[i];
     Arr[Index] := Vector;
 end;
 
-procedure DeleteVectorFromArray(var Arr: TVector3Array; const Index: LongInt);
-var
-    i: LongInt;
+procedure DeleteVectorFromArray(
+    var Arr: TVector3Array;
+    const Index: LongInt
+    );
+var i: LongInt;
 begin
     if (Index < 0) or (Index >= Length(Arr)) then
         raise ETools.Create('Invalid array index...');
-    for i := Index + 1 to Length(Arr) - 1 do
-        Arr[i - 1] := Arr[i];
+    for i := Index + 1 to Length(Arr) - 1 do Arr[i - 1] := Arr[i];
     SetLength(Arr, Length(Arr) - 1);
 end;
 
 function ReadComponentByReader(const Reader: TReader): TComponent;
-var
-    SaveReaderOwner: TComponent;
+var SaveReaderOwner: TComponent;
 begin
     SaveReaderOwner := Reader.Owner;
     Reader.Owner := nil;
@@ -636,10 +519,8 @@ end;
 
 procedure UtilizeObject(PtrToObject: TObject);
 begin
-    if PtrToObject is TCBRCComponent then
-        TCBRCComponent(PtrToObject).Free
-    else
-        PtrToObject.Free;
+    if PtrToObject is TCBRCComponent then TCBRCComponent(PtrToObject).Free
+    else PtrToObject.Free;
 end;
 
 procedure CheckArrItemIndex(const MinIndex, MaxIndex, Index: LongInt);
@@ -648,29 +529,34 @@ begin
         raise ETools.Create('Invalid item index (' + IntToStr(Index) + ')...');
 end;
 
-procedure DeleteItemLongArr(var Arr: TLongArray; const Index: LongInt);
-var
-    i: LongInt;
+procedure DeleteItemLongArr(
+    var Arr: TLongArray;
+    const Index: LongInt
+    );
+var i: LongInt;
 begin
     CheckArrItemIndex(0, Length(Arr) - 1, Index);
-    for i := Index + 1 to Length(Arr) - 1 do
-        Arr[i - 1] := Arr[i];
+    for i := Index + 1 to Length(Arr) - 1 do Arr[i - 1] := Arr[i];
     SetLength(Arr, Length(Arr) - 1);
 end;
 
-procedure InsertItemLongArr(var Arr: TLongArray; const Index: LongInt;
-    const Item: LongInt);
-var
-    i: LongInt;
+procedure InsertItemLongArr(
+    var Arr: TLongArray;
+    const Index: LongInt;
+    const Item: LongInt
+    );
+var i: LongInt;
 begin
     CheckArrItemIndex(0, Length(Arr) - 1, Index);
     SetLength(Arr, Length(Arr) + 1);
-    for i := Length(Arr) - 2 downto Index do
-        Arr[i + 1] := Arr[i];
+    for i := Length(Arr) - 2 downto Index do Arr[i + 1] := Arr[i];
     Arr[Index] := Item;
 end;
 
-procedure AddItemLongArr(var Arr: TLongArray; const Item: LongInt);
+procedure AddItemLongArr(
+    var Arr: TLongArray;
+    const Item: LongInt
+    );
 begin
     SetLength(Arr, Length(Arr) + 1);
     Arr[Length(Arr) - 1] := Item;
