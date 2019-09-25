@@ -622,31 +622,40 @@ function TDecisionsList.GetMaxDecision(
 var i: LongInt;
     Decision: TAbstractDecision;
     Max: Double;
-    Flag: Boolean;
+    Flag: Boolean;  //  Controls initialization of Max.
 begin
   Result := nil;
   if Count = 0 then
     raise EDecisionsList.Create('Decisions list should not be empty...');
 
   Flag := True;
+  Max := 0;         //  It is initialized to avoid warning.
   for i := StartIndex to Count - 1 do
   begin
     Decision := TAbstractDecision(Items[i]);
     if Flag then
+    begin
+      //  Searches for the first value less or equal to UpLimit.
       if Decision.Evaluation <= UpLimit then
       begin
         Max := Decision.Evaluation;
         Result := Decision;
         Flag := False;
+        //  Checks if the best solution found.
         if Decision.Evaluation = UpLimit then Exit;
       end
+    end
     else
+    begin
+      //  Checks another solution if it would be be better than the first found.
       if (Decision.Evaluation >= Max) and (Decision.Evaluation <= UpLimit) then
       begin
         Max := Decision.Evaluation;
         Result := Decision;
+        //  Checks if the best solution found.
         if Decision.Evaluation = UpLimit then Exit;
       end;
+    end;
   end;
 end;
 
@@ -655,7 +664,7 @@ function TDecisionsList.GetMinDecision(
 var i: LongInt;
     Decision: TAbstractDecision;
     Min: Double;
-    Flag: Boolean;
+    Flag: Boolean;  //  Controls initialization of Min.
 begin
   Result := nil;
   if Count = 0 then
@@ -666,20 +675,28 @@ begin
   begin
     Decision := TAbstractDecision(Items[i]);
     if Flag then
+    begin
+      //  Searches for the first value greater or equal to LowLimit.
       if Decision.Evaluation >= LowLimit then
       begin
         Min := Decision.Evaluation;
         Result := Decision;
         Flag := False;
+        //  Checks if the best solution found.
         if Decision.Evaluation = LowLimit then Exit;
       end
+    end
     else
+    begin
+      //  Checks another solution if it would be be better than the first found.
       if (Decision.Evaluation <= Min) and (Decision.Evaluation >= LowLimit) then
       begin
         Min := Decision.Evaluation;
         Result := Decision;
+        //  Checks if the best solution found.
         if Decision.Evaluation = LowLimit then Exit;
       end;
+    end;
   end;
 end;
 
@@ -687,7 +704,6 @@ function TDecisionsList.GetAbsoluteMin: TAbstractDecision;
 var i: LongInt;
     Decision: TAbstractDecision;
 begin
-  Result := nil;
   if Count = 0 then
     raise EDecisionsList.Create('Decisions list should not be empty...');
 
@@ -705,7 +721,6 @@ function TDecisionsList.GetAbsoluteMax: TAbstractDecision;
 var i: LongInt;
     Decision: TAbstractDecision;
 begin
-  Result := nil;
   if Count = 0 then
     raise EDecisionsList.Create('Decisions list should not be empty...');
 
@@ -739,7 +754,7 @@ var Decision1: TAbstractDecision absolute Item1;
 begin
   if Decision1.Evaluation > Decision2.Evaluation then Result := 1;
   if Decision1.Evaluation < Decision2.Evaluation then Result := -1;
-  if Decision1.Evaluation = Decision2.Evaluation then Result := 0;
+  Result := 0;
 end;
 
 function EvalDownSortFunc(Item1, Item2: Pointer): Integer;
@@ -748,7 +763,7 @@ var Decision1: TAbstractDecision absolute Item1;
 begin
   if Decision1.Evaluation > Decision2.Evaluation then Result := -1;
   if Decision1.Evaluation < Decision2.Evaluation then Result := 1;
-  if Decision1.Evaluation = Decision2.Evaluation then Result := 0;
+  Result := 0;
 end;
 
 initialization
