@@ -25,7 +25,6 @@ uses
 type
     TDownhillSimplexDecision = class(TFloatDecision)
     public
-        function GetCopy: TDownhillSimplexDecision; override;
     end;
 
 	//	Component-decision for simulated annealing optimization.
@@ -34,7 +33,7 @@ type
         FFluctEvaluation: Double;
 
     public
-        function GetCopy: TDownhillSimplexSADecision; override;
+        function GetCopy: TAbstractDecision; override;
 
     published
 		//	Value of estimation function with random additive value depending on the "temperature".
@@ -166,11 +165,11 @@ end;
 procedure TDownhillSimplexAlgorithm.Restart;
 var TempDecision: TDownhillSimplexDecision;
 begin
-    TempDecision := GetBestDecision.GetCopy;
+    TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do EvaluateDecision(Self, TempDecision);
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
-    BestDecision := GetBestDecision.GetCopy;
+    BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
 end;
 
@@ -185,7 +184,7 @@ begin
     end;    //  with DownhillSimplexServer do...
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
-    BestDecision := GetBestDecision.GetCopy;
+    BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
 end;
 
@@ -333,7 +332,7 @@ begin
     if TempDecision.Evaluation < BestDecision.Evaluation then
     begin
         UtilizeObject(BestDecision);
-        BestDecision := TempDecision.GetCopy;
+        BestDecision := TDownhillSimplexDecision(TempDecision.GetCopy);
         DownhillSimplexServer.UpdateResults(Self, BestDecision);
     end;
 end;
@@ -590,12 +589,7 @@ begin
     Result := (-1) * Temperature * Ln(Random + TINY);
 end;
 
-function TDownhillSimplexDecision.GetCopy: TDownhillSimplexDecision;
-begin
-    Result := TDownhillSimplexDecision(inherited GetCopy);
-end;
-
-function TDownhillSimplexSADecision.GetCopy: TDownhillSimplexSADecision;
+function TDownhillSimplexSADecision.GetCopy: TAbstractDecision;
 var i: LongInt;
     TempDecision: TDownhillSimplexSADecision;
 begin
