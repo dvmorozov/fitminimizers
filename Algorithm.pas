@@ -28,3 +28,5 @@ implementation
 initialization
     RegisterClass(TAlgorithm);
 end.
+
+
