@@ -164,11 +164,11 @@ end;
 procedure TDownhillSimplexAlgorithm.Restart;
 var TempDecision: TDownhillSimplexDecision;
 begin
-    TempDecision := GetBestDecision.GetCopy as TDownhillSimplexDecision;
+    TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do EvaluateDecision(Self, TempDecision);
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
-    BestDecision := GetBestDecision.GetCopy as TDownhillSimplexDecision;
+    BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
 end;
 
@@ -183,7 +183,7 @@ begin
     end;    //  with DownhillSimplexServer do...
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
-    BestDecision := GetBestDecision.GetCopy as TDownhillSimplexDecision;
+    BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
 end;
 
@@ -331,7 +331,7 @@ begin
     if TempDecision.Evaluation < BestDecision.Evaluation then
     begin
         UtilizeObject(BestDecision);
-        BestDecision := TempDecision.GetCopy as TDownhillSimplexDecision;
+        BestDecision := TDownhillSimplexDecision(TempDecision.GetCopy);
         DownhillSimplexServer.UpdateResults(Self, BestDecision);
     end;
 end;
