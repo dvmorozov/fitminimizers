@@ -17,6 +17,8 @@ interface
 uses
 {$IFDEF Lazarus}
     LCLIntf,
+{$ELSE}
+    Types,  //  This causes warning when compiled under Lazarus.
 {$ENDIF}
     SysUtils,  Classes, CBRCComponent, Tools;
 
