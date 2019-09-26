@@ -11,12 +11,14 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     Contnrs,
   {$ENDIF}
-    Algorithm, DownhillSimplexAlgorithm, SimpMath, Math3d;
+    Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
+
+{$ASSERTIONS ON}
 
 type
     { TForm1 }
 
-    TForm1 = class(TForm)
+    TForm1 = class(TForm, IDownhillSimplexServer)
         BitBtn1: TBitBtn;
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         procedure BitBtn1Click(Sender: TObject);
@@ -38,6 +40,7 @@ type
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
         procedure TransformPointCloudCoordinates;
+        procedure OptimizeVolume;
 
         function ComputeCenterOfMass: TDoubleVector3;
         { Retuns triplet of max coordinates (actually not a vector). }
@@ -46,6 +49,24 @@ type
         function ComputeMinCoordinates: TDoubleVector3;
         { Return volume of the box, based on values of parameters. }
         function ComputeBoxVolume: Double;
+
+        { IDownhillSimplexServer }
+        //  Return initial characteristic length for every parameter.
+        function GetInitParamLength(Sender: TComponent;
+            ParameterNumber, ParametersCount: LongInt): Double;
+
+        //  Set inital calculation point in internal representation.
+        //  The number of array element is equal to the number of parameters of task to be solved.
+        procedure FillStartDecision(Sender: TComponent;
+            StartDecision: TFloatDecision);
+        //  Calculate evaluation function for the point given in internal representation.
+        procedure EvaluateDecision(Sender: TComponent;
+            Decision: TFloatDecision);
+
+        procedure UpdateResults(Sender: TComponent;
+            Decision: TFloatDecision);
+        //  Return flag of calculation termination.
+        function EndOfCalculation(Sender: TComponent): Boolean;
     public
         { Public declarations }
     end;
@@ -63,9 +84,7 @@ procedure TForm1.BitBtn1Click(Sender: TObject);
 begin
     GenerateRandomPointCloud;
     InitializeVariableParameters;
-    MessageDlg('Volumes',
-        'Initial volume: ' + FloatToStr(InitialVolume) + sLineBreak,
-        mtInformation, [mbOK], 0, mbOK);
+    OptimizeVolume;
 end;
 
 procedure TForm1.GenerateRandomPointCloud;
@@ -237,6 +256,81 @@ end;
 procedure TForm1.RestorePointCloud;
 begin
     CopyPointCloud(SavedPointCloud, PointCloud);
+end;
+
+procedure TForm1.OptimizeVolume;
+begin
+    { Initializing algorithm. }
+    DownhillSimplexAlgorithm1.ParametersNumber := 6;
+    DownhillSimplexAlgorithm1.FinalTolerance := 0.1;
+    DownhillSimplexAlgorithm1.RestartDisabled := True;
+    DownhillSimplexAlgorithm1.ExitDerivative := 0.5;
+    DownhillSimplexAlgorithm1.DownhillSimplexServer := Self;
+    { Optimizing. }
+    DownhillSimplexAlgorithm1.AlgorithmRealization;
+end;
+
+function TForm1.GetInitParamLength(Sender: TComponent;
+    ParameterNumber, ParametersCount: LongInt): Double;
+begin
+    Result := 0.001;
+end;
+
+//  Set inital calculation point in internal representation.
+//  The number of array element is equal to the number of parameters
+//  of task to be solved.
+procedure TForm1.FillStartDecision(Sender: TComponent;
+    StartDecision: TFloatDecision);
+begin
+    { Sets up capacity. }
+    StartDecision.ParametersNumber := 6;
+    { Fills variable parameters. }
+    StartDecision.Parameters[0] := Alpha;
+    StartDecision.Parameters[1] := Beta;
+    StartDecision.Parameters[2] := Gamma;
+    StartDecision.Parameters[3] := BoxPosition[1];
+    StartDecision.Parameters[4] := BoxPosition[2];
+    StartDecision.Parameters[5] := BoxPosition[3];
+    { Computes evaluation function. }
+    StartDecision.Evaluation := ComputeBoxVolume;
+end;
+
+//  Calculate evaluation function for the point given in internal representation.
+procedure TForm1.EvaluateDecision(Sender: TComponent;
+    Decision: TFloatDecision);
+begin
+    Assert(Decision.ParametersNumber = 6);
+
+    { Fills variable parameters from the object. }
+    Alpha := Decision.Parameters[0];
+    Beta := Decision.Parameters[1];
+    Gamma := Decision.Parameters[2];
+    BoxPosition[1] := Decision.Parameters[3];
+    BoxPosition[2] := Decision.Parameters[4];
+    BoxPosition[3] := Decision.Parameters[5];
+
+    SavePointCloud;
+    { Transforms coordinates accorging to variable parameters. }
+    TransformPointCloudCoordinates;
+    { Computes evaluation function. }
+    Decision.Evaluation := ComputeBoxVolume;
+    RestorePointCloud;
+end;
+
+procedure TForm1.UpdateResults(Sender: TComponent;
+    Decision: TFloatDecision);
+begin
+    MessageDlg('Volumes',
+        'Initial volume: ' + FloatToStr(InitialVolume) + sLineBreak +
+        'Optimized volume: ' + FloatToStr(Decision.Evaluation),
+        mtInformation, [mbOK], 0, mbOK);
+end;
+
+//  Return flag of calculation termination.
+function TForm1.EndOfCalculation(Sender: TComponent): Boolean;
+begin
+    { Set up True to interrupt computation. }
+    Result := False;
 end;
 
 end.
