@@ -11,7 +11,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     Contnrs,
   {$ENDIF}
-    Algorithm, DownhillSimplexAlgorithm, SimpMath;
+    Algorithm, DownhillSimplexAlgorithm, SimpMath, Math3d;
 
 type
     { TForm1 }
@@ -33,6 +33,7 @@ type
 
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
+        procedure TransformPointCloudCoordinates;
 
         function ComputeCenterOfMass: TDoubleVector3;
         { Retuns triplet of max coordinates (actually not a vector). }
@@ -169,9 +170,34 @@ begin
     end;
 end;
 
+{$hints off}
+procedure TForm1.TransformPointCloudCoordinates;
+var RotX, RotY, RotZ, RotMatr: TMatrix;
+    i: LongInt;
+    Point: T3DVector;
+    Vector: T3Vector;
+begin
+    { Computing matrices. }
+    GetMatrixRotX(Alpha, RotX);
+    GetMatrixRotY(Beta, RotY);
+    GetMatrixRotZ(Gamma, RotZ);
+    { Computes rotation matrix. }
+    Mul3DMatrix(RotY, RotZ, RotMatr);
+    Mul3DMatrix(RotX, RotMatr, RotMatr);
+
+    for i := 0 to PointCloud.Count - 1 do
+    begin
+       Point := T3DVector(PointCloud[i]);
+       Vector := Point.Vector;
+       MulVectMatr(RotMatr, Vector);
+       Point.Vector := Vector;
+    end;
+end;
+{$hints on}
+
 function TForm1.ComputeBoxVolume: Double;
-var A, B, C: Double;    //  Sizes of the box.
-    MaxCoords, MinCoords: TDoubleVector3;
+var MaxCoords, MinCoords: TDoubleVector3;
+    A, B, C: Double;    //  Sizes of the box.
 begin
     { Computes volume of bounding box. }
     MaxCoords := ComputeMaxCoordinates;
