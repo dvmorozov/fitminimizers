@@ -9,7 +9,7 @@ uses
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    Contnrs,
+    StdCtrls, Contnrs,
   {$ENDIF}
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
@@ -21,6 +21,8 @@ type
     TForm1 = class(TForm, IDownhillSimplexServer)
         BitBtn1: TBitBtn;
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
+        Label1: TLabel;
+        Memo1: TMemo;
         procedure BitBtn1Click(Sender: TObject);
     private
         { Minimum bounding box problem. }
@@ -145,6 +147,13 @@ begin
     BoxPosition := ComputeCenterOfMass;
     Alpha := 0; Beta := 0; Gamma := 0;
     InitialVolume := ComputeBoxVolume;
+
+    Memo1.Lines.Add('Initial volume: ' + FloatToStr(InitialVolume));
+    Memo1.Lines.Add('Initial angles: ');
+    Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
+    Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
+    Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
+    Memo1.Lines.Add('');
 end;
 
 function TForm1.ComputeMaxCoordinates: TDoubleVector3;
@@ -262,7 +271,7 @@ procedure TForm1.OptimizeVolume;
 begin
     { Initializing algorithm. }
     DownhillSimplexAlgorithm1.ParametersNumber := 6;
-    DownhillSimplexAlgorithm1.FinalTolerance := 0.1;
+    //DownhillSimplexAlgorithm1.FinalTolerance := 0.000001;
     DownhillSimplexAlgorithm1.RestartDisabled := True;
     DownhillSimplexAlgorithm1.ExitDerivative := 0.5;
     DownhillSimplexAlgorithm1.DownhillSimplexServer := Self;
@@ -320,10 +329,12 @@ end;
 procedure TForm1.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
 begin
-    MessageDlg('Volumes',
-        'Initial volume: ' + FloatToStr(InitialVolume) + sLineBreak +
-        'Optimized volume: ' + FloatToStr(Decision.Evaluation),
-        mtInformation, [mbOK], 0, mbOK);
+    Memo1.Lines.Add('Optimized volume: ' + FloatToStr(Decision.Evaluation));
+    Memo1.Lines.Add('Optimized angles: ');
+    Memo1.Lines.Add('Alpha: ' + FloatToStr(Decision.Parameters[0]));
+    Memo1.Lines.Add('Beta: ' + FloatToStr(Decision.Parameters[1]));
+    Memo1.Lines.Add('Gamma: ' + FloatToStr(Decision.Parameters[2]));
+    Memo1.Lines.Add('');
 end;
 
 //  Return flag of calculation termination.
