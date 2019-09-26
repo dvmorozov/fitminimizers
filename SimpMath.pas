@@ -12,6 +12,8 @@ unit SimpMath;
 {$MODE Delphi}
 {$ENDIF}
 
+{$ASSERTIONS ON}
+
 interface
 
 uses

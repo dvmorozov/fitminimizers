@@ -99,7 +99,7 @@ type
         procedure ExchangeWithOuter(const Decision: TAbstractDecision;
             ParamNum: LongInt); override;
         procedure CopyParameter(const ParamNum, NewParamNum: LongInt); override;
-
+        //  Index is zero-based.
         property Parameters[index: LongInt]: Double read GetParameter write SetParameter;
             default;
     end;
