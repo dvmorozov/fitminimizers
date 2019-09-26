@@ -21,8 +21,8 @@ type
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         procedure BitBtn1Click(Sender: TObject);
     private
-        { Private declarations }
         { Minimum bounding box problem. }
+        SavedPointCloud: TComponentList;
         { Set of random points. }
         PointCloud: TComponentList;
         { Angles describing rotation of coordinate system. }
@@ -31,6 +31,10 @@ type
         BoxPosition:  TDoubleVector3;
         InitialVolume: Double;
 
+        { TODO: saving/restoring make more efficient. }
+        procedure CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
+        procedure SavePointCloud;
+        procedure RestorePointCloud;
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
         procedure TransformPointCloudCoordinates;
@@ -206,6 +210,33 @@ begin
     B := MaxCoords[2] - MinCoords[2];
     C := MaxCoords[3] - MinCoords[3];
     Result := A * B * C;
+end;
+
+procedure TForm1.CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
+var i: LongInt;
+    Point: T3DVector;
+begin
+    if Dest <> nil then
+        Dest.Destroy;
+
+    Dest := TComponentList.Create(True);
+
+    for i := 0 to Src.Count - 1 do
+    begin
+       Point := T3DVector.Create(nil);
+       Point.Vector := T3DVector(Src[i]).Vector;
+       Dest.Add(Point);
+    end;
+end;
+
+procedure TForm1.SavePointCloud;
+begin
+    CopyPointCloud(PointCloud, SavedPointCloud);
+end;
+
+procedure TForm1.RestorePointCloud;
+begin
+    CopyPointCloud(SavedPointCloud, PointCloud);
 end;
 
 end.
