@@ -25,12 +25,11 @@ type
         { Minimum bounding box problem. }
         { Set of random points. }
         PointCloud: TComponentList;
-        { Unit vector displaying box orientation. }
-        BoxOrientation: TDoubleVector3;
+        { Angles describing rotation of coordinate system. }
+        Alpha, Beta, Gamma: Double;
         { Vector displaying position of center of the box. }
         BoxPosition:  TDoubleVector3;
-        { Sizes of the box. }
-        A, B, C: Double;
+        InitialVolume: Double;
 
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
@@ -40,6 +39,8 @@ type
         function ComputeMaxCoordinates: TDoubleVector3;
         { Retuns triplet of min coordinates (actually not a vector). }
         function ComputeMinCoordinates: TDoubleVector3;
+        { Return volume of the box, based on values of parameters. }
+        function ComputeBoxVolume: Double;
     public
         { Public declarations }
     end;
@@ -56,6 +57,10 @@ implementation
 procedure TForm1.BitBtn1Click(Sender: TObject);
 begin
     GenerateRandomPointCloud;
+    InitializeVariableParameters;
+    MessageDlg('Volumes',
+        'Initial volume: ' + FloatToStr(InitialVolume) + sLineBreak,
+        mtInformation, [mbOK], 0, mbOK);
 end;
 
 procedure TForm1.GenerateRandomPointCloud;
@@ -112,15 +117,10 @@ begin
 end;
 
 procedure TForm1.InitializeVariableParameters;
-var MaxCoords, MinCoords: TDoubleVector3;
 begin
     BoxPosition := ComputeCenterOfMass;
-    BoxOrientation[1] := 1; BoxOrientation[2] := 0; BoxOrientation[3] := 0;
-    MaxCoords := ComputeMaxCoordinates;
-    MinCoords := ComputeMinCoordinates;
-    A := MaxCoords[1] - MinCoords[1];
-    B := MaxCoords[2] - MinCoords[2];
-    C := MaxCoords[3] - MinCoords[3];
+    Alpha := 0; Beta := 0; Gamma := 0;
+    InitialVolume := ComputeBoxVolume;
 end;
 
 function TForm1.ComputeMaxCoordinates: TDoubleVector3;
@@ -167,6 +167,19 @@ begin
         if Point.Comps[2] < Result[3] then
             Result[3] := Point.Comps[2];
     end;
+end;
+
+function TForm1.ComputeBoxVolume: Double;
+var A, B, C: Double;    //  Sizes of the box.
+    MaxCoords, MinCoords: TDoubleVector3;
+begin
+    { Computes volume of bounding box. }
+    MaxCoords := ComputeMaxCoordinates;
+    MinCoords := ComputeMinCoordinates;
+    A := MaxCoords[1] - MinCoords[1];
+    B := MaxCoords[2] - MinCoords[2];
+    C := MaxCoords[3] - MinCoords[3];
+    Result := A * B * C;
 end;
 
 end.
