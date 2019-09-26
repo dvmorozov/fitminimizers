@@ -27,6 +27,7 @@ object Form1: TForm1
     Height = 289
     Top = 80
     Width = 512
+    Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
     TabOrder = 1
   end

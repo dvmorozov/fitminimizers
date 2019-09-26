@@ -43,6 +43,7 @@ type
         procedure InitializeVariableParameters;
         procedure TransformPointCloudCoordinates;
         procedure OptimizeVolume;
+        procedure PrintPointCloud;
 
         function ComputeCenterOfMass: TDoubleVector3;
         { Retuns triplet of max coordinates (actually not a vector). }
@@ -84,7 +85,9 @@ implementation
 
 procedure TForm1.BitBtn1Click(Sender: TObject);
 begin
+    Memo1.Lines.Clear;
     GenerateRandomPointCloud;
+    PrintPointCloud;
     InitializeVariableParameters;
     OptimizeVolume;
 end;
@@ -92,14 +95,18 @@ end;
 procedure TForm1.GenerateRandomPointCloud;
 const PointCount: LongInt = 10;     //  Number of points in the cloud.
 //  Cloud boundaries.
-const MaxX: double = 10.0;
-const MinX: double = -10.0;
-const MaxY: double = 10.0;
-const MinY: double = -10.0;
-const MaxZ: double = 10.0;
-const MinZ: double = -10.0;
+const MaxX: double = 0.5;
+const MinX: double = -0.5;
+const MaxY: double = 0.5;
+const MinY: double = -0.5;
+const MaxZ: double = 0.5;
+const MinZ: double = -0.5;
+//  Offsets along (1,1,1) axis.
+const Max111: double = 10.0;
+const Min111: double = -10.0;
 var i: LongInt;
     Point: T3DVector;
+    Offset111: double;
 begin
     Randomize;
     if PointCloud <> nil then
@@ -110,9 +117,13 @@ begin
     for i := 0 to PointCount - 1 do
     begin
         Point := T3DVector.Create(nil);
-        Point.Comps[0] := MinX + Random * (MaxX - MinX);
-        Point.Comps[1] := MinY + Random * (MaxY - MinY);
-        Point.Comps[2] := MinZ + Random * (MaxZ - MinZ);
+
+        //  Coordinates are located along (1,1,1) axis with
+        //  relatively small dispersion.
+        Offset111 := Min111 + Random * (Max111 - Min111);
+        Point.Comps[0] := Offset111 + MinX + Random * (MaxX - MinX);
+        Point.Comps[1] := Offset111 + MinY + Random * (MaxY - MinY);
+        Point.Comps[2] := Offset111 + MinZ + Random * (MaxZ - MinZ);
 
         PointCloud.Add(Point);
     end;
@@ -342,6 +353,23 @@ function TForm1.EndOfCalculation(Sender: TComponent): Boolean;
 begin
     { Set up True to interrupt computation. }
     Result := False;
+end;
+
+procedure TForm1.PrintPointCloud;
+var i: LongInt;
+    Point: T3DVector;
+begin
+    Memo1.Lines.Add('Points:');
+    for i := 0 to PointCloud.Count - 1 do
+    begin
+        Point := T3DVector(PointCloud[i]);
+        Memo1.Lines.Add(
+            '  X=' + FloatToStr(Point.Comps[0]) +
+            ', Y=' + FloatToStr(Point.Comps[1]) +
+            ', Z=' + FloatToStr(Point.Comps[2])
+            );
+    end;
+    Memo1.Lines.Add('');
 end;
 
 end.
