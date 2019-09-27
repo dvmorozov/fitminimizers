@@ -290,7 +290,7 @@ procedure TForm1.OptimizeVolume;
 begin
     { Initializing algorithm. }
     DownhillSimplexAlgorithm1.ParametersNumber := 6;
-    //DownhillSimplexAlgorithm1.FinalTolerance := 0.000001;
+    DownhillSimplexAlgorithm1.FinalTolerance := 0.1;
     DownhillSimplexAlgorithm1.RestartDisabled := True;
     DownhillSimplexAlgorithm1.ExitDerivative := 0.5;
     DownhillSimplexAlgorithm1.DownhillSimplexServer := Self;
@@ -301,7 +301,7 @@ end;
 function TForm1.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
-    Result := 0.001;
+    Result := 1.0;
 end;
 
 //  Set inital calculation point in internal representation.
