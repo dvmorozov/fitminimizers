@@ -36,7 +36,8 @@ type
         Translation:  TDoubleVector3;
         InitialVolume: Double;
 
-        { TODO: saving/restoring make more efficient. }
+        procedure FillParametersFromDecision(Decision: TFloatDecision);
+        { TODO: make saving/restoring more efficient. }
         procedure CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
         procedure SavePointCloud;
         procedure RestorePointCloud;
@@ -44,9 +45,14 @@ type
         procedure InitializeVariableParameters;
         procedure TransformPointCloudCoordinates;
         procedure OptimizeVolume;
-        procedure PrintPointCloud;
-        procedure PrintParameters;
+        procedure PrintParameters(Header: string);
+        { Print data according state of the check box. }
+        procedure DisplayPointCloud;
+        procedure DisplayParameters;
 
+        { Returns transformation matrix according to current parameters. }
+        function GetTransformationMatrix: TMatrix;
+        { Computes center of mass of point cloud. }
         function ComputeCenterOfMass: TDoubleVector3;
         { Retuns triplet of max coordinates (actually not a vector). }
         function ComputeMaxCoordinates: TDoubleVector3;
@@ -91,7 +97,7 @@ procedure TForm1.BitBtn1Click(Sender: TObject);
 begin
     Memo1.Lines.Clear;
     GenerateRandomPointCloud;
-    PrintPointCloud;
+    DisplayPointCloud;
     InitializeVariableParameters;
     OptimizeVolume;
 end;
@@ -164,11 +170,8 @@ begin
     InitialVolume := ComputeBoxVolume;
 
     Memo1.Lines.Add('Initial volume: ' + FloatToStr(InitialVolume));
-    Memo1.Lines.Add('Initial angles: ');
-    Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
-    Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
-    Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
-    Memo1.Lines.Add('');
+
+    PrintParameters('Initial parameters: ');
 end;
 
 function TForm1.ComputeMaxCoordinates: TDoubleVector3;
@@ -217,12 +220,8 @@ begin
     end;
 end;
 
-{$hints off}
-procedure TForm1.TransformPointCloudCoordinates;
+function TForm1.GetTransformationMatrix: TMatrix;
 var RotX, RotY, RotZ, Matr, Trans, InverseTrans: TMatrix;
-    i: LongInt;
-    Point: T3DVector;
-    Vector: T3Vector;
 begin
     { Computing rotation matrices. }
     GetMatrixRotX(Alpha, RotX);
@@ -239,6 +238,18 @@ begin
     Mul3DMatrix(RotY, Matr, Matr);
     Mul3DMatrix(RotX, Matr, Matr);
     Mul3DMatrix(Trans, Matr, Matr);
+
+    Result := Matr;
+end;
+
+{$hints off}
+procedure TForm1.TransformPointCloudCoordinates;
+var Matr: TMatrix;
+    i: LongInt;
+    Point: T3DVector;
+    Vector: T3Vector;
+begin
+    Matr := GetTransformationMatrix;
 
     for i := 0 to PointCloud.Count - 1 do
     begin
@@ -327,25 +338,30 @@ begin
     StartDecision.Evaluation := ComputeBoxVolume;
 end;
 
-//  Calculate evaluation function for the point given in internal representation.
-procedure TForm1.EvaluateDecision(Sender: TComponent;
-    Decision: TFloatDecision);
+procedure TForm1.FillParametersFromDecision(Decision: TFloatDecision);
 begin
-    Assert(Decision.ParametersNumber = 6);
-
-    { Fills variable parameters from the object. }
     Alpha := Decision.Parameters[0];
     Beta := Decision.Parameters[1];
     Gamma := Decision.Parameters[2];
     Translation[1] := Decision.Parameters[3];
     Translation[2] := Decision.Parameters[4];
     Translation[3] := Decision.Parameters[5];
-    PrintParameters;
+end;
 
+//  Calculate evaluation function for the point given in internal representation.
+procedure TForm1.EvaluateDecision(Sender: TComponent;
+    Decision: TFloatDecision);
+
+begin
+    Assert(Decision.ParametersNumber = 6);
+
+    { Fills variable parameters from the object. }
+    FillParametersFromDecision(Decision);
+    DisplayParameters;
     SavePointCloud;
     { Transforms coordinates accorging to variable parameters. }
     TransformPointCloudCoordinates;
-    PrintPointCloud;
+    DisplayPointCloud;
     { Computes evaluation function. }
     Decision.Evaluation := ComputeBoxVolume;
     RestorePointCloud;
@@ -353,19 +369,24 @@ end;
 
 procedure TForm1.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
+var Matr: TMatrix;
+    Vector: T3Vector;
 begin
     Memo1.Lines.Add('Optimized volume: ' + FloatToStr(Decision.Evaluation));
 
-    Memo1.Lines.Add('Optimized parameters: ');
+    FillParametersFromDecision(Decision);
+    PrintParameters('Optimized parameters: ');
 
-    Memo1.Lines.Add('Alpha: ' + FloatToStr(Decision.Parameters[0]));
-    Memo1.Lines.Add('Beta: ' + FloatToStr(Decision.Parameters[1]));
-    Memo1.Lines.Add('Gamma: ' + FloatToStr(Decision.Parameters[2]));
-
-    Memo1.Lines.Add('Translation X: ' + FloatToStr(Decision.Parameters[3]));
-    Memo1.Lines.Add('Translation Y: ' + FloatToStr(Decision.Parameters[4]));
-    Memo1.Lines.Add('Translation Z: ' + FloatToStr(Decision.Parameters[5]));
-
+    { Transforms and prints etalon vector for clearness. }
+    Matr := GetTransformationMatrix;
+    Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+    MulVectMatr(Matr, Vector);
+    Memo1.Lines.Add('Rotated vector: ');
+    Memo1.Lines.Add(
+        '  X=' + FloatToStr(Vector[1]) +
+        ', Y=' + FloatToStr(Vector[2]) +
+        ', Z=' + FloatToStr(Vector[3])
+        );
     Memo1.Lines.Add('');
 end;
 
@@ -376,7 +397,7 @@ begin
     Result := False;
 end;
 
-procedure TForm1.PrintPointCloud;
+procedure TForm1.DisplayPointCloud;
 var i: LongInt;
     Point: T3DVector;
 begin
@@ -396,22 +417,25 @@ begin
     end;
 end;
 
-procedure TForm1.PrintParameters;
+procedure TForm1.DisplayParameters;
 begin
     if CheckBox1.Checked then
-    begin
-        Memo1.Lines.Add('Modified parameters: ');
+        PrintParameters('Modified parameters:');
+end;
 
-        Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
-        Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
-        Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
+procedure TForm1.PrintParameters(Header: string);
+begin
+    Memo1.Lines.Add(Header);
 
-        Memo1.Lines.Add('Translation X: ' + FloatToStr(Translation[1]));
-        Memo1.Lines.Add('Translation Y: ' + FloatToStr(Translation[2]));
-        Memo1.Lines.Add('Translation Z: ' + FloatToStr(Translation[3]));
+    Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
+    Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
+    Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
 
-        Memo1.Lines.Add('');
-    end;
+    Memo1.Lines.Add('Translation X: ' + FloatToStr(Translation[1]));
+    Memo1.Lines.Add('Translation Y: ' + FloatToStr(Translation[2]));
+    Memo1.Lines.Add('Translation Z: ' + FloatToStr(Translation[3]));
+
+    Memo1.Lines.Add('');
 end;
 
 end.
