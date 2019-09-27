@@ -523,7 +523,7 @@ begin
             else
             if PrevTolDefined then
             begin
-                if Abs(PrevTolerance - Tolerance) < 1e-6 then
+                if Abs(PrevTolerance - Tolerance) < 1e-9{1e-6} then
                     Break;
             end;
 
