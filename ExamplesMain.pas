@@ -20,6 +20,7 @@ type
 
     TForm1 = class(TForm, IDownhillSimplexServer)
         BitBtn1: TBitBtn;
+        CheckBox1: TCheckBox;
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         Label1: TLabel;
         Memo1: TMemo;
@@ -32,7 +33,7 @@ type
         { Angles describing rotation of coordinate system. }
         Alpha, Beta, Gamma: Double;
         { Vector displaying position of center of the box. }
-        BoxPosition:  TDoubleVector3;
+        Translation:  TDoubleVector3;
         InitialVolume: Double;
 
         { TODO: saving/restoring make more efficient. }
@@ -60,10 +61,12 @@ type
             ParameterNumber, ParametersCount: LongInt): Double;
 
         //  Set inital calculation point in internal representation.
-        //  The number of array element is equal to the number of parameters of task to be solved.
+        //  The number of array element is equal to the number of
+        //  parameters of task to be solved.
         procedure FillStartDecision(Sender: TComponent;
             StartDecision: TFloatDecision);
-        //  Calculate evaluation function for the point given in internal representation.
+        //  Calculate evaluation function for the point given in internal
+        //  representation.
         procedure EvaluateDecision(Sender: TComponent;
             Decision: TFloatDecision);
 
@@ -95,19 +98,19 @@ end;
 
 procedure TForm1.GenerateRandomPointCloud;
 const PointCount: LongInt = 10;     //  Number of points in the cloud.
-//  Cloud boundaries.
+//  Dispersion boundaries.
 const MaxX: double = 0.5;
 const MinX: double = -0.5;
 const MaxY: double = 0.5;
 const MinY: double = -0.5;
 const MaxZ: double = 0.5;
 const MinZ: double = -0.5;
-//  Offsets along (1,1,1) axis.
+//  Boundaries along (1,1,1) axis.
 const Max111: double = 10.0;
 const Min111: double = -10.0;
 var i: LongInt;
     Point: T3DVector;
-    Offset111: double;
+    Translation111: double;
 begin
     Randomize;
     if PointCloud <> nil then
@@ -119,12 +122,12 @@ begin
     begin
         Point := T3DVector.Create(nil);
 
-        //  Coordinates are located along (1,1,1) axis with
-        //  relatively small dispersion.
-        Offset111 := Min111 + Random * (Max111 - Min111);
-        Point.Comps[0] := Offset111 + MinX + Random * (MaxX - MinX);
-        Point.Comps[1] := Offset111 + MinY + Random * (MaxY - MinY);
-        Point.Comps[2] := Offset111 + MinZ + Random * (MaxZ - MinZ);
+        //  Coordinates are located mainly along (1,1,1) axis
+        //  with relatively small dispersion.
+        Translation111 := Min111 + Random * (Max111 - Min111);
+        Point.Comps[0] := Translation111 + MinX + Random * (MaxX - MinX);
+        Point.Comps[1] := Translation111 + MinY + Random * (MaxY - MinY);
+        Point.Comps[2] := Translation111 + MinZ + Random * (MaxZ - MinZ);
 
         PointCloud.Add(Point);
     end;
@@ -156,7 +159,7 @@ end;
 
 procedure TForm1.InitializeVariableParameters;
 begin
-    BoxPosition := ComputeCenterOfMass;
+    Translation := ComputeCenterOfMass;
     Alpha := 0; Beta := 0; Gamma := 0;
     InitialVolume := ComputeBoxVolume;
 
@@ -226,8 +229,9 @@ begin
     GetMatrixRotY(Beta, RotY);
     GetMatrixRotZ(Gamma, RotZ);
     { Computing translation matrices. }
-    GetMatrixTrans(BoxPosition[1], BoxPosition[2], BoxPosition[3], Trans);
-    GetMatrixTrans(-1.0 * BoxPosition[1], -1.0 * BoxPosition[2], -1.0 * BoxPosition[3], InverseTrans);
+    GetMatrixTrans(Translation[1], Translation[2], Translation[3], Trans);
+    GetMatrixTrans(-1.0 * Translation[1],
+        -1.0 * Translation[2], -1.0 * Translation[3], InverseTrans);
     { Computes rotation matrix. }
     GetUnitMatrix(Matr);
     Mul3DMatrix(InverseTrans, Matr, Matr);
@@ -305,8 +309,8 @@ begin
 end;
 
 //  Set inital calculation point in internal representation.
-//  The number of array element is equal to the number of parameters
-//  of task to be solved.
+//  The number of array element is equal to the number of
+//  parameters of task to be solved.
 procedure TForm1.FillStartDecision(Sender: TComponent;
     StartDecision: TFloatDecision);
 begin
@@ -316,9 +320,9 @@ begin
     StartDecision.Parameters[0] := Alpha;
     StartDecision.Parameters[1] := Beta;
     StartDecision.Parameters[2] := Gamma;
-    StartDecision.Parameters[3] := BoxPosition[1];
-    StartDecision.Parameters[4] := BoxPosition[2];
-    StartDecision.Parameters[5] := BoxPosition[3];
+    StartDecision.Parameters[3] := Translation[1];
+    StartDecision.Parameters[4] := Translation[2];
+    StartDecision.Parameters[5] := Translation[3];
     { Computes evaluation function. }
     StartDecision.Evaluation := ComputeBoxVolume;
 end;
@@ -333,9 +337,9 @@ begin
     Alpha := Decision.Parameters[0];
     Beta := Decision.Parameters[1];
     Gamma := Decision.Parameters[2];
-    BoxPosition[1] := Decision.Parameters[3];
-    BoxPosition[2] := Decision.Parameters[4];
-    BoxPosition[3] := Decision.Parameters[5];
+    Translation[1] := Decision.Parameters[3];
+    Translation[2] := Decision.Parameters[4];
+    Translation[3] := Decision.Parameters[5];
     PrintParameters;
 
     SavePointCloud;
@@ -352,14 +356,20 @@ procedure TForm1.UpdateResults(Sender: TComponent;
 begin
     Memo1.Lines.Add('Optimized volume: ' + FloatToStr(Decision.Evaluation));
 
-    Memo1.Lines.Add('Optimized angles: ');
+    Memo1.Lines.Add('Optimized parameters: ');
+
     Memo1.Lines.Add('Alpha: ' + FloatToStr(Decision.Parameters[0]));
     Memo1.Lines.Add('Beta: ' + FloatToStr(Decision.Parameters[1]));
     Memo1.Lines.Add('Gamma: ' + FloatToStr(Decision.Parameters[2]));
+
+    Memo1.Lines.Add('Translation X: ' + FloatToStr(Decision.Parameters[3]));
+    Memo1.Lines.Add('Translation Y: ' + FloatToStr(Decision.Parameters[4]));
+    Memo1.Lines.Add('Translation Z: ' + FloatToStr(Decision.Parameters[5]));
+
     Memo1.Lines.Add('');
 end;
 
-//  Return flag of calculation termination.
+//  Return flag of termination.
 function TForm1.EndOfCalculation(Sender: TComponent): Boolean;
 begin
     { Set up True to interrupt computation. }
@@ -370,32 +380,38 @@ procedure TForm1.PrintPointCloud;
 var i: LongInt;
     Point: T3DVector;
 begin
-    Memo1.Lines.Add('Points:');
-    for i := 0 to PointCloud.Count - 1 do
+    if CheckBox1.Checked then
     begin
-        Point := T3DVector(PointCloud[i]);
-        Memo1.Lines.Add(
-            '  X=' + FloatToStr(Point.Comps[0]) +
-            ', Y=' + FloatToStr(Point.Comps[1]) +
-            ', Z=' + FloatToStr(Point.Comps[2])
-            );
+        Memo1.Lines.Add('Points:');
+        for i := 0 to PointCloud.Count - 1 do
+        begin
+            Point := T3DVector(PointCloud[i]);
+            Memo1.Lines.Add(
+                '  X=' + FloatToStr(Point.Comps[0]) +
+                ', Y=' + FloatToStr(Point.Comps[1]) +
+                ', Z=' + FloatToStr(Point.Comps[2])
+                );
+        end;
+        Memo1.Lines.Add('');
     end;
-    Memo1.Lines.Add('');
 end;
 
 procedure TForm1.PrintParameters;
 begin
-    Memo1.Lines.Add('Modified parameters: ');
+    if CheckBox1.Checked then
+    begin
+        Memo1.Lines.Add('Modified parameters: ');
 
-    Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
-    Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
-    Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
+        Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
+        Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
+        Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
 
-    Memo1.Lines.Add('Offset X: ' + FloatToStr(BoxPosition[1]));
-    Memo1.Lines.Add('Offset Y: ' + FloatToStr(BoxPosition[2]));
-    Memo1.Lines.Add('Offset Z: ' + FloatToStr(BoxPosition[3]));
+        Memo1.Lines.Add('Translation X: ' + FloatToStr(Translation[1]));
+        Memo1.Lines.Add('Translation Y: ' + FloatToStr(Translation[2]));
+        Memo1.Lines.Add('Translation Z: ' + FloatToStr(Translation[3]));
 
-    Memo1.Lines.Add('');
+        Memo1.Lines.Add('');
+    end;
 end;
 
 end.
