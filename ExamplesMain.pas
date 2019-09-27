@@ -216,24 +216,31 @@ end;
 
 {$hints off}
 procedure TForm1.TransformPointCloudCoordinates;
-var RotX, RotY, RotZ, RotMatr: TMatrix;
+var RotX, RotY, RotZ, Matr, Trans, InverseTrans: TMatrix;
     i: LongInt;
     Point: T3DVector;
     Vector: T3Vector;
 begin
-    { Computing matrices. }
+    { Computing rotation matrices. }
     GetMatrixRotX(Alpha, RotX);
     GetMatrixRotY(Beta, RotY);
     GetMatrixRotZ(Gamma, RotZ);
+    { Computing translation matrices. }
+    GetMatrixTrans(BoxPosition[1], BoxPosition[2], BoxPosition[3], Trans);
+    GetMatrixTrans(-1.0 * BoxPosition[1], -1.0 * BoxPosition[2], -1.0 * BoxPosition[3], InverseTrans);
     { Computes rotation matrix. }
-    Mul3DMatrix(RotY, RotZ, RotMatr);
-    Mul3DMatrix(RotX, RotMatr, RotMatr);
+    GetUnitMatrix(Matr);
+    Mul3DMatrix(InverseTrans, Matr, Matr);
+    Mul3DMatrix(RotZ, Matr, Matr);
+    Mul3DMatrix(RotY, Matr, Matr);
+    Mul3DMatrix(RotX, Matr, Matr);
+    Mul3DMatrix(Trans, Matr, Matr);
 
     for i := 0 to PointCloud.Count - 1 do
     begin
        Point := T3DVector(PointCloud[i]);
        Vector := Point.Vector;
-       MulVectMatr(RotMatr, Vector);
+       MulVectMatr(Matr, Vector);
        Point.Vector := Vector;
     end;
 end;
