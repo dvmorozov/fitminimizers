@@ -44,6 +44,7 @@ type
         procedure TransformPointCloudCoordinates;
         procedure OptimizeVolume;
         procedure PrintPointCloud;
+        procedure PrintParameters;
 
         function ComputeCenterOfMass: TDoubleVector3;
         { Retuns triplet of max coordinates (actually not a vector). }
@@ -328,10 +329,12 @@ begin
     BoxPosition[1] := Decision.Parameters[3];
     BoxPosition[2] := Decision.Parameters[4];
     BoxPosition[3] := Decision.Parameters[5];
+    PrintParameters;
 
     SavePointCloud;
     { Transforms coordinates accorging to variable parameters. }
     TransformPointCloudCoordinates;
+    PrintPointCloud;
     { Computes evaluation function. }
     Decision.Evaluation := ComputeBoxVolume;
     RestorePointCloud;
@@ -341,6 +344,7 @@ procedure TForm1.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
 begin
     Memo1.Lines.Add('Optimized volume: ' + FloatToStr(Decision.Evaluation));
+
     Memo1.Lines.Add('Optimized angles: ');
     Memo1.Lines.Add('Alpha: ' + FloatToStr(Decision.Parameters[0]));
     Memo1.Lines.Add('Beta: ' + FloatToStr(Decision.Parameters[1]));
@@ -369,6 +373,21 @@ begin
             ', Z=' + FloatToStr(Point.Comps[2])
             );
     end;
+    Memo1.Lines.Add('');
+end;
+
+procedure TForm1.PrintParameters;
+begin
+    Memo1.Lines.Add('Modified parameters: ');
+
+    Memo1.Lines.Add('Alpha: ' + FloatToStr(Alpha));
+    Memo1.Lines.Add('Beta: ' + FloatToStr(Beta));
+    Memo1.Lines.Add('Gamma: ' + FloatToStr(Gamma));
+
+    Memo1.Lines.Add('Offset X: ' + FloatToStr(BoxPosition[1]));
+    Memo1.Lines.Add('Offset Y: ' + FloatToStr(BoxPosition[2]));
+    Memo1.Lines.Add('Offset Z: ' + FloatToStr(BoxPosition[3]));
+
     Memo1.Lines.Add('');
 end;
 
