@@ -12,7 +12,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="194"/>
+        <UsageCount Value="195"/>
       </Unit0>
       <Unit1>
         <Filename Value="ExamplesMain.pas"/>
@@ -20,10 +20,9 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="456"/>
+        <TopLine Value="90"/>
         <CursorPos X="23" Y="90"/>
-        <UsageCount Value="194"/>
+        <UsageCount Value="195"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -93,9 +92,10 @@
       </Unit11>
       <Unit12>
         <Filename Value="Math3d.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="29"/>
-        <CursorPos X="25" Y="45"/>
+        <TopLine Value="34"/>
+        <CursorPos X="2" Y="53"/>
         <UsageCount Value="70"/>
         <Loaded Value="True"/>
       </Unit12>
