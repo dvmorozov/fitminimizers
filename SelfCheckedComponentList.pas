@@ -29,7 +29,8 @@ type
         function MyNameIs: string;
     end;
 
-const SelfCheckedGUID: TGUID = '{E7E7008A-EE1C-4828-B1D6-A53806820A66}';
+const
+    SelfCheckedGUID: TGUID = '{E7E7008A-EE1C-4828-B1D6-A53806820A66}';
 
 type
     //  By default release stored components.
@@ -113,7 +114,8 @@ begin
 end;
 
 procedure TSelfCheckedComponentList.ReadList(Reader: TReader);
-var i, CompCount: LongInt;
+var
+    i, CompCount: LongInt;
 begin
     CompCount := Reader.ReadInteger;
     for i := 1 to CompCount do
@@ -121,7 +123,8 @@ begin
 end;
 
 procedure TSelfCheckedComponentList.WriteList(Writer: TWriter);
-var i: LongInt;
+var
+    i: LongInt;
 begin
     Writer.WriteInteger(Count);
     for i := 0 to Count - 1 do
@@ -130,7 +133,8 @@ end;
 
 procedure TSelfCheckedComponentList.Clear;
 begin
-    if State = cfActive then ClearAll;
+    if State = cfActive then
+        ClearAll;
     List.Clear;
 end;
 
@@ -151,7 +155,7 @@ end;
 
 function TSelfCheckedComponentList.GetCapacity: Integer;
 begin
-    GetCapacity := List.Capacity
+    GetCapacity := List.Capacity;
 end;
 
 procedure TSelfCheckedComponentList.SetCapacity(ACapacity: Integer);
@@ -170,7 +174,8 @@ begin
 end;
 
 procedure TSelfCheckedComponentList.Delete(Index: Integer);
-var TC: TComponent;
+var
+    TC: TComponent;
 begin
     if State = cfActive then
     begin
@@ -193,7 +198,8 @@ end;
 
 procedure TSelfCheckedComponentList.ClearAll;
 begin
-    while Count <> 0 do Delete(0);
+    while Count <> 0 do
+        Delete(0);
 end;
 
 function TSelfCheckedComponentList.IndexOf(Item: Pointer): Integer;
@@ -222,27 +228,33 @@ begin
 end;
 
 procedure TSelfCleanList.ClearAll;
-var i: LongInt;
+var
+    i: LongInt;
     Item: Pointer;
 begin
     for i := 0 to Count - 1 do
     begin
         Item := Items[i];
         if Assigned(Item) then
-            with TObject(Item) do try
-                UtilizeObject(TObject(Item));
-                Items[i] := nil;
-            except Items[i] := nil end;
+            with TObject(Item) do
+                try
+                    UtilizeObject(TObject(Item));
+                    Items[i] := nil;
+                except
+                    Items[i] := nil
+                end;
     end;
     Clear;
 end;
 
 procedure TSelfCheckedComponentList.IsReady;
-var i: LongInt;
+var
+    i: LongInt;
     ISC: ISelfChecked;
 begin
     for i := 0 to Count - 1 do
-        if Items[i].GetInterface(SelfCheckedGUID, ISC) then ISC.IsReady;
+        if Items[i].GetInterface(SelfCheckedGUID, ISC) then
+            ISC.IsReady;
 end;
 
 function TSelfCheckedComponentList.MyNameIs: string;
