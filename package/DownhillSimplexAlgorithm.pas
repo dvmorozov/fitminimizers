@@ -503,26 +503,30 @@ begin
 
             //  Tolerance directly depends on height of the simplex along
             //  the axis of minimized function. Therefore when tolerance stops
-            //  decrease substantially for cycle it is necessary to terminate calculation.
-            if FinalTolDefined and (Tolerance < FinalTolerance) then
+            //  decrease substantially for cycle it is necessary to terminate
+            //  calculation.
+            if FinalTolDefined then
             begin
-                //  mnogogrannik splyuschilsya do minimal'no dopustimogo razmera
-                if (Abs(GetBestDecision.Evaluation - SavedLoEval) >
-                    ExitDerivative) and (not RestartDisabled) then
+                if Tolerance < FinalTolerance then
                 begin
+                    //  Size of simplex was reduced to minimal admissible value.
+                    if (Abs(GetBestDecision.Evaluation - SavedLoEval) >
+                        ExitDerivative) and (not RestartDisabled) then
+                    begin
 
-                    SavedLoEval := GetBestDecision.Evaluation;
-                    Restart;
-                    Continue;
+                        SavedLoEval := GetBestDecision.Evaluation;
+                        Restart;
+                        Continue;
 
-                end
-                else
-                    Break;
+                    end
+                    else
+                        Break;
+                end;
             end
             else
             if PrevTolDefined then
             begin
-                if Abs(PrevTolerance - Tolerance) < 1e-6 then
+                if Abs(PrevTolerance - Tolerance) < TINY then
                     Break;
             end;
 
