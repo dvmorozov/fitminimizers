@@ -104,6 +104,8 @@ begin
     OptimizeVolume;
 end;
 
+{$warnings off}
+{$hints off}
 procedure TForm1.GenerateRandomPointCloud;
 const PointCount: LongInt = 10;     //  Number of points in the cloud.
 //  Dispersion boundaries.
@@ -140,6 +142,8 @@ begin
         PointCloud.Add(Point);
     end;
 end;
+{$hints on}
+{$warnings on}
 
 function TForm1.ComputeCenterOfMass: TDoubleVector3;
 var i: LongInt;
@@ -292,6 +296,8 @@ begin
     Result := A * B * C;
 end;
 
+{$warnings off}
+{$hints off}
 procedure TForm1.CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
 var i: LongInt;
     Point: T3DVector;
@@ -308,6 +314,8 @@ begin
        Dest.Add(Point);
     end;
 end;
+{$hints on}
+{$warnings on}
 
 procedure TForm1.SavePointCloud;
 begin
