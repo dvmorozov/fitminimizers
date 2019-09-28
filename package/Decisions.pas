@@ -700,6 +700,9 @@ begin
         raise EDecisionsList.Create('Decisions list should not be empty...');
 
     Flag := True;
+    Min := 0;       //  Avoiding warning. Min is initialized when the first
+                    //  point is found having evaluation value greater or
+                    //  equal to the lower limit (see below).
     for i := StartIndex to Count - 1 do
     begin
         Decision := TAbstractDecision(Items[i]);
@@ -789,11 +792,11 @@ var
     Decision1: TAbstractDecision absolute Item1;
     Decision2: TAbstractDecision absolute Item2;
 begin
+    Result := 0;
     if Decision1.Evaluation > Decision2.Evaluation then
         Result := 1;
     if Decision1.Evaluation < Decision2.Evaluation then
         Result := -1;
-    Result := 0;
 end;
 
 function EvalDownSortFunc(Item1, Item2: Pointer): Integer;
@@ -801,11 +804,11 @@ var
     Decision1: TAbstractDecision absolute Item1;
     Decision2: TAbstractDecision absolute Item2;
 begin
+    Result := 0;
     if Decision1.Evaluation > Decision2.Evaluation then
         Result := -1;
     if Decision1.Evaluation < Decision2.Evaluation then
         Result := 1;
-    Result := 0;
 end;
 
 initialization
