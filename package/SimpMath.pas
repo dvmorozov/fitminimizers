@@ -12,6 +12,8 @@ unit SimpMath;
 {$MODE Delphi}
 {$ENDIF}
 
+{$ASSERTIONS ON}
+
 interface
 
 uses
@@ -35,7 +37,7 @@ type
         function GetScalarMul(const Vect1, Vect2: IVector): Double;
     end;
 
-    //  Vector containing real numbers.
+    //  Vector of arbitrary number of dimensions containing real numbers.
     IVector = interface
         function GetSpace: ISpace;
         procedure SetSpace(const ASpace: ISpace);
@@ -47,12 +49,14 @@ type
 
         property Space: ISpace read GetSpace write SetSpace;
         property Norma: Double read GetNorma;
+        //  Returns number of vector coordinates (dimensions).
         property CompsNumber: LongInt read GetCompsNumber;
+        //  Gets/sets value of vector coordinate. Index is zero-based.
         property Comps[index: LongInt]: Double read GetComp write SetComp;
         property NormComps[index: LongInt]: Double read GetNormComp;
     end;
 
-    //  Vector containing complex number.
+    //  Vector of arbitrary number of dimensions containing complex number.
     IComplexVector = interface(IVector)
         function GetImComp(index: LongInt): Double;
         procedure SetImComp(index: LongInt; AImComp: Double);
@@ -67,6 +71,7 @@ type
 
     E3DVector = class(Exception);
 
+    //  Vector of 3D space.
     T3DVector = class(TCBRCComponent, IVector)
     protected
         FSpace: ISpace;
@@ -80,15 +85,19 @@ type
         procedure SetNorma(const ANorma: Double); virtual; abstract;
         function GetCompsNumber: LongInt;
         function GetComp(index: LongInt): Double;
-        procedure SetComp(index: LongInt; AComp: Double); virtual; abstract;
+        //  TODO: normalized vector should be recomputed.
+        procedure SetComp(index: LongInt; AComp: Double);
         function GetNormComp(index: LongInt): Double;
+        function GetVector: TDoubleVector3;
+        procedure SetVector(Vector: TDoubleVector3);
 
     public
         property Space: ISpace read GetSpace write SetSpace;
         property Norma: Double read GetNorma;
         property CompsNumber: LongInt read GetCompsNumber;
-        property Comps[index: LongInt]: Double read GetComp;
+        property Comps[index: LongInt]: Double read GetComp write SetComp;
         property NormComps[index: LongInt]: Double read GetNormComp;
+        property Vector: TDoubleVector3 read GetVector write SetVector;
     end;
 
     T3DComplexVector = class(T3DVector, IComplexVector)
@@ -903,17 +912,39 @@ begin
     Result := 3;
 end;
 
+function T3DVector.GetVector: TDoubleVector3;
+begin
+    Result[1] := Comps[0];
+    Result[2] := Comps[1];
+    Result[3] := Comps[2];
+end;
+
+procedure T3DVector.SetVector(Vector: TDoubleVector3);
+begin
+    Comps[0] := Vector[1];
+    Comps[1] := Vector[2];
+    Comps[2] := Vector[3];
+end;
+
 function T3DVector.GetComp(index: LongInt): Double;
 begin
-    if (Index < 0) or (index > CompsNumber) then
+    if (Index < 0) or (index >= CompsNumber) then
         raise E3DVector.Create('Invalid index...')
     else
         Result := FVector[index + 1];
 end;
 
+procedure T3DVector.SetComp(index: LongInt; AComp: Double);
+begin
+    if (Index < 0) or (index >= CompsNumber) then
+        raise E3DVector.Create('Invalid index...')
+    else
+        FVector[index + 1] := AComp;
+end;
+
 function T3DVector.GetNormComp(index: LongInt): Double;
 begin
-    if (Index < 0) or (index > CompsNumber) then
+    if (Index < 0) or (index >= CompsNumber) then
         raise E3DVector.Create('Invalid index...')
     else
         Result := FNormalizedVector[index + 1];
