@@ -22,7 +22,7 @@ uses SysUtils, Classes, SimpMath, CBRCComponent
 type
     //  Return value of the parameter 'Param'.
     FParamRequest = function(Param: string): Double of object;
-    TCharSet = set of Char;
+    TCharSet = set of AnsiChar;
     TVector3Array = array of TDoubleVector3;
 
     ETools = class(Exception);
@@ -314,7 +314,7 @@ begin
         1:
         begin
             for i := StartIndex to Length(St) do
-                if St[i] in ChSet then
+                if AnsiChar(St[i]) in ChSet then
                 begin
                     Result := i;
                     Ch := St[i];
@@ -325,7 +325,7 @@ begin
         -1:
         begin
             for i := StartIndex downto 1 do
-                if St[i] in ChSet then
+                if AnsiChar(St[i]) in ChSet then
                 begin
                     Result := i;
                     Ch := St[i];
@@ -566,7 +566,8 @@ function GetRandomWithSign: Double;
 begin
     case Round(Random) of
         0: Result := (-1) * Random;
-        1: Result := Random;
+        else
+            Result := Random;
     end;
 end;
 
