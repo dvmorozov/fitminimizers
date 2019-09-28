@@ -30,7 +30,7 @@ type
         SavedPointCloud: TComponentList;
         { Set of random points. }
         PointCloud: TComponentList;
-        { Angles describing rotation of coordinate system. }
+        { Angles describing rotation of coordinate system (in degrees). }
         Alpha, Beta, Gamma: Double;
         { Vector displaying position of center of the box. }
         Translation:  TDoubleVector3;
@@ -62,6 +62,8 @@ type
         function ComputeMinCoordinates: TDoubleVector3;
         { Return volume of the box, based on values of parameters. }
         function ComputeBoxVolume: Double;
+
+        function DegToRad(Deg: Double): Double;
 
         { IDownhillSimplexServer }
         //  Return initial characteristic length for every parameter.
@@ -232,9 +234,9 @@ var RotX, RotY, RotZ, Matr: TMatrix;
 begin
     { Computing rotation matrices.
       Matrices are initalized inside functions. }
-    GetMatrixRotX(Alpha, RotX);
-    GetMatrixRotY(Beta, RotY);
-    GetMatrixRotZ(Gamma, RotZ);
+    GetMatrixRotX(DegToRad(Alpha), RotX);
+    GetMatrixRotY(DegToRad(Beta), RotY);
+    GetMatrixRotZ(DegToRad(Gamma), RotZ);
     { Computes rotation matrix. }
     GetUnitMatrix(Matr);
     Mul3DMatrix(RotZ, Matr, Matr);
@@ -342,7 +344,18 @@ end;
 function TForm1.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
-    Result := 1.0;
+    Assert(ParametersCount = 6);
+
+    { Sets initial steps for angles 57 degrees, for translations 1 unit. }
+    if (ParameterNumber < 3) then
+        Result := 57.0
+    else
+        Result := 1.0;
+end;
+
+function TForm1.DegToRad(Deg: Double): Double;
+begin
+    Result := Deg * Pi / 180.0;
 end;
 
 //  Set inital calculation point in internal representation.
