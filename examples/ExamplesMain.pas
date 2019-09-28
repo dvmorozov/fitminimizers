@@ -41,12 +41,18 @@ type
         procedure CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
         procedure SavePointCloud;
         procedure RestorePointCloud;
+
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
+
+        { Transforms cloud coordinates according values of variable parameters. }
         procedure TransformPointCloudCoordinates;
+        { Executes optimization algorithm. }
         procedure OptimizeVolume;
+
+        { Prints values of variable parameters. }
         procedure PrintParameters(Header: string);
-        { Print data according state of the check box. }
+        { Prints data according state of the check box. }
         procedure DisplayPointCloud;
         procedure DisplayParameters;
 
@@ -54,13 +60,14 @@ type
         function GetRotationMatrix: TMatrix;
         { Returns transformation matrix according to current parameters. }
         function GetTransformationMatrix: TMatrix;
-        { Computes center of mass of point cloud. }
+        { Computes center of mass of point cloud for initial translation. }
         function ComputeCenterOfMass: TDoubleVector3;
         { Retuns triplet of max coordinates (actually not a vector). }
         function ComputeMaxCoordinates: TDoubleVector3;
         { Retuns triplet of min coordinates (actually not a vector). }
         function ComputeMinCoordinates: TDoubleVector3;
-        { Return volume of the box, based on values of parameters. }
+        { Return volume of the box (evaluation function,
+          based on values of parameters. }
         function ComputeBoxVolume: Double;
 
         function DegToRad(Deg: Double): Double;
@@ -72,14 +79,14 @@ type
 
         //  Set inital calculation point in internal representation.
         //  The number of array element is equal to the number of
-        //  parameters of task to be solved.
+        //  variable parameters of task being solved.
         procedure FillStartDecision(Sender: TComponent;
             StartDecision: TFloatDecision);
         //  Calculate evaluation function for the point given in internal
         //  representation.
         procedure EvaluateDecision(Sender: TComponent;
             Decision: TFloatDecision);
-
+        //  Displays current minimum.
         procedure UpdateResults(Sender: TComponent;
             Decision: TFloatDecision);
         //  Return flag of calculation termination.
