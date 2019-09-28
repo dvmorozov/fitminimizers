@@ -50,6 +50,8 @@ type
         procedure DisplayPointCloud;
         procedure DisplayParameters;
 
+        { Returns rotation matrix. }
+        function GetRotationMatrix: TMatrix;
         { Returns transformation matrix according to current parameters. }
         function GetTransformationMatrix: TMatrix;
         { Computes center of mass of point cloud. }
@@ -220,29 +222,45 @@ begin
     end;
 end;
 
-function TForm1.GetTransformationMatrix: TMatrix;
-var RotX, RotY, RotZ, Matr, Trans, InverseTrans: TMatrix;
+{$hints off}
+function TForm1.GetRotationMatrix: TMatrix;
+var RotX, RotY, RotZ, Matr: TMatrix;
 begin
-    { Computing rotation matrices. }
+    { Computing rotation matrices.
+      Matrices are initalized inside functions. }
     GetMatrixRotX(Alpha, RotX);
     GetMatrixRotY(Beta, RotY);
     GetMatrixRotZ(Gamma, RotZ);
-    { Computing translation matrices. }
-    GetMatrixTrans(Translation[1], Translation[2], Translation[3], Trans);
-    GetMatrixTrans(-1.0 * Translation[1],
-        -1.0 * Translation[2], -1.0 * Translation[3], InverseTrans);
     { Computes rotation matrix. }
     GetUnitMatrix(Matr);
-    Mul3DMatrix(InverseTrans, Matr, Matr);
     Mul3DMatrix(RotZ, Matr, Matr);
     Mul3DMatrix(RotY, Matr, Matr);
     Mul3DMatrix(RotX, Matr, Matr);
+
+    Result := Matr;
+end;
+
+function TForm1.GetTransformationMatrix: TMatrix;
+var Matr, Rot, Trans, InverseTrans: TMatrix;
+    A, B, C: Double;
+begin
+    Rot := GetRotationMatrix;
+    { Computing translation matrices. }
+    A := Translation[1];
+    B := Translation[2];
+    C := Translation[3];
+
+    GetMatrixTrans(A, B, C, Trans);
+    GetMatrixTrans(-1.0 * A, -1.0 * B, -1.0 * C, InverseTrans);
+
+    GetUnitMatrix(Matr);
+    Mul3DMatrix(InverseTrans, Matr, Matr);
+    Mul3DMatrix(Rot, Matr, Matr);
     Mul3DMatrix(Trans, Matr, Matr);
 
     Result := Matr;
 end;
 
-{$hints off}
 procedure TForm1.TransformPointCloudCoordinates;
 var Matr: TMatrix;
     i: LongInt;
@@ -378,7 +396,7 @@ begin
     PrintParameters('Optimized parameters: ');
 
     { Transforms and prints etalon vector for clearness. }
-    Matr := GetTransformationMatrix;
+    Matr := GetRotationMatrix;
     Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
     MulVectMatr(Matr, Vector);
     Memo1.Lines.Add('Rotated vector: ');
