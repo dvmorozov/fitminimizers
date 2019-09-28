@@ -33,7 +33,7 @@ type
         { Angles describing rotation of coordinate system (in degrees). }
         Alpha, Beta, Gamma: Double;
         { Vector displaying position of center of the box. }
-        Translation:  TDoubleVector3;
+        Translation: TDoubleVector3;
         InitialVolume: Double;
 
         procedure FillParametersFromDecision(Decision: TFloatDecision);
@@ -87,8 +87,7 @@ type
         procedure EvaluateDecision(Sender: TComponent;
             Decision: TFloatDecision);
         //  Displays current minimum.
-        procedure UpdateResults(Sender: TComponent;
-            Decision: TFloatDecision);
+        procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
         //  Return flag of calculation termination.
         function EndOfCalculation(Sender: TComponent): Boolean;
     public
@@ -116,18 +115,28 @@ end;
 {$warnings off}
 {$hints off}
 procedure TForm1.GenerateRandomPointCloud;
-const PointCount: LongInt = 10;     //  Number of points in the cloud.
-//  Dispersion boundaries.
-const MaxX: double = 0.5;
-const MinX: double = -0.5;
-const MaxY: double = 0.5;
-const MinY: double = -0.5;
-const MaxZ: double = 0.5;
-const MinZ: double = -0.5;
-//  Boundaries along (1,1,1) axis.
-const Max111: double = 10.0;
-const Min111: double = -10.0;
-var i: LongInt;
+const
+    PointCount: LongInt = 10;     //  Number of points in the cloud.
+    //  Dispersion boundaries.
+const
+    MaxX: double = 0.5;
+const
+    MinX: double = -0.5;
+const
+    MaxY: double = 0.5;
+const
+    MinY: double = -0.5;
+const
+    MaxZ: double = 0.5;
+const
+    MinZ: double = -0.5;
+    //  Boundaries along (1,1,1) axis.
+const
+    Max111: double = 10.0;
+const
+    Min111: double = -10.0;
+var
+    i: LongInt;
     Point: T3DVector;
     Translation111: double;
 begin
@@ -151,17 +160,21 @@ begin
         PointCloud.Add(Point);
     end;
 end;
+
 {$hints on}
 {$warnings on}
 
 function TForm1.ComputeCenterOfMass: TDoubleVector3;
-var i: LongInt;
+var
+    i: LongInt;
     X, Y, Z: Double;
     Point: T3DVector;
 begin
     Assert(PointCloud.Count <> 0);
 
-    X := 0; Y := 0; Z := 0;
+    X := 0;
+    Y := 0;
+    Z := 0;
     for i := 0 to PointCloud.Count - 1 do
     begin
         Point := T3DVector(PointCloud[i]);
@@ -181,7 +194,9 @@ end;
 procedure TForm1.InitializeVariableParameters;
 begin
     Translation := ComputeCenterOfMass;
-    Alpha := 0; Beta := 0; Gamma := 0;
+    Alpha := 0;
+    Beta := 0;
+    Gamma := 0;
     InitialVolume := ComputeBoxVolume;
 
     Memo1.Lines.Add('Initial volume: ' + FloatToStr(InitialVolume));
@@ -190,7 +205,8 @@ begin
 end;
 
 function TForm1.ComputeMaxCoordinates: TDoubleVector3;
-var i: LongInt;
+var
+    i: LongInt;
     Point: T3DVector;
 begin
     Assert(PointCloud.Count <> 0);
@@ -213,7 +229,8 @@ begin
 end;
 
 function TForm1.ComputeMinCoordinates: TDoubleVector3;
-var i: LongInt;
+var
+    i: LongInt;
     Point: T3DVector;
 begin
     Assert(PointCloud.Count <> 0);
@@ -237,7 +254,8 @@ end;
 
 {$hints off}
 function TForm1.GetRotationMatrix: TMatrix;
-var RotX, RotY, RotZ, Matr: TMatrix;
+var
+    RotX, RotY, RotZ, Matr: TMatrix;
 begin
     { Computing rotation matrices.
       Matrices are initalized inside functions. }
@@ -254,7 +272,8 @@ begin
 end;
 
 function TForm1.GetTransformationMatrix: TMatrix;
-var Matr, Rot, Trans, InverseTrans: TMatrix;
+var
+    Matr, Rot, Trans, InverseTrans: TMatrix;
     A, B, C: Double;
 begin
     Rot := GetRotationMatrix;
@@ -275,7 +294,8 @@ begin
 end;
 
 procedure TForm1.TransformPointCloudCoordinates;
-var Matr: TMatrix;
+var
+    Matr: TMatrix;
     i: LongInt;
     Point: T3DVector;
     Vector: T3Vector;
@@ -284,16 +304,18 @@ begin
 
     for i := 0 to PointCloud.Count - 1 do
     begin
-       Point := T3DVector(PointCloud[i]);
-       Vector := Point.Vector;
-       MulVectMatr(Matr, Vector);
-       Point.Vector := Vector;
+        Point := T3DVector(PointCloud[i]);
+        Vector := Point.Vector;
+        MulVectMatr(Matr, Vector);
+        Point.Vector := Vector;
     end;
 end;
+
 {$hints on}
 
 function TForm1.ComputeBoxVolume: Double;
-var MaxCoords, MinCoords: TDoubleVector3;
+var
+    MaxCoords, MinCoords: TDoubleVector3;
     A, B, C: Double;    //  Sizes of the box.
 begin
     { Computes volume of bounding box. }
@@ -308,7 +330,8 @@ end;
 {$warnings off}
 {$hints off}
 procedure TForm1.CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
-var i: LongInt;
+var
+    i: LongInt;
     Point: T3DVector;
 begin
     if Dest <> nil then
@@ -318,11 +341,12 @@ begin
 
     for i := 0 to Src.Count - 1 do
     begin
-       Point := T3DVector.Create(nil);
-       Point.Vector := T3DVector(Src[i]).Vector;
-       Dest.Add(Point);
+        Point := T3DVector.Create(nil);
+        Point.Vector := T3DVector(Src[i]).Vector;
+        Dest.Add(Point);
     end;
 end;
+
 {$hints on}
 {$warnings on}
 
@@ -368,8 +392,7 @@ end;
 //  Set inital calculation point in internal representation.
 //  The number of array element is equal to the number of
 //  parameters of task to be solved.
-procedure TForm1.FillStartDecision(Sender: TComponent;
-    StartDecision: TFloatDecision);
+procedure TForm1.FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
 begin
     { Sets up capacity. }
     StartDecision.ParametersNumber := 6;
@@ -395,8 +418,7 @@ begin
 end;
 
 //  Calculate evaluation function for the point given in internal representation.
-procedure TForm1.EvaluateDecision(Sender: TComponent;
-    Decision: TFloatDecision);
+procedure TForm1.EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
 
 begin
     Assert(Decision.ParametersNumber = 6);
@@ -413,9 +435,9 @@ begin
     RestorePointCloud;
 end;
 
-procedure TForm1.UpdateResults(Sender: TComponent;
-    Decision: TFloatDecision);
-var Matr: TMatrix;
+procedure TForm1.UpdateResults(Sender: TComponent; Decision: TFloatDecision);
+var
+    Matr: TMatrix;
     Vector: T3Vector;
 begin
     Memo1.Lines.Add('Optimized volume: ' + FloatToStr(Decision.Evaluation));
@@ -425,12 +447,13 @@ begin
 
     { Transforms and prints etalon vector for clearness. }
     Matr := GetRotationMatrix;
-    Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+    Vector[1] := 1;
+    Vector[2] := 0;
+    Vector[3] := 0;
     MulVectMatr(Matr, Vector);
     Memo1.Lines.Add('Rotated vector: ');
     Memo1.Lines.Add(
-        '  X=' + FloatToStr(Vector[1]) +
-        ', Y=' + FloatToStr(Vector[2]) +
+        '  X=' + FloatToStr(Vector[1]) + ', Y=' + FloatToStr(Vector[2]) +
         ', Z=' + FloatToStr(Vector[3])
         );
     Memo1.Lines.Add('');
@@ -444,7 +467,8 @@ begin
 end;
 
 procedure TForm1.DisplayPointCloud;
-var i: LongInt;
+var
+    i: LongInt;
     Point: T3DVector;
 begin
     if CheckBox1.Checked then
@@ -454,9 +478,8 @@ begin
         begin
             Point := T3DVector(PointCloud[i]);
             Memo1.Lines.Add(
-                '  X=' + FloatToStr(Point.Comps[0]) +
-                ', Y=' + FloatToStr(Point.Comps[1]) +
-                ', Z=' + FloatToStr(Point.Comps[2])
+                '  X=' + FloatToStr(Point.Comps[0]) + ', Y=' +
+                FloatToStr(Point.Comps[1]) + ', Z=' + FloatToStr(Point.Comps[2])
                 );
         end;
         Memo1.Lines.Add('');
