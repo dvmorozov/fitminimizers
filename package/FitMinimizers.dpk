@@ -36,7 +36,6 @@ contains
   CBRCComponent in 'CBRCComponent.pas',
   Decisions in 'Decisions.pas',
   DownhillSimplexAlgorithm in 'DownhillSimplexAlgorithm.pas',
-  ExamplesMain in 'ExamplesMain.pas',
   MyExceptions in 'MyExceptions.pas',
   SelfCheckedComponentList in 'SelfCheckedComponentList.pas',
   SimpMath in 'SimpMath.pas',

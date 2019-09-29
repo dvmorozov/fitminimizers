@@ -15,6 +15,16 @@ object Form1: TForm1
   Position = poDefault
   LCLVersion = '1.8.4.0'
   WindowState = wsMaximized
+  object Label1: TLabel
+    Left = 10
+    Height = 13
+    Top = 56
+    Width = 38
+    Caption = 'Output:'
+    Color = clBtnFace
+    ParentColor = False
+    Transparent = False
+  end
   object BitBtn1: TBitBtn
     Left = 10
     Height = 38
@@ -32,14 +42,6 @@ object Form1: TForm1
     Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
     TabOrder = 1
-  end
-  object Label1: TLabel
-    Left = 10
-    Height = 13
-    Top = 56
-    Width = 38
-    Caption = 'Output:'
-    ParentColor = False
   end
   object CheckBox1: TCheckBox
     Left = 264
