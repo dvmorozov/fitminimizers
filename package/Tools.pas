@@ -80,7 +80,10 @@ function WithGivenAccuracy(
     Decimals: LongInt): Double;
 { Returns substring of command line string excluding path to executable
   enclosed in quotation marks. }
+{$IFNDEF Lazarus}
+{ Delphi specific function. }
 function GetCmdLineParameters: string;
+{$ENDIF}
 { Returns random negative or positive value. }
 function GetRandomWithSign: Double;
 { Calculates expression passed via Expression parameter. }
@@ -238,6 +241,7 @@ begin
     Result := TempLong / PowerOf10;
 end;
 
+{$IFNDEF Lazarus}
 function GetCmdLineParameters: string;
 var
     St: string;
@@ -271,6 +275,7 @@ begin
         St := '';
     Result := St;
 end;
+{$ENDIF}
 
 function GetCharPosition(St: string; Ch: Char; Direction: ShortInt;
     StartIndex: LongInt): LongInt;
