@@ -20,7 +20,7 @@ uses SysUtils, Classes, SimpMath, CBRCComponent
 {$ENDIF};
 
 type
-    //  Return value of the parameter 'Param'.
+    { Returns value of parameter with given name. }
     FParamRequest = function(Param: string): Double of object;
     TCharSet = set of AnsiChar;
     TVector3Array = array of TDoubleVector3;
@@ -28,86 +28,97 @@ type
     ETools = class(Exception);
 
 const
-    //  Error codes.
+    { Error constants of the procedure evaluating user defined expression. }
     CALC_NO_ERRORS: LongInt = 0;
     CALC_INVALID_PARAMETER: LongInt = 1;
     CALC_INVALID_EXPRESSION: LongInt = 2;
 
-//  Add vector to the end of vector array.
-procedure AddVectorToArray(var Arr: TVector3Array;
+{ Adds vector to the end of vector array. }
+procedure AddVectorToArray(var Arr: TVector3Array; const Vector: TDoubleVector3);
+{ Inserts vector into the given position Index. }
+procedure InsertVectorIntoArray(var Arr: TVector3Array; const Index: LongInt;
     const Vector: TDoubleVector3);
-//  Insert vector into array at the position 'Index'.
-procedure InsertVectorIntoArray(var Arr: TVector3Array;
-    const Index: LongInt; const Vector: TDoubleVector3);
+{ Deletes vector with given position from array. }
 procedure DeleteVectorFromArray(var Arr: TVector3Array; const Index: LongInt);
 
 type
     TLongArray = array of LongInt;
 
+{ Deletes item from array. }
 procedure DeleteItemLongArr(var Arr: TLongArray; const Index: LongInt);
+{ Inserts item into array. }
 procedure InsertItemLongArr(var Arr: TLongArray; const Index: LongInt;
-    const Item: LongInt         //  Inserted value.
-    );
+    const Item: LongInt);
+{ Adds item to array. }
 procedure AddItemLongArr(var Arr: TLongArray; const Item: LongInt);
-
-//  Check if index of element is admissible otherwise throw an exception.
+{ Checks if index of item is valid. Otherwise throws an exception. }
 procedure CheckArrItemIndex(const MinIndex, MaxIndex, Index: LongInt);
 
-//  The mask must correspond to format of Str in StringAsDoubleVector3!
+{ Functions converting vector to string and back. }
+
+{ Mask defining format of the string passed to StringAsDoubleVector3. }
 const
     DoubleVector3EditMask = '!\(0\.0999\,\ 0\.0999\,\ 0\.0999\);1;';
 
-//  Functions for conversion vectors to strings and back.
-//  Result must correspond to the mask!
-function DoubleVector3AsString(const Vect: TDoubleVector3; FixedMode: Boolean;
-    //  True - fixed number of digits after decimal separator.
-    Precision, Digits: LongInt): string;
+{ Converts vector to string. Result has format of DoubleVector3EditMask. }
+function DoubleVector3AsString(const Vect: TDoubleVector3;
+    { True means that number of digits after decimal separator is fixed. }
+    FixedMode: Boolean; Precision, Digits: LongInt): string;
 
 function StringAsDoubleVector3(const Str: string): TDoubleVector3;
 
 function StrToFloatDef(St: string; DefVal: Extended): Extended;
-//  Convert string having format (*.*,*.*,*.*) to vector.
+{ Converts string having format (*.*,*.*,*.*) to vector. }
 function StrToVector3(const St: string): TDoubleVector3;
-//  Convert vector to string having format (*.*,*.*,*.*).
+{ Converts vector to string having format (*.*,*.*,*.*). }
 function Vector3ToStr(const Vector: TDoubleVector3): string;
-
-function WithGivenAccuracy(Value: Double;      //  Number for conversion.
-    Decimals: LongInt   //  Number of digits after decimal separator.
-    ): Double;
-//  Return substring of parameters from executable command line enclosed with "".
-//  If the command line doesn't have any other parameters except path to executable
-//  then empty string is returned.
+{ Converts given number to number with given accuracy. }
+function WithGivenAccuracy(
+    { The number to convert. }
+    Value: Double;
+    { Required number of decimal digits after decimal separator. }
+    Decimals: LongInt): Double;
+{ Returns substring of command line string excluding path to executable
+  enclosed in quotation marks. }
+{$IFNDEF Lazarus}
+{ Delphi specific function. }
 function GetCmdLineParameters: string;
-
+{$ENDIF}
+{ Returns random negative or positive value. }
 function GetRandomWithSign: Double;
-
-//  Calculate expression given by string.
+{ Calculates expression passed via Expression parameter. }
 function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
+{ Calculates expression passed via Expression parameter. }
 function CalculateExpr(var Expression: string; var ErrorCode: LongInt;
     const ParamRequest: FParamRequest): Double;
-
-//  Search symbol in the string. Return -1 if the symbol not found. 
+{ Searches char in string. Returns -1 if char not found. }
 function GetCharPosition(St: string; Ch: Char; Direction: ShortInt;
     StartIndex: LongInt): LongInt;
+{ Searches chars from the given set in string.
+  Direction = 1 means moving to the right,
+  Direction = -1 means moving to the left.
+  Returns -1 in the case of error. }
 function GetCharSetPosition(St: string; ChSet: TCharSet; Direction: ShortInt;
-    //  Direction =  1 - scan string from the beginning to the end.
-    //  Direction = -1 - scan string from the end to the beginning.
+    {  Direction =  1 - scan string from the beginning to the end.
+       Direction = -1 - scan string from the end to the beginning. }
     StartIndex: LongInt; var Ch: Char): LongInt;
-
-//  Return number of array and index of element in
-//  this array by the through index of an element.
-procedure GetPosInArrays(const ArraysLengths: array of LongInt;
-    //  Array of array lengths.
-    const Index: LongInt;                   //  Through index of element.
+{ Returns index of array and index of item in this array by through
+  index of element among all arrays. }
+procedure GetPosInArrays(
+    { Array containing lengths of item arrays. }
+    const ArraysLengths: array of LongInt;
+    { Throug index of item in arrays. }
+    const Index: LongInt;
+    { Index of array containing required item. }
     var ArrayNumber: LongInt;
-    //  Number of the array containing the element.
-    var ArrayIndex: LongInt                 //  Index of element in the array.
-    );
+    { Index of item in this array. }
+    var ArrayIndex: LongInt);
 
 function ReadComponentByReader(const Reader: TReader): TComponent;
-//  Free object and perform additional actions if necessary.
-//  Use this function to free all the objects.
+{ Destructs objects performing additional actions. To the moment it is only checking that
+  type is TCBRCComponent and calling its method Free. All application objects should be
+  destroyed by this function. }
 procedure UtilizeObject(PtrToObject: TObject);
 
 implementation
@@ -230,13 +241,14 @@ begin
     Result := TempLong / PowerOf10;
 end;
 
+{$IFNDEF Lazarus}
 function GetCmdLineParameters: string;
 var
     St: string;
     Index: LongInt;
     Index1, Index2: LongInt;
 begin
-    St := ''; //??? GetCommandLine;
+    St := GetCommandLine;
     Index1 := -1;
     Index2 := -1;
 
@@ -263,6 +275,7 @@ begin
         St := '';
     Result := St;
 end;
+{$ENDIF}
 
 function GetCharPosition(St: string; Ch: Char; Direction: ShortInt;
     StartIndex: LongInt): LongInt;
@@ -372,8 +385,8 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
             begin
                 if (Index = 1) then
                 begin
-                    //  The case when the first number is negative.
-                    //  Processing '+', '-' operations.
+                    { The case when the first number is negative.
+                      Processing '+', '-' operations. }
                     TempIndex := Index;
                     Index := GetCharSetPosition(Expression, OperSet,
                         1, TempIndex + 1, Oper);
@@ -391,7 +404,7 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
 
             if (IndexR = Index + 1) and (Expression[Index + 1] = '-') then
             begin
-                //  The case when the number following the operation is negative.
+                { The case when the number following the operation is negative. }
                 IndexR := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexR + 1, TempCh);
                 if IndexR = -1 then
@@ -400,7 +413,7 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
 
             if (IndexL = Index - 1) and (Expression[Index] = '-') then
             begin
-                //  The case when the number preceding the operation is negative.
+                { The case when the number preceding the operation is negative. }
                 IndexL := GetCharSetPosition(Expression,
                     ['*', '/', '+', '-'], 1, IndexL - 1, TempCh);
                 if IndexR = -1 then
@@ -420,10 +433,12 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
                         if ArgStrL[1] in ['-', '+'] then
                             case ArgStrL[1] of
                                 '-': ArgL :=
-                                        (-1) * ParamRequest(Copy(ArgStrL,
-                                        2, Length(ArgStrL) - 1));
+                                        (-1) *
+                                        ParamRequest(Copy(ArgStrL, 2,
+                                        Length(ArgStrL) - 1));
                                 '+': ArgL :=
-                                        ParamRequest(Copy(ArgStrL, 2, Length(ArgStrL) - 1));
+                                        ParamRequest(Copy(ArgStrL,
+                                        2, Length(ArgStrL) - 1));
                             end
                         else
                             ArgL := ParamRequest(ArgStrL);
@@ -446,8 +461,8 @@ function CalculateSimpExpr(var Expression: string; var ErrorCode: LongInt;
                     if ArgStrR[1] in ['-', '+'] then
                         case ArgStrR[1] of
                             '-': ArgR :=
-                                    (-1) * ParamRequest(Copy(ArgStrR,
-                                    2, Length(ArgStrR) - 1));
+                                    (-1) *
+                                    ParamRequest(Copy(ArgStrR, 2, Length(ArgStrR) - 1));
                             '+': ArgR :=
                                     ParamRequest(Copy(ArgStrR, 2, Length(ArgStrR) - 1));
                         end
@@ -496,8 +511,8 @@ begin
             if Expression[1] in ['-', '+'] then
                 case Expression[1] of
                     '-': Result :=
-                            (-1) * ParamRequest(Copy(Expression, 2,
-                            Length(Expression) - 1));
+                            (-1) *
+                            ParamRequest(Copy(Expression, 2, Length(Expression) - 1));
                     '+': Result :=
                             ParamRequest(Copy(Expression, 2, Length(Expression) - 1));
                 end
@@ -600,15 +615,14 @@ begin
     end;
 end;
 
-procedure AddVectorToArray(var Arr: TVector3Array;
-    const Vector: TDoubleVector3);
+procedure AddVectorToArray(var Arr: TVector3Array; const Vector: TDoubleVector3);
 begin
     SetLength(Arr, Length(Arr) + 1);
     Arr[Length(Arr) - 1] := Vector;
 end;
 
-procedure InsertVectorIntoArray(var Arr: TVector3Array;
-    const Index: LongInt; const Vector: TDoubleVector3);
+procedure InsertVectorIntoArray(var Arr: TVector3Array; const Index: LongInt;
+    const Vector: TDoubleVector3);
 var
     i: LongInt;
 begin

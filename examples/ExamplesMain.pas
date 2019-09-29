@@ -7,11 +7,12 @@ uses
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+    Vcl.StdCtrls, Vcl.Buttons,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls, Contnrs,
+    StdCtrls,
   {$ENDIF}
-    Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
+    Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 {$ASSERTIONS ON}
 
