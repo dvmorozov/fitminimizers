@@ -112,7 +112,7 @@
     <General>
       <ActiveEditorIndexAtStart Value="3"/>
     </General>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="ExamplesMain.pas"/>
         <Caret Line="11" Column="9" TopLine="1"/>
@@ -125,6 +125,10 @@
         <Filename Value="ExamplesMain.pas"/>
         <Caret Line="24" Column="16" TopLine="1"/>
       </Position3>
+      <Position4>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="1" Column="18" TopLine="1"/>
+      </Position4>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
