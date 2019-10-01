@@ -5,6 +5,7 @@ object Form1: TForm1
   Width = 400
   HorzScrollBar.Page = 399
   VertScrollBar.Page = 299
+  ActiveControl = Button1
   Caption = 'Demo'
   ClientHeight = 300
   ClientWidth = 400

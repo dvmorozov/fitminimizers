@@ -9,20 +9,20 @@
         <IsPartOfProject Value="True"/>
         <CursorPos X="24" Y="8"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="2"/>
-        <UsageCount Value="196"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="197"/>
       </Unit0>
       <Unit1>
         <Filename Value="ExamplesMain.pas"/>
-        <ComponentName Value="Form2"/>
+        <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <IsPartOfProject Value="True"/>
         <ResourceFilename Value="ExamplesMain.lrs"/>
-        <UnitName Value="Unit1"/>
-        <CursorPos X="19" Y="24"/>
+        <UnitName Value="ExamplesMain"/>
+        <CursorPos X="1" Y="14"/>
         <TopLine Value="1"/>
-        <UsageCount Value="20"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
@@ -84,7 +84,7 @@
         <CursorPos X="80" Y="45"/>
         <TopLine Value="34"/>
         <EditorIndex Value="0"/>
-        <UsageCount Value="70"/>
+        <UsageCount Value="71"/>
         <Loaded Value="True"/>
       </Unit12>
       <Unit13>
@@ -93,42 +93,40 @@
         <CursorPos X="17" Y="807"/>
         <TopLine Value="757"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="ExamplesMain.pas"/>
-        <ComponentName Value="Form1"/>
-        <IsPartOfProject Value="True"/>
-        <ResourceFilename Value="ExamplesMain.lrs"/>
-        <UnitName Value="ExamplesMain"/>
-        <CursorPos X="18" Y="1"/>
+        <Filename Value="ExamplesMain.lrs"/>
+        <CursorPos X="31" Y="1"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="3"/>
-        <UsageCount Value="20"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="10"/>
       </Unit14>
     </Units>
     <General>
-      <ActiveEditorIndexAtStart Value="3"/>
+      <ActiveEditorIndexAtStart Value="2"/>
     </General>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="11" Column="9" TopLine="1"/>
+        <Caret Line="11" Column="49" TopLine="1"/>
       </Position1>
       <Position2>
         <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="19" Column="16" TopLine="1"/>
+        <Caret Line="500" Column="1" TopLine="468"/>
       </Position2>
       <Position3>
         <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="24" Column="16" TopLine="1"/>
+        <Caret Line="102" Column="1" TopLine="80"/>
       </Position3>
       <Position4>
         <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="1" Column="18" TopLine="1"/>
+        <Caret Line="6" Column="27" TopLine="1"/>
       </Position4>
+      <Position5>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
+      </Position5>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
