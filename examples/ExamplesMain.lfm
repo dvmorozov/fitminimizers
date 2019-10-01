@@ -1,0 +1,54 @@
+object Form1: TForm1
+  Left = 315
+  Height = 300
+  Top = 116
+  Width = 400
+  HorzScrollBar.Page = 399
+  VertScrollBar.Page = 299
+  ActiveControl = Button1
+  Caption = 'Demo'
+  ClientHeight = 300
+  ClientWidth = 400
+  WindowState = wsMaximized
+  object Label1: TLabel
+    Left = 8
+    Height = 21
+    Top = 40
+    Width = 50
+    Caption = 'Output:'
+    ParentColor = False
+  end
+  object Button1: TButton
+    Left = 8
+    Height = 25
+    Top = 8
+    Width = 195
+    Caption = 'Find Minimum Bounding Box'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object CheckBox1: TCheckBox
+    Left = 216
+    Height = 25
+    Top = 8
+    Width = 127
+    Caption = 'Show extra data'
+    TabOrder = 1
+  end
+  object Memo1: TMemo
+    Left = 8
+    Height = 218
+    Top = 72
+    Width = 384
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Lines.Strings = (
+      ''
+    )
+    ScrollBars = ssAutoBoth
+    TabOrder = 2
+  end
+  object DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm
+    left = 360
+    top = 32
+  end
+end
