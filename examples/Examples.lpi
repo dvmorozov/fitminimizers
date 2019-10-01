@@ -28,7 +28,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="2">
+    <Units Count="3">
       <Unit0>
         <Filename Value="Examples.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -39,8 +39,15 @@
         <HasResources Value="True"/>
         <IsPartOfProject Value="True"/>
         <ResourceFilename Value="ExamplesMain.lrs"/>
-        <UnitName Value="ExamplesMain"/>
+        <UnitName Value="Unit1"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="ExamplesMain.pas"/>
+        <ComponentName Value="Form1"/>
+        <IsPartOfProject Value="True"/>
+        <ResourceFilename Value="ExamplesMain.lrs"/>
+        <UnitName Value="ExamplesMain"/>
+      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

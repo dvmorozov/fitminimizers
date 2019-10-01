@@ -3,11 +3,11 @@
   <ProjectSession>
     <PathDelim Value="\"/>
     <Version Value="6"/>
-    <Units Count="14">
+    <Units Count="15">
       <Unit0>
         <Filename Value="Examples.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="34" Y="14"/>
+        <CursorPos X="24" Y="8"/>
         <TopLine Value="1"/>
         <EditorIndex Value="2"/>
         <UsageCount Value="196"/>
@@ -19,12 +19,10 @@
         <HasResources Value="True"/>
         <IsPartOfProject Value="True"/>
         <ResourceFilename Value="ExamplesMain.lrs"/>
-        <UnitName Value="ExamplesMain"/>
-        <CursorPos X="18" Y="1"/>
+        <UnitName Value="Unit1"/>
+        <CursorPos X="19" Y="24"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="3"/>
         <UsageCount Value="20"/>
-        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
@@ -98,15 +96,35 @@
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit13>
+      <Unit14>
+        <Filename Value="ExamplesMain.pas"/>
+        <ComponentName Value="Form1"/>
+        <IsPartOfProject Value="True"/>
+        <ResourceFilename Value="ExamplesMain.lrs"/>
+        <UnitName Value="ExamplesMain"/>
+        <CursorPos X="18" Y="1"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit14>
     </Units>
     <General>
-      <ActiveEditorIndexAtStart Value="2"/>
+      <ActiveEditorIndexAtStart Value="3"/>
     </General>
-    <JumpHistory Count="1" HistoryIndex="0">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
-        <Filename Value="Examples.lpr"/>
-        <Caret Line="14" Column="41" TopLine="1"/>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="11" Column="9" TopLine="1"/>
       </Position1>
+      <Position2>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="19" Column="16" TopLine="1"/>
+      </Position2>
+      <Position3>
+        <Filename Value="ExamplesMain.pas"/>
+        <Caret Line="24" Column="16" TopLine="1"/>
+      </Position3>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
