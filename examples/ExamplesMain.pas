@@ -16,6 +16,7 @@ uses
   {$ENDIF}
     Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
+{$ASSERTIONS ON}
 type
   
   { TForm1 }
@@ -26,6 +27,7 @@ type
     DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
     Label1: TLabel;
     Memo1: TMemo;
+    procedure Button1Click(Sender: TObject);
   private
         { Minimum bounding box problem. }
         SavedPointCloud: TComponentList;
@@ -393,6 +395,15 @@ begin
     StartDecision.Parameters[5] := Translation[3];
     { Computes evaluation function. }
     StartDecision.Evaluation := ComputeBoxVolume;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+    Memo1.Lines.Clear;
+    GenerateRandomPointCloud;
+    DisplayPointCloud;
+    InitializeVariableParameters;
+    OptimizeVolume;
 end;
 
 procedure TForm1.FillParametersFromDecision(Decision: TFloatDecision);

@@ -24,6 +24,7 @@ object Form1: TForm1
     Top = 8
     Width = 195
     Caption = 'Find Minimum Bounding Box'
+    OnClick = Button1Click
     TabOrder = 0
   end
   object CheckBox1: TCheckBox
@@ -43,6 +44,7 @@ object Form1: TForm1
     Lines.Strings = (
       ''
     )
+    ScrollBars = ssAutoBoth
     TabOrder = 2
   end
   object DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm

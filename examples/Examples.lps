@@ -106,28 +106,7 @@
     <General>
       <ActiveEditorIndexAtStart Value="2"/>
     </General>
-    <JumpHistory Count="5" HistoryIndex="4">
-      <Position1>
-        <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="11" Column="49" TopLine="1"/>
-      </Position1>
-      <Position2>
-        <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="500" Column="1" TopLine="468"/>
-      </Position2>
-      <Position3>
-        <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="102" Column="1" TopLine="80"/>
-      </Position3>
-      <Position4>
-        <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="6" Column="27" TopLine="1"/>
-      </Position4>
-      <Position5>
-        <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
-      </Position5>
-    </JumpHistory>
+    <JumpHistory Count="0" HistoryIndex="-1"/>
   </ProjectSession>
   <Debugging>
     <Watches Count="2">
