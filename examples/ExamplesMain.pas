@@ -100,7 +100,9 @@ var
 
 implementation
 
-{$R *.dfm}
+{$IFNDEF Lazarus}
+    {$R *.dfm}
+{$ENDIF}
 
 { TForm1 }
 
