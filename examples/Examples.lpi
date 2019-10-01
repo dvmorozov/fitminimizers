@@ -22,10 +22,10 @@
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="FitMinimizers"/>
       </Item1>
       <Item2>
-        <PackageName Value="FitMinimizers"/>
+        <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
     <Units Count="2">
@@ -35,7 +35,7 @@
       </Unit0>
       <Unit1>
         <Filename Value="ExamplesMain.pas"/>
-        <ComponentName Value="Form1"/>
+        <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <IsPartOfProject Value="True"/>
         <ResourceFilename Value="ExamplesMain.lrs"/>

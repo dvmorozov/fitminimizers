@@ -7,23 +7,23 @@
       <Unit0>
         <Filename Value="Examples.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="1" Y="14"/>
+        <CursorPos X="34" Y="14"/>
         <TopLine Value="1"/>
-        <EditorIndex Value="3"/>
-        <UsageCount Value="195"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="196"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="ExamplesMain.pas"/>
-        <ComponentName Value="Form1"/>
+        <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <IsPartOfProject Value="True"/>
         <ResourceFilename Value="ExamplesMain.lrs"/>
         <UnitName Value="ExamplesMain"/>
-        <CursorPos X="8" Y="105"/>
-        <TopLine Value="77"/>
-        <EditorIndex Value="2"/>
-        <UsageCount Value="195"/>
+        <CursorPos X="18" Y="1"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -100,17 +100,13 @@
       </Unit13>
     </Units>
     <General>
-      <ActiveEditorIndexAtStart Value="3"/>
+      <ActiveEditorIndexAtStart Value="2"/>
     </General>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="1" HistoryIndex="0">
       <Position1>
-        <Filename Value="ExamplesMain.pas"/>
-        <Caret Line="13" Column="37" TopLine="1"/>
-      </Position1>
-      <Position2>
         <Filename Value="Examples.lpr"/>
-        <Caret Line="10" Column="16" TopLine="1"/>
-      </Position2>
+        <Caret Line="14" Column="41" TopLine="1"/>
+      </Position1>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
