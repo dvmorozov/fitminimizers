@@ -1,4 +1,4 @@
-program Examples;
+program bounding_box_server_demo;
 
 {$mode objfpc}{$H+}
 
