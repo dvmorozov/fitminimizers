@@ -1,10 +1,10 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
-  Left = 310
+  Left = 141
   Height = 379
-  Top = 132
+  Top = 131
   Width = 532
   BorderStyle = bsSingle
-  Caption = 'BoundingBoxServer Demo'
+  Caption = 'TBoundingBoxServerForm Demo'
   ClientHeight = 379
   ClientWidth = 532
   Color = clBtnFace
