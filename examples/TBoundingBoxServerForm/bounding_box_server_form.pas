@@ -1,6 +1,4 @@
-unit ExamplesMain;
-
-{$mode objfpc}{$H+}
+unit bounding_box_server_form;
 
 interface
 
@@ -11,24 +9,25 @@ uses
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
     Vcl.StdCtrls, Vcl.Buttons,
   {$ELSE}
-    Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, Buttons,
+    SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls,
   {$ENDIF}
     Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 {$ASSERTIONS ON}
-type
-  
-  { TForm1 }
 
-  TForm1 = class(TForm, IDownhillSimplexServer)
-    Button1: TButton;
-    CheckBox1: TCheckBox;
-    DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
-    Label1: TLabel;
-    Memo1: TMemo;
-    procedure Button1Click(Sender: TObject);
-  private
+type
+    { TBoundingBoxServerForm }
+    { Demonstrates the simplest way of integration of algorithm into application.
+      The form directly implements IDownhillSimplexServer interface. }
+    TBoundingBoxServerForm = class(TForm, IDownhillSimplexServer)
+        BitBtn1: TBitBtn;
+        CheckBox1: TCheckBox;
+        DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
+        Label1: TLabel;
+        Memo1: TMemo;
+        procedure BitBtn1Click(Sender: TObject);
+    private
         { Minimum bounding box problem. }
         SavedPointCloud: TComponentList;
         { Set of random points. }
@@ -93,18 +92,31 @@ type
         procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
         //  Return flag of calculation termination.
         function EndOfCalculation(Sender: TComponent): Boolean;
-  public
-    { public declarations }
-  end; 
+    public
+        { Public declarations }
+    end;
 
 var
-  Form1: TForm1;
+    BoundingBoxServerForm: TBoundingBoxServerForm;
 
 implementation
 
+{$R *.dfm}
+
+{ TBoundingBoxServerForm }
+
+procedure TBoundingBoxServerForm.BitBtn1Click(Sender: TObject);
+begin
+    Memo1.Lines.Clear;
+    GenerateRandomPointCloud;
+    DisplayPointCloud;
+    InitializeVariableParameters;
+    OptimizeVolume;
+end;
+
 {$warnings off}
 {$hints off}
-procedure TForm1.GenerateRandomPointCloud;
+procedure TBoundingBoxServerForm.GenerateRandomPointCloud;
 const
     PointCount: LongInt = 10;     //  Number of points in the cloud.
     //  Dispersion boundaries.
@@ -154,7 +166,7 @@ end;
 {$hints on}
 {$warnings on}
 
-function TForm1.ComputeCenterOfMass: TDoubleVector3;
+function TBoundingBoxServerForm.ComputeCenterOfMass: TDoubleVector3;
 var
     i: LongInt;
     X, Y, Z: Double;
@@ -181,7 +193,7 @@ begin
     Result[3] := Z;
 end;
 
-procedure TForm1.InitializeVariableParameters;
+procedure TBoundingBoxServerForm.InitializeVariableParameters;
 begin
     Translation := ComputeCenterOfMass;
     Alpha := 0;
@@ -194,7 +206,7 @@ begin
     PrintParameters('Initial parameters: ');
 end;
 
-function TForm1.ComputeMaxCoordinates: TDoubleVector3;
+function TBoundingBoxServerForm.ComputeMaxCoordinates: TDoubleVector3;
 var
     i: LongInt;
     Point: T3DVector;
@@ -218,7 +230,7 @@ begin
     end;
 end;
 
-function TForm1.ComputeMinCoordinates: TDoubleVector3;
+function TBoundingBoxServerForm.ComputeMinCoordinates: TDoubleVector3;
 var
     i: LongInt;
     Point: T3DVector;
@@ -243,7 +255,7 @@ begin
 end;
 
 {$hints off}
-function TForm1.GetRotationMatrix: TMatrix;
+function TBoundingBoxServerForm.GetRotationMatrix: TMatrix;
 var
     RotX, RotY, RotZ, Matr: TMatrix;
 begin
@@ -261,7 +273,7 @@ begin
     Result := Matr;
 end;
 
-function TForm1.GetTransformationMatrix: TMatrix;
+function TBoundingBoxServerForm.GetTransformationMatrix: TMatrix;
 var
     Matr, Rot, Trans, InverseTrans: TMatrix;
     A, B, C: Double;
@@ -283,7 +295,7 @@ begin
     Result := Matr;
 end;
 
-procedure TForm1.TransformPointCloudCoordinates;
+procedure TBoundingBoxServerForm.TransformPointCloudCoordinates;
 var
     Matr: TMatrix;
     i: LongInt;
@@ -303,7 +315,7 @@ end;
 
 {$hints on}
 
-function TForm1.ComputeBoxVolume: Double;
+function TBoundingBoxServerForm.ComputeBoxVolume: Double;
 var
     MaxCoords, MinCoords: TDoubleVector3;
     A, B, C: Double;    //  Sizes of the box.
@@ -319,7 +331,7 @@ end;
 
 {$warnings off}
 {$hints off}
-procedure TForm1.CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
+procedure TBoundingBoxServerForm.CopyPointCloud(Src: TComponentList; var Dest: TComponentList);
 var
     i: LongInt;
     Point: T3DVector;
@@ -340,17 +352,17 @@ end;
 {$hints on}
 {$warnings on}
 
-procedure TForm1.SavePointCloud;
+procedure TBoundingBoxServerForm.SavePointCloud;
 begin
     CopyPointCloud(PointCloud, SavedPointCloud);
 end;
 
-procedure TForm1.RestorePointCloud;
+procedure TBoundingBoxServerForm.RestorePointCloud;
 begin
     CopyPointCloud(SavedPointCloud, PointCloud);
 end;
 
-procedure TForm1.OptimizeVolume;
+procedure TBoundingBoxServerForm.OptimizeVolume;
 begin
     { Initializing algorithm. }
     DownhillSimplexAlgorithm1.ParametersNumber := 6;
@@ -362,7 +374,7 @@ begin
     DownhillSimplexAlgorithm1.AlgorithmRealization;
 end;
 
-function TForm1.GetInitParamLength(Sender: TComponent;
+function TBoundingBoxServerForm.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
     Assert(ParametersCount = 6);
@@ -374,7 +386,7 @@ begin
         Result := 1.0;
 end;
 
-function TForm1.DegToRad(Deg: Double): Double;
+function TBoundingBoxServerForm.DegToRad(Deg: Double): Double;
 begin
     Result := Deg * Pi / 180.0;
 end;
@@ -382,7 +394,7 @@ end;
 //  Set inital calculation point in internal representation.
 //  The number of array element is equal to the number of
 //  parameters of task to be solved.
-procedure TForm1.FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
+procedure TBoundingBoxServerForm.FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
 begin
     { Sets up capacity. }
     StartDecision.ParametersNumber := 6;
@@ -397,16 +409,7 @@ begin
     StartDecision.Evaluation := ComputeBoxVolume;
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
-begin
-    Memo1.Lines.Clear;
-    GenerateRandomPointCloud;
-    DisplayPointCloud;
-    InitializeVariableParameters;
-    OptimizeVolume;
-end;
-
-procedure TForm1.FillParametersFromDecision(Decision: TFloatDecision);
+procedure TBoundingBoxServerForm.FillParametersFromDecision(Decision: TFloatDecision);
 begin
     Alpha := Decision.Parameters[0];
     Beta := Decision.Parameters[1];
@@ -417,7 +420,7 @@ begin
 end;
 
 //  Calculate evaluation function for the point given in internal representation.
-procedure TForm1.EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
+procedure TBoundingBoxServerForm.EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
 
 begin
     Assert(Decision.ParametersNumber = 6);
@@ -434,7 +437,7 @@ begin
     RestorePointCloud;
 end;
 
-procedure TForm1.UpdateResults(Sender: TComponent; Decision: TFloatDecision);
+procedure TBoundingBoxServerForm.UpdateResults(Sender: TComponent; Decision: TFloatDecision);
 var
     Matr: TMatrix;
     Vector: T3Vector;
@@ -459,13 +462,13 @@ begin
 end;
 
 //  Return flag of termination.
-function TForm1.EndOfCalculation(Sender: TComponent): Boolean;
+function TBoundingBoxServerForm.EndOfCalculation(Sender: TComponent): Boolean;
 begin
     { Set up True to interrupt computation. }
     Result := False;
 end;
 
-procedure TForm1.DisplayPointCloud;
+procedure TBoundingBoxServerForm.DisplayPointCloud;
 var
     i: LongInt;
     Point: T3DVector;
@@ -485,13 +488,13 @@ begin
     end;
 end;
 
-procedure TForm1.DisplayParameters;
+procedure TBoundingBoxServerForm.DisplayParameters;
 begin
     if CheckBox1.Checked then
         PrintParameters('Modified parameters:');
 end;
 
-procedure TForm1.PrintParameters(Header: string);
+procedure TBoundingBoxServerForm.PrintParameters(Header: string);
 begin
     Memo1.Lines.Add(Header);
 
@@ -506,7 +509,4 @@ begin
     Memo1.Lines.Add('');
 end;
 
-initialization
-  {$I ExamplesMain.lrs}
 end.
-
