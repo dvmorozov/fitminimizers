@@ -11,7 +11,6 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
 {$R *.res}
 
 begin
-    RequireDerivedFormResource := True;
     Application.Initialize;
     Application.CreateForm(TBoundingBoxServerForm, BoundingBoxServerForm);
     Application.Run;

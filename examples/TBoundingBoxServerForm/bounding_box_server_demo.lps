@@ -1,156 +1,131 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <CONFIG>
   <ProjectSession>
     <PathDelim Value="\"/>
-    <Version Value="10"/>
-    <BuildModes Active="Default"/>
-    <Units Count="16">
+    <Version Value="6"/>
+    <Units Count="17">
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
-        <CursorPos X="40" Y="11"/>
+        <CursorPos X="73" Y="15"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="0"/>
         <UsageCount Value="199"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="bounding_box_server_form.pas"/>
-        <IsPartOfProject Value="True"/>
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="2"/>
-        <CursorPos X="27" Y="23"/>
+        <IsPartOfProject Value="True"/>
+        <ResourceFilename Value="bounding_box_server_form.lrs"/>
+        <UnitName Value="bounding_box_server_form"/>
+        <CursorPos X="24" Y="101"/>
+        <TopLine Value="82"/>
+        <EditorIndex Value="2"/>
         <UsageCount Value="199"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="163"/>
         <CursorPos Y="179"/>
+        <TopLine Value="163"/>
         <UsageCount Value="91"/>
       </Unit2>
       <Unit3>
         <Filename Value="Algorithm.pas"/>
-        <EditorIndex Value="-1"/>
         <CursorPos Y="9"/>
         <UsageCount Value="28"/>
       </Unit3>
       <Unit4>
         <Filename Value="CBRCComponent.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="14"/>
         <CursorPos X="5" Y="20"/>
+        <TopLine Value="14"/>
         <UsageCount Value="28"/>
       </Unit4>
       <Unit5>
         <Filename Value="Decisions.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="203"/>
         <CursorPos Y="220"/>
+        <TopLine Value="203"/>
         <UsageCount Value="91"/>
       </Unit5>
       <Unit6>
         <Filename Value="MyExceptions.pas"/>
-        <EditorIndex Value="-1"/>
         <UsageCount Value="26"/>
       </Unit6>
       <Unit7>
         <Filename Value="SimpMath.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="916"/>
         <CursorPos Y="935"/>
+        <TopLine Value="916"/>
         <UsageCount Value="90"/>
       </Unit7>
       <Unit8>
         <Filename Value="Tools.pas"/>
-        <EditorIndex Value="-1"/>
         <CursorPos X="104" Y="9"/>
         <UsageCount Value="92"/>
       </Unit8>
       <Unit9>
         <Filename Value="FitMinimizers.pas"/>
-        <EditorIndex Value="-1"/>
         <CursorPos X="26" Y="4"/>
         <UsageCount Value="23"/>
       </Unit9>
       <Unit10>
         <Filename Value="SelfCheckedComponentList.pas"/>
-        <EditorIndex Value="-1"/>
         <CursorPos X="53" Y="12"/>
         <UsageCount Value="26"/>
       </Unit10>
       <Unit11>
-        <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\contnrs.pp"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="67"/>
+        <Filename Value="..\..\..\..\lazarus\fpc\3.0.4\source\packages\fcl-base\src\contnrs.pp"/>
         <CursorPos X="17" Y="83"/>
+        <TopLine Value="67"/>
         <UsageCount Value="22"/>
       </Unit11>
       <Unit12>
         <Filename Value="Math3d.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="34"/>
         <CursorPos X="80" Y="45"/>
+        <TopLine Value="34"/>
         <UsageCount Value="71"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\package\Decisions.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="757"/>
         <CursorPos X="17" Y="807"/>
+        <TopLine Value="757"/>
         <UsageCount Value="11"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\package\DownhillSimplexAlgorithm.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="129"/>
         <CursorPos X="5" Y="43"/>
+        <TopLine Value="129"/>
         <UsageCount Value="11"/>
       </Unit14>
       <Unit15>
-        <Filename Value="C:\lazarus\lcl\include\customform.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2048"/>
+        <Filename Value="..\..\..\..\lazarus\lcl\include\customform.inc"/>
         <CursorPos Y="2064"/>
+        <TopLine Value="2048"/>
         <UsageCount Value="10"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="..\Math3d.pas"/>
+        <UnitName Value="Math3d"/>
+        <CursorPos X="1" Y="379"/>
+        <TopLine Value="347"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit16>
     </Units>
-    <OtherDefines Count="1">
-      <Define0 Value="Lazarus"/>
-    </OtherDefines>
-    <JumpHistory Count="7" HistoryIndex="6">
+    <General>
+      <ActiveEditorIndexAtStart Value="2"/>
+    </General>
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="12" Column="5"/>
+        <Caret Line="110" Column="1" TopLine="99"/>
       </Position1>
       <Position2>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="104" Column="8" TopLine="84"/>
+        <Filename Value="bounding_box_server_demo.lpr"/>
+        <Caret Line="1" Column="71" TopLine="1"/>
       </Position2>
-      <Position3>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="23" Column="6" TopLine="3"/>
-      </Position3>
-      <Position4>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="9" Column="37" TopLine="19"/>
-      </Position4>
-      <Position5>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="20" Column="25" TopLine="14"/>
-      </Position5>
-      <Position6>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="23" Column="23" TopLine="14"/>
-      </Position6>
-      <Position7>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="100" Column="46" TopLine="74"/>
-      </Position7>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
