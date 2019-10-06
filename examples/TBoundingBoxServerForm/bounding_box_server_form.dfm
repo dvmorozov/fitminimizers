@@ -1,10 +1,10 @@
-object Form1: TForm1
+object BoundingBoxServerForm: TBoundingBoxServerForm
   Left = 310
   Height = 379
   Top = 132
   Width = 532
   BorderStyle = bsSingle
-  Caption = 'Demo'
+  Caption = 'BoundingBoxServer Demo'
   ClientHeight = 379
   ClientWidth = 532
   Color = clBtnFace
@@ -35,9 +35,9 @@ object Form1: TForm1
     TabOrder = 0
   end
   object Memo1: TMemo
-    Left = 10
+    Left = 8
     Height = 289
-    Top = 80
+    Top = 72
     Width = 512
     Anchors = [akTop, akLeft, akRight, akBottom]
     ScrollBars = ssAutoBoth
