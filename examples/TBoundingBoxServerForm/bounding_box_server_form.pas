@@ -1,5 +1,7 @@
 unit bounding_box_server_form;
 
+{$mode objfpc}{$H+}
+
 interface
 
 uses
@@ -9,25 +11,24 @@ uses
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
     Vcl.StdCtrls, Vcl.Buttons,
   {$ELSE}
-    SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
+    Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs, Buttons,
     StdCtrls,
   {$ENDIF}
     Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 {$ASSERTIONS ON}
-
 type
     { TBoundingBoxServerForm }
     { Demonstrates the simplest way of integration of algorithm into application.
       The form directly implements IDownhillSimplexServer interface. }
-    TBoundingBoxServerForm = class(TForm, IDownhillSimplexServer)
-        BitBtn1: TBitBtn;
-        CheckBox1: TCheckBox;
-        DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
-        Label1: TLabel;
-        Memo1: TMemo;
-        procedure BitBtn1Click(Sender: TObject);
-    private
+  TBoundingBoxServerForm = class(TForm, IDownhillSimplexServer)
+    Button1: TButton;
+    CheckBox1: TCheckBox;
+    DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
+    Label1: TLabel;
+    Memo1: TMemo;
+    procedure Button1Click(Sender: TObject);
+  private
         { Minimum bounding box problem. }
         SavedPointCloud: TComponentList;
         { Set of random points. }
@@ -92,27 +93,14 @@ type
         procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
         //  Return flag of calculation termination.
         function EndOfCalculation(Sender: TComponent): Boolean;
-    public
-        { Public declarations }
-    end;
+  public
+    { public declarations }
+  end; 
 
 var
-    BoundingBoxServerForm: TBoundingBoxServerForm;
+  BoundingBoxServerForm: TBoundingBoxServerForm;
 
 implementation
-
-{$R *.dfm}
-
-{ TBoundingBoxServerForm }
-
-procedure TBoundingBoxServerForm.BitBtn1Click(Sender: TObject);
-begin
-    Memo1.Lines.Clear;
-    GenerateRandomPointCloud;
-    DisplayPointCloud;
-    InitializeVariableParameters;
-    OptimizeVolume;
-end;
 
 {$warnings off}
 {$hints off}
@@ -409,6 +397,15 @@ begin
     StartDecision.Evaluation := ComputeBoxVolume;
 end;
 
+procedure TBoundingBoxServerForm.Button1Click(Sender: TObject);
+begin
+    Memo1.Lines.Clear;
+    GenerateRandomPointCloud;
+    DisplayPointCloud;
+    InitializeVariableParameters;
+    OptimizeVolume;
+end;
+
 procedure TBoundingBoxServerForm.FillParametersFromDecision(Decision: TFloatDecision);
 begin
     Alpha := Decision.Parameters[0];
@@ -509,4 +506,7 @@ begin
     Memo1.Lines.Add('');
 end;
 
+initialization
+  {$I bounding_box_server_form.lrs}
 end.
+
