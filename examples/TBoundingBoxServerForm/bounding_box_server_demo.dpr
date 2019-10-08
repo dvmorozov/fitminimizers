@@ -1,14 +1,14 @@
-program Examples;
+program bounding_box_server_demo;
 
 uses
   Vcl.Forms,
-  ExamplesMain in 'ExamplesMain.pas' {Form1};
+  bounding_box_server_form in 'bounding_box_server_form.pas' {Form1};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TBoundingBoxServerForm, BoundingBoxServerForm);
   Application.Run;
 end.
