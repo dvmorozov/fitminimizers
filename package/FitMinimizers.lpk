@@ -16,7 +16,7 @@
         <CustomOptions Value="-dLazarus"/>
       </Other>
     </CompilerOptions>
-    <Files Count="8">
+    <Files Count="13">
       <Item1>
         <Filename Value="Tools.pas"/>
         <UnitName Value="Tools"/>
@@ -39,7 +39,7 @@
       </Item5>
       <Item6>
         <Filename Value="SelfCheckedComponentList.pas"/>
-        <UnitName Value="ComponentList"/>
+        <UnitName Value="SelfCheckedComponentList"/>
       </Item6>
       <Item7>
         <Filename Value="Decisions.pas"/>
@@ -50,6 +50,26 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="DownhillSimplexAlgorithm"/>
       </Item8>
+      <Item9>
+        <Filename Value="DownhillSimplexContainer.pas"/>
+        <UnitName Value="DownhillSimplexContainer"/>
+      </Item9>
+      <Item10>
+        <Filename Value="FitMinimizers.pas"/>
+        <UnitName Value="FitMinimizers"/>
+      </Item10>
+      <Item11>
+        <Filename Value="AlgorithmContainer.pas"/>
+        <UnitName Value="AlgorithmContainer"/>
+      </Item11>
+      <Item12>
+        <Filename Value="RunningThread.pas"/>
+        <UnitName Value="RunningThread"/>
+      </Item12>
+      <Item13>
+        <Filename Value="CombEnumerator.pas"/>
+        <UnitName Value="comb_enumerator"/>
+      </Item13>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
