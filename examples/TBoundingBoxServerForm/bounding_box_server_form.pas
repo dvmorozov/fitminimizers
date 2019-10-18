@@ -7,10 +7,10 @@ uses
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-    Vcl.StdCtrls, Vcl.Buttons,
+    Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls,
+    StdCtrls, StrUtils,
   {$ENDIF}
     Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
@@ -22,7 +22,8 @@ type
       The form directly implements IDownhillSimplexServer interface. }
     TBoundingBoxServerForm = class(TForm, IDownhillSimplexServer)
         BitBtn1: TBitBtn;
-        CheckBox1: TCheckBox;
+        CheckBoxExtraData: TCheckBox;
+        CheckBoxRandomData: TCheckBox;
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         Label1: TLabel;
         Memo1: TMemo;
@@ -44,6 +45,7 @@ type
         procedure SavePointCloud;
         procedure RestorePointCloud;
 
+        procedure LoadObjPointCloud(iFileName:String);
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
 
@@ -106,12 +108,99 @@ implementation
 { TBoundingBoxServerForm }
 
 procedure TBoundingBoxServerForm.BitBtn1Click(Sender: TObject);
+var FileName: string;
 begin
     Memo1.Lines.Clear;
-    GenerateRandomPointCloud;
+
+    if CheckBoxRandomData.Checked then
+    begin
+        GenerateRandomPointCloud;
+    end
+    else
+    begin
+        //  Uses model data.
+        FileName := ExtractFilePath(ParamStr(0)) + 'TestModel.obj';
+        LoadObjPointCloud(FileName);
+    end;
     DisplayPointCloud;
     InitializeVariableParameters;
     OptimizeVolume;
+end;
+
+procedure TBoundingBoxServerForm.LoadObjPointCloud(iFileName:String);
+  type TOBJCoord = record // Stores X, Y, Z coordinates
+    X, Y, Z: Single;
+  end;
+
+  function GetCoords(iString: string): TOBJCoord;
+  var P, P2, P3: Integer;
+    fCoord: TOBJCoord;
+  begin
+    iString:= Trim(Copy(iString, 3, Length(iString)));
+    P:= Pos(' ', iString);
+    P2:= PosEx(' ', iString, P + 1);
+    P3:= PosEx(' ', iString, P2 + 1);
+    if P3 = 0 then P3:= 1000;
+    iString:= StringReplace(iString, '.', FormatSettings.DecimalSeparator, [rfReplaceAll]);
+    fCoord.X:= StrToFloat(Copy(iString, 1, P - 1));
+    fCoord.Y:= StrToFloat(Copy(iString, P + 1, P2 - P - 1));
+    fCoord.Z:= StrToFloat(Copy(iString, P2 + 1, P3 - P2 - 1));
+    Result:= fCoord;
+  end;
+
+var F : TextFile;
+    S : String;
+    fCoord: TOBJCoord;
+    fPoint: T3DVector;
+    fAlpha, fBeta, fGamma: Double;
+    RotX, RotY, RotZ, Matr: TMatrix;
+    fVector: T3Vector;
+begin
+  if PointCloud <> nil then
+      PointCloud.Destroy;
+  PointCloud := TComponentList.Create(True);
+  if FileExists(iFileName) then
+  begin
+    fAlpha := 0;
+    fBeta := 0;
+    fGamma := 45;
+
+    GetMatrixRotX(DegToRad(fAlpha), RotX);
+    GetMatrixRotY(DegToRad(fBeta), RotY);
+    GetMatrixRotZ(DegToRad(fGamma), RotZ);
+    { Computes rotation matrix. }
+    GetUnitMatrix(Matr);
+    Mul3DMatrix(RotZ, Matr, Matr);
+    Mul3DMatrix(RotY, Matr, Matr);
+    Mul3DMatrix(RotX, Matr, Matr);
+
+    AssignFile(F, iFileName);
+    Reset(F);
+    while not(EOF(F)) do
+    begin
+      Readln(F, S);
+      if (Length(S) >= 2 ) AND (S[1] <> '#') then
+      begin
+        S :=Uppercase(S);
+        if (S[1] = 'V') and (S[2] = ' ') then begin
+          // Read Vertex Data
+          fPoint := T3DVector.Create(nil);
+          fCoord:= GetCoords(S);
+          fVector[1]:= fCoord.X;
+          fVector[2]:= fCoord.Y;
+          fVector[3]:= fCoord.Z;
+          MulVectMatr(Matr, fVector);
+
+          fPoint.Comps[0] := fVector[1];
+          fPoint.Comps[1] := fVector[2];
+          fPoint.Comps[2] := fVector[3];
+
+          PointCloud.Add(fPoint);
+        end;
+      end;
+    end;
+    Closefile(F);
+  end;
 end;
 
 {$warnings off}
@@ -366,7 +455,7 @@ procedure TBoundingBoxServerForm.OptimizeVolume;
 begin
     { Initializing algorithm. }
     DownhillSimplexAlgorithm1.ParametersNumber := 6;
-    DownhillSimplexAlgorithm1.FinalTolerance := 0.1;
+    DownhillSimplexAlgorithm1.FinalTolerance := 0.00001;
     DownhillSimplexAlgorithm1.RestartDisabled := True;
     DownhillSimplexAlgorithm1.ExitDerivative := 0.5;
     DownhillSimplexAlgorithm1.DownhillSimplexServer := Self;
@@ -473,7 +562,7 @@ var
     i: LongInt;
     Point: T3DVector;
 begin
-    if CheckBox1.Checked then
+    if CheckBoxExtraData.Checked then
     begin
         Memo1.Lines.Add('Points:');
         for i := 0 to PointCloud.Count - 1 do
@@ -490,7 +579,7 @@ end;
 
 procedure TBoundingBoxServerForm.DisplayParameters;
 begin
-    if CheckBox1.Checked then
+    if CheckBoxExtraData.Checked then
         PrintParameters('Modified parameters:');
 end;
 
