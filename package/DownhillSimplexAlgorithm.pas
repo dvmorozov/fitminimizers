@@ -92,6 +92,7 @@ type
         //  Return indicies of the best solution, solution next to the best and worst solution.
         procedure GetIndicativeDecisions(
             var Highest, NextHighest, Lowest: LongInt); virtual;
+        //  For each parameter index computes sum of values for all vertexes.
         procedure GetParametersSum;
         procedure Start;
         procedure Restart;
@@ -442,10 +443,12 @@ begin
                 TryResult := TryNewDecision(Highest, 0.5);
                 if TryResult >= SavedResult then
                 begin
-                    //  Calculating average position of best vertext and
-                    //  all other vortices. Obtained value determines new
+                    //  Decrements sizes of simplex toward best vertex.
+                    //  Calculates average positions between best vertex and
+                    //  every other vertex. Obtained values determine new
                     //  position of the simplex.
                     for i := 0 to Simplex.Count - 1 do
+                    begin
                         if i <> Lowest then
                         begin
                             for j := 0 to ParametersNumber - 1 do
@@ -459,6 +462,7 @@ begin
                             EvaluateDecision(Self,
                                 TDownhillSimplexDecision(Simplex.Items[i]));
                         end;    //  if i <> Lowest then...
+                    end;
                     GetParametersSum;
                 end;    //  if TryResult >= SavedResult then...
             end;    //  if TryResult >= TDownhillSimplexDecision(
