@@ -7,7 +7,7 @@ uses
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-    Vcl.StdCtrls, Vcl.Buttons,
+    Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
@@ -143,12 +143,28 @@ var F : TextFile;
     S : String;
     fCoord: TOBJCoord;
     fPoint: T3DVector;
+    fAlpha, fBeta, fGamma: Double;
+    RotX, RotY, RotZ, Matr: TMatrix;
+    fVector: T3Vector;
 begin
   if PointCloud <> nil then
       PointCloud.Destroy;
   PointCloud := TComponentList.Create(True);
   if FileExists(iFileName) then
   begin
+    fAlpha := 0;
+    fBeta := 0;
+    fGamma := 45;
+
+    GetMatrixRotX(DegToRad(fAlpha), RotX);
+    GetMatrixRotY(DegToRad(fBeta), RotY);
+    GetMatrixRotZ(DegToRad(fGamma), RotZ);
+    { Computes rotation matrix. }
+    GetUnitMatrix(Matr);
+    Mul3DMatrix(RotZ, Matr, Matr);
+    Mul3DMatrix(RotY, Matr, Matr);
+    Mul3DMatrix(RotX, Matr, Matr);
+
     AssignFile(F, iFileName);
     Reset(F);
     while not(EOF(F)) do
@@ -161,9 +177,15 @@ begin
           // Read Vertex Data
           fPoint := T3DVector.Create(nil);
           fCoord:= GetCoords(S);
-          fPoint.Comps[0] := fCoord.X;
-          fPoint.Comps[1] := fCoord.Y;
-          fPoint.Comps[2] := fCoord.Z;
+          fVector[1]:= fCoord.X;
+          fVector[2]:= fCoord.Y;
+          fVector[3]:= fCoord.Z;
+          MulVectMatr(Matr, fVector);
+
+          fPoint.Comps[0] := fVector[1];
+          fPoint.Comps[1] := fVector[2];
+          fPoint.Comps[2] := fVector[3];
+
           PointCloud.Add(fPoint);
         end;
       end;
