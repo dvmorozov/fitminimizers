@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls,
+    StdCtrls, StrUtils,
   {$ENDIF}
     Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
@@ -44,6 +44,7 @@ type
         procedure SavePointCloud;
         procedure RestorePointCloud;
 
+        procedure LoadObjPointCloud(iFileName:String);
         procedure GenerateRandomPointCloud;
         procedure InitializeVariableParameters;
 
@@ -106,12 +107,69 @@ implementation
 { TBoundingBoxServerForm }
 
 procedure TBoundingBoxServerForm.BitBtn1Click(Sender: TObject);
+var FileName: string;
 begin
     Memo1.Lines.Clear;
-    GenerateRandomPointCloud;
+//    GenerateRandomPointCloud;
+    FileName:= ExtractFilePath(ParamStr(0))+'TestModel.obj';
+    LoadObjPointCloud(FileName);
     DisplayPointCloud;
     InitializeVariableParameters;
     OptimizeVolume;
+end;
+
+procedure TBoundingBoxServerForm.LoadObjPointCloud(iFileName:String);
+  type TOBJCoord = record // Stores X, Y, Z coordinates
+    X, Y, Z: Single;
+  end;
+
+  function GetCoords(iString: string): TOBJCoord;
+  var P, P2, P3: Integer;
+    fCoord: TOBJCoord;
+  begin
+    iString:= Trim(Copy(iString, 3, Length(iString)));
+    P:= Pos(' ', iString);
+    P2:= PosEx(' ', iString, P + 1);
+    P3:= PosEx(' ', iString, P2 + 1);
+    if P3 = 0 then P3:= 1000;
+    iString:= StringReplace(iString, '.', FormatSettings.DecimalSeparator, [rfReplaceAll]);
+    fCoord.X:= StrToFloat(Copy(iString, 1, P - 1));
+    fCoord.Y:= StrToFloat(Copy(iString, P + 1, P2 - P - 1));
+    fCoord.Z:= StrToFloat(Copy(iString, P2 + 1, P3 - P2 - 1));
+    Result:= fCoord;
+  end;
+
+var F : TextFile;
+    S : String;
+    fCoord: TOBJCoord;
+    fPoint: T3DVector;
+begin
+  if PointCloud <> nil then
+      PointCloud.Destroy;
+  PointCloud := TComponentList.Create(True);
+  if FileExists(iFileName) then
+  begin
+    AssignFile(F, iFileName);
+    Reset(F);
+    while not(EOF(F)) do
+    begin
+      Readln(F, S);
+      if (Length(S) >= 2 ) AND (S[1] <> '#') then
+      begin
+        S :=Uppercase(S);
+        if (S[1] = 'V') and (S[2] = ' ') then begin
+          // Read Vertex Data
+          fPoint := T3DVector.Create(nil);
+          fCoord:= GetCoords(S);
+          fPoint.Comps[0] := fCoord.X;
+          fPoint.Comps[1] := fCoord.Y;
+          fPoint.Comps[2] := fCoord.Z;
+          PointCloud.Add(fPoint);
+        end;
+      end;
+    end;
+    Closefile(F);
+  end;
 end;
 
 {$warnings off}
