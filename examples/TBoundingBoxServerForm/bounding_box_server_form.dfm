@@ -40,6 +40,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Top = 72
     Width = 512
     Anchors = [akTop, akLeft, akRight, akBottom]
+    ScrollBars = ssAutoBoth
     TabOrder = 1
   end
   object CheckBox1: TCheckBox
