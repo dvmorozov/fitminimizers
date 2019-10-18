@@ -43,13 +43,21 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     ScrollBars = ssAutoBoth
     TabOrder = 1
   end
-  object CheckBox1: TCheckBox
+  object CheckBoxExtraData: TCheckBox
     Left = 264
     Height = 23
     Top = 23
     Width = 104
     Caption = 'Show extra data'
     TabOrder = 2
+  end
+  object CheckBoxRandomData: TCheckBox
+    Left = 376
+    Height = 23
+    Top = 24
+    Width = 106
+    Caption = 'Use random data'
+    TabOrder = 3
   end
   object DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm
     left = 248

@@ -22,7 +22,8 @@ type
       The form directly implements IDownhillSimplexServer interface. }
     TBoundingBoxServerForm = class(TForm, IDownhillSimplexServer)
         BitBtn1: TBitBtn;
-        CheckBox1: TCheckBox;
+        CheckBoxExtraData: TCheckBox;
+        CheckBoxRandomData: TCheckBox;
         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         Label1: TLabel;
         Memo1: TMemo;
@@ -110,9 +111,17 @@ procedure TBoundingBoxServerForm.BitBtn1Click(Sender: TObject);
 var FileName: string;
 begin
     Memo1.Lines.Clear;
-//    GenerateRandomPointCloud;
-    FileName:= ExtractFilePath(ParamStr(0))+'TestModel.obj';
-    LoadObjPointCloud(FileName);
+
+    if CheckBoxRandomData.Checked then
+    begin
+        GenerateRandomPointCloud;
+    end
+    else
+    begin
+        //  Uses model data.
+        FileName := ExtractFilePath(ParamStr(0)) + 'TestModel.obj';
+        LoadObjPointCloud(FileName);
+    end;
     DisplayPointCloud;
     InitializeVariableParameters;
     OptimizeVolume;
@@ -553,7 +562,7 @@ var
     i: LongInt;
     Point: T3DVector;
 begin
-    if CheckBox1.Checked then
+    if CheckBoxExtraData.Checked then
     begin
         Memo1.Lines.Add('Points:');
         for i := 0 to PointCloud.Count - 1 do
@@ -570,7 +579,7 @@ end;
 
 procedure TBoundingBoxServerForm.DisplayParameters;
 begin
-    if CheckBox1.Checked then
+    if CheckBoxExtraData.Checked then
         PrintParameters('Modified parameters:');
 end;
 
