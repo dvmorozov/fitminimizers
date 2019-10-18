@@ -459,12 +459,11 @@ function TBoundingBoxServerForm.GetInitParamLength(Sender: TComponent;
 begin
     Assert(ParametersCount = 6);
 
-    Randomize;
     { Sets initial steps for angles 57 degrees, for translations 1 unit. }
     if (ParameterNumber < 3) then
-        Result := 57.0 + Random
+        Result := 57.0
     else
-        Result := 1.0 + Random;
+        Result := 1.0;
 end;
 
 function TBoundingBoxServerForm.DegToRad(Deg: Double): Double;
