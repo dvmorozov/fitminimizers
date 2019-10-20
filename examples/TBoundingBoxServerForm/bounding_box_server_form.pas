@@ -468,7 +468,7 @@ begin
     { Initializing algorithm. }
     DownhillSimplexAlgorithm1.ParametersNumber := 6;
     DownhillSimplexAlgorithm1.FinalTolerance := 0.00001;
-    DownhillSimplexAlgorithm1.RestartDisabled := True;
+    DownhillSimplexAlgorithm1.RestartDisabled := False;
     DownhillSimplexAlgorithm1.ExitDerivative := 0.5;
     DownhillSimplexAlgorithm1.DownhillSimplexServer := Self;
     { Optimizing. }
@@ -541,6 +541,8 @@ begin
     { Computes evaluation function. }
     Decision.Evaluation := ComputeBoxVolume;
     RestorePointCloud;
+
+    Memo1.Lines.Add('Volume: ' + FloatToStr(Decision.Evaluation));
 end;
 
 procedure TBoundingBoxServerForm.UpdateResults(Sender: TComponent; Decision: TFloatDecision);
