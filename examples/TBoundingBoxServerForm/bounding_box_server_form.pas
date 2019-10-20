@@ -466,7 +466,7 @@ end;
 procedure TBoundingBoxServerForm.OptimizeVolume;
 begin
     { Initializing algorithm. }
-    DownhillSimplexAlgorithm1.ParametersNumber := 6;
+    DownhillSimplexAlgorithm1.ParametersNumber := 3;
     DownhillSimplexAlgorithm1.FinalTolerance := 0.00001;
     DownhillSimplexAlgorithm1.RestartDisabled := False;
     DownhillSimplexAlgorithm1.ExitDerivative := 0.5;
@@ -478,7 +478,7 @@ end;
 function TBoundingBoxServerForm.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
-    Assert(ParametersCount = 6);
+    Assert(ParametersCount = 3);
 
     { Sets initial steps for angles 57 degrees, for translations 1 unit. }
     if (ParameterNumber < 3) then
@@ -498,14 +498,11 @@ end;
 procedure TBoundingBoxServerForm.FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
 begin
     { Sets up capacity. }
-    StartDecision.ParametersNumber := 6;
+    StartDecision.ParametersNumber := 3;
     { Fills variable parameters. }
     StartDecision.Parameters[0] := Alpha;
     StartDecision.Parameters[1] := Beta;
     StartDecision.Parameters[2] := Gamma;
-    StartDecision.Parameters[3] := Translation[1];
-    StartDecision.Parameters[4] := Translation[2];
-    StartDecision.Parameters[5] := Translation[3];
     { Computes evaluation function. }
     StartDecision.Evaluation := ComputeBoxVolume;
 end;
@@ -520,16 +517,13 @@ begin
     Alpha := Decision.Parameters[0];
     Beta := Decision.Parameters[1];
     Gamma := Decision.Parameters[2];
-    Translation[1] := Decision.Parameters[3];
-    Translation[2] := Decision.Parameters[4];
-    Translation[3] := Decision.Parameters[5];
 end;
 
 //  Calculate evaluation function for the point given in internal representation.
 procedure TBoundingBoxServerForm.EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
 
 begin
-    Assert(Decision.ParametersNumber = 6);
+    Assert(Decision.ParametersNumber = 3);
 
     { Fills variable parameters from the object. }
     FillParametersFromDecision(Decision);
@@ -542,7 +536,11 @@ begin
     Decision.Evaluation := ComputeBoxVolume;
     RestorePointCloud;
 
-    Memo1.Lines.Add('Volume: ' + FloatToStr(Decision.Evaluation));
+    if CheckBoxExtraData.Checked then
+    begin
+        Memo1.Lines.Add('Volume: ' + FloatToStr(Decision.Evaluation));
+        Memo1.Lines.Add('');
+    end;
 end;
 
 procedure TBoundingBoxServerForm.UpdateResults(Sender: TComponent; Decision: TFloatDecision);
