@@ -24,11 +24,12 @@ type
         BitBtn1: TBitBtn;
         CheckBoxExtraData: TCheckBox;
         CheckBoxRandomData: TCheckBox;
-        DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         Label1: TLabel;
         Memo1: TMemo;
         procedure BitBtn1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     private
+         DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
         { Minimum bounding box problem. }
         SavedPointCloud: TComponentList;
         { Set of random points. }
@@ -119,7 +120,7 @@ begin
     else
     begin
         //  Uses model data.
-        FileName := ExtractFilePath(ParamStr(0)) + 'TestModel.obj';
+        FileName := ExtractFilePath(ParamStr(0)) + 'TestModel.obj';    // Dimension: 85,5 x 54 x 0,8) - Volume 3.693,6
         LoadObjPointCloud(FileName);
     end;
     DisplayPointCloud;
@@ -162,7 +163,7 @@ begin
   if FileExists(iFileName) then
   begin
     fAlpha := 0;
-    fBeta := 0;
+    fBeta := 45;
     fGamma := 45;
 
     GetMatrixRotX(DegToRad(fAlpha), RotX);
@@ -173,6 +174,17 @@ begin
     Mul3DMatrix(RotZ, Matr, Matr);
     Mul3DMatrix(RotY, Matr, Matr);
     Mul3DMatrix(RotX, Matr, Matr);
+
+    fVector[1] := 1;
+    fVector[2] := 0;
+    fVector[3] := 0;
+    MulVectMatr(Matr, fVector);
+    Memo1.Lines.Add('Initial Rotated vector: ');
+    Memo1.Lines.Add(
+        '  X=' + FloatToStr(fVector[1]) + ', Y=' + FloatToStr(fVector[2]) +
+        ', Z=' + FloatToStr(fVector[3])
+        );
+    Memo1.Lines.Add('');
 
     AssignFile(F, iFileName);
     Reset(F);
@@ -496,6 +508,11 @@ begin
     StartDecision.Parameters[5] := Translation[3];
     { Computes evaluation function. }
     StartDecision.Evaluation := ComputeBoxVolume;
+end;
+
+procedure TBoundingBoxServerForm.FormCreate(Sender: TObject);
+begin
+  DownhillSimplexAlgorithm1:= TDownhillSimplexAlgorithm.Create(self);
 end;
 
 procedure TBoundingBoxServerForm.FillParametersFromDecision(Decision: TFloatDecision);

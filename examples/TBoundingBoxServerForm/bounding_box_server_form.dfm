@@ -12,9 +12,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
+  OnCreate = FormCreate
   Position = poDefault
   LCLVersion = '1.8.4.0'
-  WindowState = wsMaximized
   object Label1: TLabel
     Left = 10
     Height = 13
@@ -40,7 +40,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Top = 72
     Width = 512
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ScrollBars = ssAutoBoth
+    ScrollBars = ssVertical
     TabOrder = 1
   end
   object CheckBoxExtraData: TCheckBox
@@ -58,9 +58,5 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Width = 106
     Caption = 'Use random data'
     TabOrder = 3
-  end
-  object DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm
-    left = 248
-    top = 296
   end
 end
