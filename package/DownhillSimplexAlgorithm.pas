@@ -65,6 +65,9 @@ type
     TDownhillSimplexAlgorithm = class(TAlgorithm)
     protected
         FDownhillSimplexServer: IDownhillSimplexServer;
+        FCycles: integer;
+        FEvaluations: integer;
+        FRestarts: integer;
         FFinalTolerance: Double;
         FRestartDisabled: Boolean;
         FinalTolDefined: Boolean;
@@ -92,6 +95,7 @@ type
         //  Return indicies of the best solution, solution next to the best and worst solution.
         procedure GetIndicativeDecisions(
             var Highest, NextHighest, Lowest: LongInt); virtual;
+        //  For each parameter index computes sum of values for all vertexes.
         procedure GetParametersSum;
         procedure Start;
         procedure Restart;
@@ -105,6 +109,10 @@ type
         procedure AlgorithmRealization; override;
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
+
+        property CycleCount: Integer read FCycles;
+        property EvaluationCount: Integer read FEvaluations;
+        property RestartCount: Integer read FRestarts;
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
@@ -158,9 +166,11 @@ procedure TDownhillSimplexAlgorithm.Restart;
 var
     TempDecision: TDownhillSimplexDecision;
 begin
+    inc(FRestarts);
     TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
         EvaluateDecision(Self, TempDecision);
+    inc(FEvaluations);
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
     BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
@@ -171,11 +181,15 @@ procedure TDownhillSimplexAlgorithm.Start;
 var
     TempDecision: TDownhillSimplexDecision;
 begin
+    FCycles:= 0;
+    FEvaluations:= 0;
+    FRestarts:= 0;
     TempDecision := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
         FillStartDecision(Self, TempDecision);
         EvaluateDecision(Self, TempDecision);
+        inc(FEvaluations);
     end;    //  with DownhillSimplexServer do...
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
@@ -223,6 +237,7 @@ begin
                 TempDecision.Parameters[i] + GetInitParamLength(Self,
                 i, TempDecision.ParametersNumber);
             EvaluateDecision(Self, TempDecision);
+            inc(FEvaluations);
             Simplex.Add(TempDecision);
         end;    //  for i := 0 to StartDecision.ParametersNumber - 1 do...
     end;    //  with DownhillSimplexServer do...
@@ -349,6 +364,7 @@ begin
             ParametersSum[j] * Factor1 - HighestDecision.Parameters[j] * Factor2;
 
     DownhillSimplexServer.EvaluateDecision(Self, TempDecision);
+    inc(FEvaluations);
     Result := TempDecision;
 
     if TempDecision.Evaluation < BestDecision.Evaluation then
@@ -425,6 +441,7 @@ var
     TryResult, SavedResult: Double;
     i, j: LongInt;
 begin
+    Inc(FCycles);
     with DownhillSimplexServer do
     begin
         TryResult := TryNewDecision(Highest, -1);
@@ -442,10 +459,12 @@ begin
                 TryResult := TryNewDecision(Highest, 0.5);
                 if TryResult >= SavedResult then
                 begin
-                    //  Calculating average position of best vertext and
-                    //  all other vortices. Obtained value determines new
+                    //  Decrements sizes of simplex toward best vertex.
+                    //  Calculates average positions between best vertex and
+                    //  every other vertex. Obtained values determine new
                     //  position of the simplex.
                     for i := 0 to Simplex.Count - 1 do
+                    begin
                         if i <> Lowest then
                         begin
                             for j := 0 to ParametersNumber - 1 do
@@ -458,7 +477,9 @@ begin
                                     Simplex.Items[Lowest]).Parameters[j]);
                             EvaluateDecision(Self,
                                 TDownhillSimplexDecision(Simplex.Items[i]));
+                            inc(FEvaluations);
                         end;    //  if i <> Lowest then...
+                    end;
                     GetParametersSum;
                 end;    //  if TryResult >= SavedResult then...
             end;    //  if TryResult >= TDownhillSimplexDecision(
@@ -537,6 +558,7 @@ begin
         end;
         //  Set up parameters of best solution.
         EvaluateDecision(Self, BestDecision);
+        inc(FEvaluations);
     end;
 end;
 
@@ -596,6 +618,7 @@ begin
         end;
         //  Set up parameters of best solution.
         EvaluateDecision(Self, BestDecision);
+        inc(FEvaluations);
     end;
 end;
 
