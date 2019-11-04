@@ -9,7 +9,8 @@ interface
 uses
   Tools, SimpMath, MyExceptions, CBRCComponent, Algorithm, 
     SelfCheckedComponentList, Decisions, DownhillSimplexAlgorithm, 
-    LazarusPackageIntf; 
+    DownhillSimplexContainer, AlgorithmContainer, RunningThread, 
+    CombEnumerator, LazarusPackageIntf; 
 
 implementation
 

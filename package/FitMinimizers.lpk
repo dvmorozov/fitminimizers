@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="3">
     <PathDelim Value="\"/>
     <Name Value="FitMinimizers"/>
-    <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
-      <Version Value="11"/>
+      <Version Value="5"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <Libraries Value="lib\i386-win32"/>
-        <OtherUnitFiles Value="."/>
+        <Libraries Value="lib\i386-win32\"/>
+        <OtherUnitFiles Value=".\"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
         <CustomOptions Value="-dLazarus"/>
+        <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="13">
+    <Files Count="12">
       <Item1>
         <Filename Value="Tools.pas"/>
         <UnitName Value="Tools"/>
@@ -55,31 +55,28 @@
         <UnitName Value="DownhillSimplexContainer"/>
       </Item9>
       <Item10>
-        <Filename Value="FitMinimizers.pas"/>
-        <UnitName Value="FitMinimizers"/>
-      </Item10>
-      <Item11>
         <Filename Value="AlgorithmContainer.pas"/>
         <UnitName Value="AlgorithmContainer"/>
-      </Item11>
-      <Item12>
+      </Item10>
+      <Item11>
         <Filename Value="RunningThread.pas"/>
         <UnitName Value="RunningThread"/>
-      </Item12>
-      <Item13>
+      </Item11>
+      <Item12>
         <Filename Value="CombEnumerator.pas"/>
-        <UnitName Value="comb_enumerator"/>
-      </Item13>
+        <UnitName Value="CombEnumerator"/>
+      </Item12>
     </Files>
+    <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="FCL"/>
       </Item1>
       <Item2>
         <PackageName Value="LCL"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item3>
     </RequiredPkgs>
     <UsageOptions>
