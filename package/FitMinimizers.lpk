@@ -68,7 +68,7 @@
       </Item12>
       <Item13>
         <Filename Value="CombEnumerator.pas"/>
-        <UnitName Value="comb_enumerator"/>
+        <UnitName Value="CombEnumerator"/>
       </Item13>
     </Files>
     <RequiredPkgs Count="3">
