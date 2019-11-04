@@ -1,12 +1,12 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
   Left = 141
-  Height = 379
+  Height = 590
   Top = 131
-  Width = 532
+  Width = 1098
   BorderStyle = bsSingle
   Caption = 'TBoundingBoxServerForm Demo'
-  ClientHeight = 379
-  ClientWidth = 532
+  ClientHeight = 590
+  ClientWidth = 1098
   Color = clBtnFace
   DesignTimePPI = 120
   Font.Color = clWindowText
@@ -25,38 +25,152 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     ParentColor = False
     Transparent = False
   end
-  object BitBtn1: TBitBtn
+  object Label2: TLabel
     Left = 10
-    Height = 38
+    Height = 13
+    Top = 341
+    Width = 62
+    Caption = 'Test Output:'
+    Color = clBtnFace
+    ParentColor = False
+    Transparent = False
+  end
+  object Label3: TLabel
+    Left = 9
+    Height = 13
+    Top = 8
+    Width = 32
+    Caption = 'Model:'
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 251
+    Height = 13
+    Top = 8
+    Width = 101
+    Caption = 'Init_InitParamLength'
+    ParentColor = False
+  end
+  object Label5: TLabel
+    Left = 251
+    Height = 13
+    Top = 30
+    Width = 93
+    Caption = 'Exit_FinalTolerance'
+    ParentColor = False
+  end
+  object Label6: TLabel
+    Left = 251
+    Height = 13
+    Top = 52
+    Width = 91
+    Caption = 'Exit_ExitDerivative'
+    ParentColor = False
+  end
+  object BitBtn1: TBitBtn
+    Left = 608
+    Height = 58
     Top = 8
     Width = 240
+    Anchors = [akTop, akRight]
     Caption = 'Find Minimum Bounding Box'
     OnClick = BitBtn1Click
     TabOrder = 0
   end
   object Memo1: TMemo
     Left = 8
-    Height = 289
+    Height = 257
     Top = 72
-    Width = 512
+    Width = 1078
     Anchors = [akTop, akLeft, akRight, akBottom]
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 1
   end
-  object CheckBoxExtraData: TCheckBox
-    Left = 264
-    Height = 23
-    Top = 23
-    Width = 104
-    Caption = 'Show extra data'
-    TabOrder = 2
-  end
   object CheckBoxRandomData: TCheckBox
-    Left = 376
+    Left = 93
     Height = 23
-    Top = 24
+    Top = 3
     Width = 106
     Caption = 'Use random data'
+    TabOrder = 2
+  end
+  object ButtonBruteForce: TButton
+    Left = 866
+    Height = 25
+    Top = 8
+    Width = 130
+    Anchors = [akTop, akRight]
+    Caption = 'Brute Force'
+    OnClick = ButtonBruteForceClick
     TabOrder = 3
+  end
+  object Memo2: TMemo
+    Left = 8
+    Height = 222
+    Top = 360
+    Width = 1078
+    Anchors = [akLeft, akRight, akBottom]
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 4
+  end
+  object ButtonStop: TButton
+    Left = 1015
+    Height = 58
+    Top = 8
+    Width = 69
+    Anchors = [akTop, akRight]
+    Caption = 'Stop'
+    OnClick = ButtonStopClick
+    TabOrder = 5
+  end
+  object ButtonRandomTest: TButton
+    Left = 866
+    Height = 25
+    Top = 39
+    Width = 130
+    Anchors = [akTop, akRight]
+    Caption = 'Random Test'
+    OnClick = ButtonRandomTestClick
+    TabOrder = 6
+  end
+  object ComboBoxFiles: TComboBox
+    Left = 8
+    Height = 21
+    Top = 30
+    Width = 193
+    ItemHeight = 13
+    TabOrder = 7
+  end
+  object Ed_IniParamLenght: TEdit
+    Left = 366
+    Height = 21
+    Top = 4
+    Width = 121
+    TabOrder = 8
+    Text = '37'
+  end
+  object Ed_FinalTolerance: TEdit
+    Left = 366
+    Height = 21
+    Top = 26
+    Width = 121
+    TabOrder = 9
+    Text = '0.00001'
+  end
+  object Ed_ExitDerivate: TEdit
+    Left = 366
+    Height = 21
+    Top = 48
+    Width = 121
+    TabOrder = 10
+    Text = '0.5'
   end
 end
