@@ -61,7 +61,8 @@ type
         { Angles describing rotation of coordinate system (in degrees). }
         Alpha, Beta, Gamma: Double;
 
-        { Vector displaying position of center of the box. }
+        { Vectors containing triplets of maximum and minimum coordinates of
+          model points. They are used to compute bounding box volume. }
         BoxMinCoords, BoxMaxCoords: TDoubleVector3;
         BoxVolume: Double;
 
@@ -404,12 +405,16 @@ begin
           LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
           fTime:= DoOptimizeVolume(0, 0, 0, GetIniParamLenght);
           if not Stop then begin
+            //  Computes difference in volumes calculated
+            //  for original and rotated orientation.
             fDeltaVolume:= (BoxVolume - fBoxVolume);
+            //  Computes lengths of edges of bounding box.
             fDeltaCord[1]:= BoxMaxCoords[1] - BoxMinCoords[1];
             fDeltaCord[2]:= BoxMaxCoords[2] - BoxMinCoords[2];
             fDeltaCord[3]:= BoxMaxCoords[3] - BoxMinCoords[3];
+            //  Sorts edges.
             SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
-            fResult:= Format(' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- % 2d',
+            fResult:= Format(' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
               [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, fTime, DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
             if fDeltaVolume > fMaxDeltaVolume then begin
               fMaxDeltaVolume:= fDeltaVolume;
