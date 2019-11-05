@@ -1,7 +1,7 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
-  Left = 141
+  Left = 551
   Height = 590
-  Top = 131
+  Top = 219
   Width = 1098
   BorderStyle = bsSingle
   Caption = 'TBoundingBoxServerForm Demo'
@@ -29,8 +29,8 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Left = 10
     Height = 13
     Top = 341
-    Width = 62
-    Caption = 'Test Output:'
+    Width = 52
+    Caption = 'Test Runs:'
     Color = clBtnFace
     ParentColor = False
     Transparent = False
@@ -47,24 +47,24 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Left = 251
     Height = 13
     Top = 8
-    Width = 101
-    Caption = 'Init_InitParamLength'
+    Width = 83
+    Caption = 'Initial angle step:'
     ParentColor = False
   end
   object Label5: TLabel
     Left = 251
     Height = 13
     Top = 30
-    Width = 93
-    Caption = 'Exit_FinalTolerance'
+    Width = 74
+    Caption = 'Final tolerance:'
     ParentColor = False
   end
   object Label6: TLabel
     Left = 251
     Height = 13
     Top = 52
-    Width = 91
-    Caption = 'Exit_ExitDerivative'
+    Width = 73
+    Caption = 'Exit derivative:'
     ParentColor = False
   end
   object BitBtn1: TBitBtn
