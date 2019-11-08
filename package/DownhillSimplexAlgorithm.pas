@@ -231,7 +231,9 @@ procedure TDownhillSimplexAlgorithm.CreateSimplexVertices(
 var
     i, j: LongInt;
     TempDecision: TDownhillSimplexDecision;
+    Direction: LongInt;
 begin
+    Randomize;
     with DownhillSimplexServer do
     begin
         ParametersNumber := StartDecision.ParametersNumber;
@@ -246,20 +248,15 @@ begin
             for j := 0 to ParametersNumber - 1 do
                 TempDecision.Parameters[j] := StartDecision.Parameters[j];
 
-            //  Offset from the original point along the basal vector 
-            //  is determined by the value of current index.
-            if AddStep then
-            begin
-                TempDecision.Parameters[i] :=
-                    StartDecision.Parameters[i] + GetInitParamLength(Self,
-                    i, StartDecision.ParametersNumber);
-            end
-            else
-            begin
-                TempDecision.Parameters[i] :=
-                    StartDecision.Parameters[i] - GetInitParamLength(Self,
-                    i, StartDecision.ParametersNumber);
-            end;
+            //  Offsets from original point are added along basal vectors
+            //  in random directions.
+            if Random() > 0.5 then Direction := 1
+            else Direction := -1;
+
+            TempDecision.Parameters[i] := StartDecision.Parameters[i] +
+                Direction *
+                GetInitParamLength(Self, i, StartDecision.ParametersNumber);
+
             EvaluateDecision(Self, TempDecision);
             inc(FEvaluations);
             Simplex.Add(TempDecision);
