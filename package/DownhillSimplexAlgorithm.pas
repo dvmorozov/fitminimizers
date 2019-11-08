@@ -72,6 +72,12 @@ type
         FRestartDisabled: Boolean;
         FinalTolDefined: Boolean;
         FExitDerivative: Double;
+        //  Defines if initial step should be added or
+        //  subracted to/from coordinates of starting point.
+        //  This gives different initial simplexes what
+        //  can in some configuration spaces help to get to
+        //  better solution.
+        AddStep: Boolean;
         //  Set of solutions - vertexes of the simplex.
         Simplex: TSelfCheckedComponentList;
         ParametersSum: array of Double;
@@ -92,7 +98,8 @@ type
         //  Replace selected solution with modified one.
         procedure ReplaceDecision(OldDecision, NewDecision:
             TDownhillSimplexDecision);
-        //  Return indicies of the best solution, solution next to the best and worst solution.
+        //  Return indicies of the best solution, solution
+        //  next to the best and worst solution.
         procedure GetIndicativeDecisions(
             var Highest, NextHighest, Lowest: LongInt); virtual;
         //  For each parameter index computes sum of values for all vertexes.
@@ -118,6 +125,9 @@ type
             read FDownhillSimplexServer write FDownhillSimplexServer;
         property FinalTolerance: Double read FFinalTolerance
             write SetFinalTolerance;
+        //  Disables algorithm restarting after reaching local minimum.
+        //  Restarting can in some configuration spaces help to get to
+        //  better solution.
         property RestartDisabled: Boolean read FRestartDisabled
             write FRestartDisabled;
         //  Total number of parameters of the problem to be solved.
@@ -167,11 +177,15 @@ var
     TempDecision: TDownhillSimplexDecision;
 begin
     inc(FRestarts);
+    //  Changes direction of steps.
+    AddStep := not AddStep;
     TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
         EvaluateDecision(Self, TempDecision);
     inc(FEvaluations);
+    //  Recreates simplex vertexes.
     CreateSimplexVertices(TempDecision);
+    //  Replaces best solution.
     UtilizeObject(BestDecision);
     BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
@@ -222,7 +236,7 @@ begin
     begin
         ParametersNumber := StartDecision.ParametersNumber;
         Simplex.Clear;
-        Simplex.Add(StartDecision); //  First vertex is added.
+        Simplex.Add(StartDecision); //  Original point is added as a vertex.
         for i := 0 to ParametersNumber - 1 do
         begin
             //  Other N vertices are added.
@@ -231,11 +245,21 @@ begin
             //  Copying vertices parameters to new solution.
             for j := 0 to ParametersNumber - 1 do
                 TempDecision.Parameters[j] := StartDecision.Parameters[j];
+
             //  Offset from the original point along the basal vector 
             //  is determined by the value of current index.
-            TempDecision.Parameters[i] :=
-                TempDecision.Parameters[i] + GetInitParamLength(Self,
-                i, TempDecision.ParametersNumber);
+            if AddStep then
+            begin
+                TempDecision.Parameters[i] :=
+                    StartDecision.Parameters[i] + GetInitParamLength(Self,
+                    i, StartDecision.ParametersNumber);
+            end
+            else
+            begin
+                TempDecision.Parameters[i] :=
+                    StartDecision.Parameters[i] - GetInitParamLength(Self,
+                    i, StartDecision.ParametersNumber);
+            end;
             EvaluateDecision(Self, TempDecision);
             inc(FEvaluations);
             Simplex.Add(TempDecision);
@@ -382,8 +406,9 @@ var
 begin
     //  It's important to preserve order of items in the list!
     Index := Simplex.IndexOf(OldDecision);
+    Simplex.Extract(OldDecision);
     UtilizeObject(OldDecision);
-    Simplex.Items[Index] := NewDecision;
+    Simplex.Insert(Index, NewDecision);
     GetParametersSum;
 end;
 
@@ -439,9 +464,12 @@ procedure TDownhillSimplexAlgorithm.BasicCalcCycle(
     const Highest, NextHighest, Lowest: LongInt);
 var
     TryResult, SavedResult: Double;
+    LowestParamValue, CurParamValue: Double;
     i, j: LongInt;
+    SimplexCount: LongInt;
 begin
     Inc(FCycles);
+
     with DownhillSimplexServer do
     begin
         TryResult := TryNewDecision(Highest, -1);
@@ -463,18 +491,23 @@ begin
                     //  Calculates average positions between best vertex and
                     //  every other vertex. Obtained values determine new
                     //  position of the simplex.
-                    for i := 0 to Simplex.Count - 1 do
+                    SimplexCount := Simplex.Count;
+                    for i := 0 to SimplexCount - 1 do
                     begin
                         if i <> Lowest then
                         begin
                             for j := 0 to ParametersNumber - 1 do
+                            begin
+                                LowestParamValue := TDownhillSimplexDecision(
+                                    Simplex.Items[Lowest]).Parameters[j];
+                                CurParamValue:= TDownhillSimplexDecision(
+                                    Simplex.Items[i]).Parameters[j];
+
                                 TDownhillSimplexDecision(Simplex.Items[i]
                                     ).Parameters[j] :=
-                                    0.5 * (
-                                    TDownhillSimplexDecision(
-                                    Simplex.Items[i]).Parameters[j] +
-                                    TDownhillSimplexDecision(
-                                    Simplex.Items[Lowest]).Parameters[j]);
+                                    LowestParamValue +
+                                    0.5 * (CurParamValue - LowestParamValue);
+                            end;
                             EvaluateDecision(Self,
                                 TDownhillSimplexDecision(Simplex.Items[i]));
                             inc(FEvaluations);
