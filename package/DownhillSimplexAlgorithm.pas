@@ -73,6 +73,7 @@ type
         FinalTolDefined: Boolean;
         FExitDerivative: Double;
         FParametersNumber: LongInt;
+        FSimplexStartStepRandomEnabled: Boolean;
         FSimplexDirectionChangingEnabled: Boolean;
         FSimplexStartStepMultiplierEnabled: Boolean;
         //  Initial simplex size is multiplied by this number.
@@ -149,6 +150,9 @@ type
         //  Every new optimization cycle starts with its own initial simplex.
         property SimplexDirectionChangingEnabled: Boolean
             read FSimplexDirectionChangingEnabled write FSimplexDirectionChangingEnabled;
+        //  Enables random multiplier in creating initial simplex vertices.
+        property SimplexStartStepRandomEnabled: Boolean
+            read FSimplexStartStepRandomEnabled write FSimplexStartStepRandomEnabled;
     end;
 
     TDownhillSimplexSAAlgorithm = class(TDownhillSimplexAlgorithm)
@@ -258,9 +262,9 @@ procedure TDownhillSimplexAlgorithm.CreateSimplexVertices(
 var
     i, j: LongInt;
     TempDecision: TDownhillSimplexDecision;
-    Direction: Double;
+    SimplexStartStepDirection, SimplexStartStepRandom: Double;
 begin
-    //???Randomize;
+    if FSimplexStartStepRandomEnabled then Randomize;
 
     with DownhillSimplexServer do
     begin
@@ -281,17 +285,23 @@ begin
             //  Steps from original point are added along basis vectors
             //  in opposite directions accorging to restart counter.
             //  Basis vector is enumerated by parameter index.
-            Direction := 1;
+            SimplexStartStepDirection := 1;
             if FSimplexDirectionChangingEnabled then
             begin
                 //  Inverts direction.
-                if FRestartCount and (1 shl i) <> 0 then Direction := -1
+                if FRestartCount and (1 shl i) <> 0 then SimplexStartStepDirection := -1;
             end;
 
+            SimplexStartStepRandom := 1;
+            if FSimplexStartStepRandomEnabled then
+                SimplexStartStepRandom := Random();
+
             TempDecision.Parameters[i] := StartDecision.Parameters[i] +
+                //  Takes into account all multipliers. All of them
+                //  should have default value 1.
+                SimplexStartStepRandom *
+                SimplexStartStepDirection *
                 SimplexStartStepMultiplier *
-                //Random() *
-                Direction *
                 GetInitParamLength(Self, i, StartDecision.ParametersNumber);
 
             EvaluateDecision(Self, TempDecision);
