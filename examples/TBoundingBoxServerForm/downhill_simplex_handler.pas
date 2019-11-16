@@ -143,7 +143,6 @@ begin
   DownhillSimplexAlgorithm1.FinalTolerance:= 0.00001;
   DownhillSimplexAlgorithm1.ExitDerivative:= 0.5;
   DownhillSimplexAlgorithm1.RestartDisabled:= False;
-  DownhillSimplexAlgorithm1.SimplexStartStepMultiplierEnabled:= True;
   gStop:= False;
 end;
 
