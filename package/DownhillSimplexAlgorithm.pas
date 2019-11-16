@@ -73,16 +73,11 @@ type
         FinalTolDefined: Boolean;
         FExitDerivative: Double;
         FParametersNumber: LongInt;
+        FSimplexDirectionChangingEnabled: Boolean;
         FSimplexStartStepMultiplierEnabled: Boolean;
         //  Initial simplex size is multiplied by this number.
         //  If enabled it is used on optimization restarting (experimental feature).
         SimplexStartStepMultiplier: Double;
-        //  Defines if initial step should be added or
-        //  subracted to/from coordinates of starting point.
-        //  This gives different initial simplexes what
-        //  can in some configuration spaces help to get to
-        //  better solution.
-        AddStep: Boolean;
         //  Set of solutions - vertexes of the simplex.
         Simplex: TSelfCheckedComponentList;
         ParametersSum: array of Double;
@@ -148,6 +143,12 @@ type
         //  By default is False.
         property SimplexStartStepMultiplierEnabled: Boolean
             read FSimplexStartStepMultiplierEnabled write FSimplexStartStepMultiplierEnabled;
+        //  Enables sequential changing of directions of initial steps
+        //  forming initial simplex vertices. Steps are taken into different
+        //  directions from the initial point according to restart counter.
+        //  Every new optimization cycle starts with its own initial simplex.
+        property SimplexDirectionChangingEnabled: Boolean
+            read FSimplexDirectionChangingEnabled write FSimplexDirectionChangingEnabled;
     end;
 
     TDownhillSimplexSAAlgorithm = class(TDownhillSimplexAlgorithm)
@@ -188,7 +189,6 @@ var
 begin
     Inc(FRestartCount);
     //  Changes direction of steps.
-    AddStep := not AddStep;
     if FSimplexStartStepMultiplierEnabled then
     begin
         SimplexStartStepMultiplier := SimplexStartStepMultiplier / 2;
@@ -264,9 +264,11 @@ begin
 
     with DownhillSimplexServer do
     begin
+        //  Initializes parameter number.
         ParametersNumber := StartDecision.ParametersNumber;
         Simplex.Clear;
-        Simplex.Add(StartDecision); //  Original point is added as a vertex.
+        //  Original point is added as a vertex.
+        Simplex.Add(StartDecision);
         for i := 0 to ParametersNumber - 1 do
         begin
             //  Other N vertices are added.
@@ -276,25 +278,20 @@ begin
             for j := 0 to ParametersNumber - 1 do
                 TempDecision.Parameters[j] := StartDecision.Parameters[j];
 
-            //  Offsets from original point are added along basal vectors
-            //  in random directions.
-            (*
-            case FRestartCount of
-            0: Direction:=1;
-            1: if i = 0 then Direction := -1 else Direction := 1;
-            2: if i = 1 then Direction := -1 else Direction := 1;
-            3: if (i = 0) or (i = 1) then Direction := -1 else Direction := 1;
-            4: if i = 2 then Direction := -1 else Direction := 1;
-            5: if (i = 0) or (i = 2) then Direction := -1 else Direction := 1;
-            6: if (i = 1) or (i = 2) then Direction := -1 else Direction := 1;
-            7: Direction := -1;
+            //  Steps from original point are added along basis vectors
+            //  in opposite directions accorging to restart counter.
+            //  Basis vector is enumerated by parameter index.
+            Direction := 1;
+            if FSimplexDirectionChangingEnabled then
+            begin
+                //  Inverts direction.
+                if FRestartCount and (1 shl i) <> 0 then Direction := -1
             end;
-            *)
 
             TempDecision.Parameters[i] := StartDecision.Parameters[i] +
                 SimplexStartStepMultiplier *
                 //Random() *
-                //Direction *
+                Direction *
                 GetInitParamLength(Self, i, StartDecision.ParametersNumber);
 
             EvaluateDecision(Self, TempDecision);
@@ -553,7 +550,6 @@ begin
                     GetParametersSum;
                 end;    //  if TryResult >= SavedResult then...
             end;    //  if TryResult >= TDownhillSimplexDecision(
-            //  Simplex.Items[NextHighest]).Evaluation then...
         end;    //  else...
     end;    //  with DownhillSimplexServer do...
 end;
@@ -602,12 +598,11 @@ begin
                 begin
                     //  Size of simplex was reduced to minimal admissible value.
                     //  Checks other termination conditions.
-                    //  ????
-                    //  Because best solution is saved between cycles
+                    //  TODO: because best solution is saved between cycles
                     //  it is necessarily to change condition.
                     if (*(Abs(GetBestDecision.Evaluation - SavedLoEval) >
                         ExitDerivative) and*) (not RestartDisabled)
-                        //and (FRestartCount < 7)
+                        and ((not FSimplexDirectionChangingEnabled) or (FRestartCount < 1 shl ParametersNumber))
                         and ((not FSimplexStartStepMultiplierEnabled) or (SimplexStartStepMultiplier > 0.01))
                     then
                     begin
