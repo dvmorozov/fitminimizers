@@ -65,9 +65,9 @@ type
     TDownhillSimplexAlgorithm = class(TAlgorithm)
     protected
         FDownhillSimplexServer: IDownhillSimplexServer;
-        FCycles: integer;
-        FEvaluations: integer;
-        FRestarts: integer;
+        FCycleCount: LongInt;
+        FEvaluationCount: LongInt;
+        FRestartCount: LongInt;
         FFinalTolerance: Double;
         FRestartDisabled: Boolean;
         FinalTolDefined: Boolean;
@@ -77,7 +77,6 @@ type
         //  Initial simplex size is multiplied by this number.
         //  If enabled it is used on optimization restarting (experimental feature).
         SimplexStartStepMultiplier: Double;
-        RestartC: LongInt;
         //  Defines if initial step should be added or
         //  subracted to/from coordinates of starting point.
         //  This gives different initial simplexes what
@@ -121,10 +120,12 @@ type
         procedure AlgorithmRealization; override;
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
-
-        property CycleCount: Integer read FCycles;
-        property EvaluationCount: Integer read FEvaluations;
-        property RestartCount: Integer read FRestarts;
+        //  The total number of optimization cycles.
+        property CycleCount: Integer read FCycleCount;
+        //  The total number of target function evaluations during optimization.
+        property EvaluationCount: Integer read FEvaluationCount;
+        //  The total number of algorithm restarts during optimization.
+        property RestartCount: Integer read FRestartCount;
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
@@ -185,26 +186,25 @@ procedure TDownhillSimplexAlgorithm.Restart;
 var
     TempDecision: TDownhillSimplexDecision;
 begin
-    inc(FRestarts);
+    Inc(FRestartCount);
     //  Changes direction of steps.
     AddStep := not AddStep;
     if FSimplexStartStepMultiplierEnabled then
     begin
         SimplexStartStepMultiplier := SimplexStartStepMultiplier / 2;
     end;
-    Inc(RestartC);
     (*
     TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
         EvaluateDecision(Self, TempDecision);
-    inc(FEvaluations);
+    Inc(FEvaluationCount);
     *)
     TempDecision := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
         FillStartDecision(Self, TempDecision);
         EvaluateDecision(Self, TempDecision);
-        inc(FEvaluations);
+        Inc(FEvaluationCount);
     end;    //  with DownhillSimplexServer do...
     //  Recreates simplex vertexes.
     CreateSimplexVertices(TempDecision);
@@ -220,10 +220,9 @@ procedure TDownhillSimplexAlgorithm.Start;
 var
     TempDecision: TDownhillSimplexDecision;
 begin
-    FCycles := 0;
-    FEvaluations := 0;
-    FRestarts := 0;
-    RestartC := 0;
+    FCycleCount := 0;
+    FEvaluationCount := 0;
+    FRestartCount := 0;
     SimplexStartStepMultiplier := 1;
 
     TempDecision := CreateAppropriateDecision;
@@ -231,7 +230,7 @@ begin
     begin
         FillStartDecision(Self, TempDecision);
         EvaluateDecision(Self, TempDecision);
-        inc(FEvaluations);
+        Inc(FEvaluationCount);
     end;    //  with DownhillSimplexServer do...
     CreateSimplexVertices(TempDecision);
     UtilizeObject(BestDecision);
@@ -280,7 +279,7 @@ begin
             //  Offsets from original point are added along basal vectors
             //  in random directions.
             (*
-            case RestartC of
+            case FRestartCount of
             0: Direction:=1;
             1: if i = 0 then Direction := -1 else Direction := 1;
             2: if i = 1 then Direction := -1 else Direction := 1;
@@ -299,7 +298,7 @@ begin
                 GetInitParamLength(Self, i, StartDecision.ParametersNumber);
 
             EvaluateDecision(Self, TempDecision);
-            inc(FEvaluations);
+            Inc(FEvaluationCount);
             Simplex.Add(TempDecision);
         end;    //  for i := 0 to StartDecision.ParametersNumber - 1 do...
     end;    //  with DownhillSimplexServer do...
@@ -426,7 +425,7 @@ begin
             ParametersSum[j] * Factor1 - HighestDecision.Parameters[j] * Factor2;
 
     DownhillSimplexServer.EvaluateDecision(Self, TempDecision);
-    inc(FEvaluations);
+    Inc(FEvaluationCount);
     Result := TempDecision;
 
     if TempDecision.Evaluation < BestDecision.Evaluation then
@@ -506,7 +505,7 @@ var
     i, j: LongInt;
     SimplexCount: LongInt;
 begin
-    Inc(FCycles);
+    Inc(FCycleCount);
 
     with DownhillSimplexServer do
     begin
@@ -548,7 +547,7 @@ begin
                             end;
                             EvaluateDecision(Self,
                                 TDownhillSimplexDecision(Simplex.Items[i]));
-                            inc(FEvaluations);
+                            Inc(FEvaluationCount);
                         end;    //  if i <> Lowest then...
                     end;
                     GetParametersSum;
@@ -608,7 +607,7 @@ begin
                     //  it is necessarily to change condition.
                     if (*(Abs(GetBestDecision.Evaluation - SavedLoEval) >
                         ExitDerivative) and*) (not RestartDisabled)
-                        //and (RestartC < 7)
+                        //and (FRestartCount < 7)
                         and ((not FSimplexStartStepMultiplierEnabled) or (SimplexStartStepMultiplier > 0.01))
                     then
                     begin
@@ -634,7 +633,7 @@ begin
         end;
         //  Set up parameters of best solution.
         EvaluateDecision(Self, BestDecision);
-        inc(FEvaluations);
+        Inc(FEvaluationCount);
     end;
 end;
 
@@ -694,7 +693,7 @@ begin
         end;
         //  Set up parameters of best solution.
         EvaluateDecision(Self, BestDecision);
-        inc(FEvaluations);
+        Inc(FEvaluationCount);
     end;
 end;
 
