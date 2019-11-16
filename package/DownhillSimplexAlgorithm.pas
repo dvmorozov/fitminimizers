@@ -72,6 +72,12 @@ type
         FRestartDisabled: Boolean;
         FinalTolDefined: Boolean;
         FExitDerivative: Double;
+        FParametersNumber: LongInt;
+        FSimplexStartStepMultiplierEnabled: Boolean;
+        //  Initial simplex size is multiplied by this number.
+        //  If enabled it is used on optimization restarting (experimental feature).
+        SimplexStartStepMultiplier: Double;
+        RestartC: LongInt;
         //  Defines if initial step should be added or
         //  subracted to/from coordinates of starting point.
         //  This gives different initial simplexes what
@@ -81,8 +87,7 @@ type
         //  Set of solutions - vertexes of the simplex.
         Simplex: TSelfCheckedComponentList;
         ParametersSum: array of Double;
-        FParametersNumber: LongInt;
-        //  Best solution found to this moment.
+        //  Best solution found over all optimization cycles.
         BestDecision: TDownhillSimplexDecision;
 
         function TryNewDecision(const Highest: LongInt;
@@ -138,13 +143,17 @@ type
         //  is less than given value then exit.
         property ExitDerivative: Double read FExitDerivative
             write FExitDerivative;
+        //  Enables using SimplexStartStepMultiplier on optimization restarting.
+        //  By default is False.
+        property SimplexStartStepMultiplierEnabled: Boolean
+            read FSimplexStartStepMultiplierEnabled write FSimplexStartStepMultiplierEnabled;
     end;
 
     TDownhillSimplexSAAlgorithm = class(TDownhillSimplexAlgorithm)
     protected
         FTemperature: Double;
-        //  Return indicies of the best solution, solution next to the best and worst solution
-        //  after adding random fluctiations to evaluated values.
+        //  Return indicies of the best solution, solution next to the best and
+        //  worst solution after adding random fluctiations to evaluated values.
         procedure GetIndicativeDecisions(
             var Highest, NextHighest, Lowest: LongInt); override;
         function TryNewDecision(const Highest: LongInt;
@@ -179,25 +188,44 @@ begin
     inc(FRestarts);
     //  Changes direction of steps.
     AddStep := not AddStep;
+    if FSimplexStartStepMultiplierEnabled then
+    begin
+        SimplexStartStepMultiplier := SimplexStartStepMultiplier / 2;
+    end;
+    Inc(RestartC);
+    (*
     TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
         EvaluateDecision(Self, TempDecision);
     inc(FEvaluations);
+    *)
+    TempDecision := CreateAppropriateDecision;
+    with DownhillSimplexServer do
+    begin
+        FillStartDecision(Self, TempDecision);
+        EvaluateDecision(Self, TempDecision);
+        inc(FEvaluations);
+    end;    //  with DownhillSimplexServer do...
     //  Recreates simplex vertexes.
     CreateSimplexVertices(TempDecision);
     //  Replaces best solution.
+    (*
     UtilizeObject(BestDecision);
     BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
+    *)
 end;
 
 procedure TDownhillSimplexAlgorithm.Start;
 var
     TempDecision: TDownhillSimplexDecision;
 begin
-    FCycles:= 0;
-    FEvaluations:= 0;
-    FRestarts:= 0;
+    FCycles := 0;
+    FEvaluations := 0;
+    FRestarts := 0;
+    RestartC := 0;
+    SimplexStartStepMultiplier := 1;
+
     TempDecision := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
@@ -231,9 +259,10 @@ procedure TDownhillSimplexAlgorithm.CreateSimplexVertices(
 var
     i, j: LongInt;
     TempDecision: TDownhillSimplexDecision;
-    Direction: LongInt;
+    Direction: Double;
 begin
-    Randomize;
+    //???Randomize;
+
     with DownhillSimplexServer do
     begin
         ParametersNumber := StartDecision.ParametersNumber;
@@ -250,11 +279,23 @@ begin
 
             //  Offsets from original point are added along basal vectors
             //  in random directions.
-            if Random() > 0.5 then Direction := 1
-            else Direction := -1;
+            (*
+            case RestartC of
+            0: Direction:=1;
+            1: if i = 0 then Direction := -1 else Direction := 1;
+            2: if i = 1 then Direction := -1 else Direction := 1;
+            3: if (i = 0) or (i = 1) then Direction := -1 else Direction := 1;
+            4: if i = 2 then Direction := -1 else Direction := 1;
+            5: if (i = 0) or (i = 2) then Direction := -1 else Direction := 1;
+            6: if (i = 1) or (i = 2) then Direction := -1 else Direction := 1;
+            7: Direction := -1;
+            end;
+            *)
 
             TempDecision.Parameters[i] := StartDecision.Parameters[i] +
-                Direction *
+                SimplexStartStepMultiplier *
+                //Random() *
+                //Direction *
                 GetInitParamLength(Self, i, StartDecision.ParametersNumber);
 
             EvaluateDecision(Self, TempDecision);
@@ -561,14 +602,19 @@ begin
                 if Tolerance < FinalTolerance then
                 begin
                     //  Size of simplex was reduced to minimal admissible value.
-                    if (Abs(GetBestDecision.Evaluation - SavedLoEval) >
-                        ExitDerivative) and (not RestartDisabled) then
+                    //  Checks other termination conditions.
+                    //  ????
+                    //  Because best solution is saved between cycles
+                    //  it is necessarily to change condition.
+                    if (*(Abs(GetBestDecision.Evaluation - SavedLoEval) >
+                        ExitDerivative) and*) (not RestartDisabled)
+                        //and (RestartC < 7)
+                        and ((not FSimplexStartStepMultiplierEnabled) or (SimplexStartStepMultiplier > 0.01))
+                    then
                     begin
-
                         SavedLoEval := GetBestDecision.Evaluation;
                         Restart;
                         Continue;
-
                     end
                     else
                         Break;
@@ -656,6 +702,7 @@ constructor TDownhillSimplexAlgorithm.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
     Simplex := TSelfCheckedComponentList.Create(nil);
+    FSimplexStartStepMultiplierEnabled := False;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetFinalTolerance(AFinalTolerance: Double);

@@ -23,8 +23,10 @@ type
 
     gShowAlgoDetails: Boolean;
 
-    { Angles describing rotation of coordinate system (in degrees). }
+    { Optimized values of angles describing rotation of coordinate system (in degrees). }
     gAlpha, gBeta, gGamma: Double;
+    { Original values of angles describing rotation of coordinate system (in degrees). }
+    gOriginalAlpha, gOriginalBeta, gOriginalGamma: Double;
     gDHS_InitParamLength: Double;
 
     { Box infomations: Volume and Coordinates}
@@ -140,6 +142,8 @@ begin
   { Initializing algorithm - Exit Parameter }
   DownhillSimplexAlgorithm1.FinalTolerance:= 0.00001;
   DownhillSimplexAlgorithm1.ExitDerivative:= 0.5;
+  DownhillSimplexAlgorithm1.RestartDisabled:= False;
+  DownhillSimplexAlgorithm1.SimplexStartStepMultiplierEnabled:= True;
   gStop:= False;
 end;
 
@@ -163,11 +167,17 @@ begin
   gAlpha:= iAlpha;
   gBeta:= iBeta;
   gGamma:= iGamma;
+
+  gOriginalAlpha:= iAlpha;
+  gOriginalBeta:= iBeta;
+  gOriginalGamma:= iGamma;
+
   gDHS_InitParamLength:= iAlgoInitialStepsAngles;
   DownhillSimplexAlgorithm1.ParametersNumber:= 3;
-  DownhillSimplexAlgorithm1.RestartDisabled:= False;
   { Optimizing. }
   DownhillSimplexAlgorithm1.AlgorithmRealization;
+
+  { Gets parameters of best solution. }
 
   if gShowAlgoDetails then begin
     fString:= '  Result:' + sLineBreak;
@@ -210,10 +220,10 @@ var fString: string;
 begin
   { Sets up capacity. }
   iStartDecision.ParametersNumber:= 3;
-  { Fills variable parameters. }
-  iStartDecision.Parameters[0]:= gAlpha;
-  iStartDecision.Parameters[1]:= gBeta;
-  iStartDecision.Parameters[2]:= gGamma;
+  { Simplex is created from original point. }
+  iStartDecision.Parameters[0]:= gOriginalAlpha;
+  iStartDecision.Parameters[1]:= gOriginalBeta;
+  iStartDecision.Parameters[2]:= gOriginalGamma;
   { Computes evaluation function. }
   gBoxVolume:= ComputeRotatedBoxVolume(gAlpha, gBeta, gGamma, gBoxMinCoords, gBoxMaxCoords);
   iStartDecision.Evaluation:= gBoxVolume;
