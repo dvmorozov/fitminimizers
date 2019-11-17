@@ -143,6 +143,7 @@ begin
   DownhillSimplexAlgorithm1.FinalTolerance:= 0.00001;
   DownhillSimplexAlgorithm1.ExitDerivative:= 0.5;
   DownhillSimplexAlgorithm1.RestartDisabled:= False;
+  //DownhillSimplexAlgorithm1.SimplexDirectionChangingEnabled:= True;
   gStop:= False;
 end;
 
@@ -172,7 +173,6 @@ begin
   gOriginalGamma:= iGamma;
 
   gDHS_InitParamLength:= iAlgoInitialStepsAngles;
-  DownhillSimplexAlgorithm1.ParametersNumber:= 3;
   { Optimizing. }
   DownhillSimplexAlgorithm1.AlgorithmRealization;
 
@@ -224,7 +224,7 @@ begin
   iStartDecision.Parameters[1]:= gOriginalBeta;
   iStartDecision.Parameters[2]:= gOriginalGamma;
   { Computes evaluation function. }
-  gBoxVolume:= ComputeRotatedBoxVolume(gAlpha, gBeta, gGamma, gBoxMinCoords, gBoxMaxCoords);
+  gBoxVolume:= ComputeRotatedBoxVolume(gOriginalAlpha, gOriginalBeta, gOriginalGamma, gBoxMinCoords, gBoxMaxCoords);
   iStartDecision.Evaluation:= gBoxVolume;
 
   if gShowAlgoDetails then begin
