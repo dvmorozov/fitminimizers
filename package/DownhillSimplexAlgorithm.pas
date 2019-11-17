@@ -91,7 +91,7 @@ type
             Factor: Double): TDownhillSimplexDecision;
         //  Return new object-solution of the type appropriate for given algorithm.
         function CreateAppropriateDecision: TDownhillSimplexDecision; virtual;
-        //  Return best solution found to this moment.
+        //  Return vertex of the simplex containing minimum value of goal function.
         function GetBestDecision: TDownhillSimplexDecision;
         procedure CreateSimplexVertices(StartDecision:
             TDownhillSimplexDecision);
@@ -135,22 +135,24 @@ type
         //  Total number of parameters of the problem to be solved.
         //  The number is defined after executing CreateSimplexVertices.
         property ParametersNumber: LongInt
-            read FParametersNumber write SetParametersNumber;
+            read FParametersNumber;
         //  If difference in evaluation of best decision for the cycle
         //  is less than given value then exit.
         property ExitDerivative: Double read FExitDerivative
             write FExitDerivative;
         //  Enables using SimplexStartStepMultiplier on optimization restarting.
-        //  By default is False.
+        //  The flag should not be used together with other SimplexXXXX flags.
         property SimplexStartStepMultiplierEnabled: Boolean
             read FSimplexStartStepMultiplierEnabled write FSimplexStartStepMultiplierEnabled;
         //  Enables sequential changing of directions of initial steps
         //  forming initial simplex vertices. Steps are taken into different
         //  directions from the initial point according to restart counter.
         //  Every new optimization cycle starts with its own initial simplex.
+        //  The flag should not be used together with other SimplexXXXX flags.
         property SimplexDirectionChangingEnabled: Boolean
             read FSimplexDirectionChangingEnabled write FSimplexDirectionChangingEnabled;
         //  Enables random multiplier in creating initial simplex vertices.
+        //  The flag should not be used together with other SimplexXXXX flags.
         property SimplexStartStepRandomEnabled: Boolean
             read FSimplexStartStepRandomEnabled write FSimplexStartStepRandomEnabled;
     end;
@@ -192,17 +194,11 @@ var
     TempDecision: TDownhillSimplexDecision;
 begin
     Inc(FRestartCount);
-    //  Changes direction of steps.
     if FSimplexStartStepMultiplierEnabled then
     begin
         SimplexStartStepMultiplier := SimplexStartStepMultiplier / 2;
     end;
-    (*
-    TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
-    with DownhillSimplexServer do
-        EvaluateDecision(Self, TempDecision);
-    Inc(FEvaluationCount);
-    *)
+
     TempDecision := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
@@ -212,12 +208,6 @@ begin
     end;    //  with DownhillSimplexServer do...
     //  Recreates simplex vertexes.
     CreateSimplexVertices(TempDecision);
-    //  Replaces best solution.
-    (*
-    UtilizeObject(BestDecision);
-    BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
-    DownhillSimplexServer.UpdateResults(Self, BestDecision);
-    *)
 end;
 
 procedure TDownhillSimplexAlgorithm.Start;
@@ -269,7 +259,7 @@ begin
     with DownhillSimplexServer do
     begin
         //  Initializes parameter number.
-        ParametersNumber := StartDecision.ParametersNumber;
+        SetParametersNumber(StartDecision.ParametersNumber);
         Simplex.Clear;
         //  Original point is added as a vertex.
         Simplex.Add(StartDecision);
@@ -569,13 +559,14 @@ var
     Highest, NextHighest, Lowest: LongInt;
     Tolerance, PrevTolerance: Double;
     EvalHi, EvalLo: Double;
-    SavedLoEval: Double;
+    SavedLoEval, CurLoEval: Double;
     PrevTolDefined: Boolean;
 begin
     if not Assigned(DownhillSimplexServer) then
         raise EDownhillSimplexAlgorithm.Create('Server is not assigned...');
 
     Start;
+    //  Saves minimum value of goal function from initial simplex.
     SavedLoEval := GetBestDecision.Evaluation;
 
     PrevTolDefined := False;
@@ -606,16 +597,19 @@ begin
             begin
                 if Tolerance < FinalTolerance then
                 begin
+                    CurLoEval := GetBestDecision.Evaluation;
                     //  Size of simplex was reduced to minimal admissible value.
-                    //  Checks other termination conditions.
-                    //  TODO: because best solution is saved between cycles
-                    //  it is necessarily to change condition.
-                    if (*(Abs(GetBestDecision.Evaluation - SavedLoEval) >
-                        ExitDerivative) and*) (not RestartDisabled)
-                        and ((not FSimplexDirectionChangingEnabled) or (FRestartCount < 1 shl ParametersNumber))
-                        and ((not FSimplexStartStepMultiplierEnabled) or (SimplexStartStepMultiplier > 0.01))
+                    if (not RestartDisabled)
+                        //  Checks other termination conditions.
+                        and (
+                            (FSimplexDirectionChangingEnabled and (FRestartCount < (1 shl ParametersNumber) - 1))
+                         or (FSimplexStartStepMultiplierEnabled and (SimplexStartStepMultiplier > 0.01))
+                         or ((not FSimplexDirectionChangingEnabled) and (not FSimplexStartStepMultiplierEnabled)
+                              and (Abs(CurLoEval - SavedLoEval) > ExitDerivative))
+                         )
                     then
                     begin
+                        //  Saves minimum value of goal function among simplex vertices.
                         SavedLoEval := GetBestDecision.Evaluation;
                         Restart;
                         Continue;
@@ -707,6 +701,8 @@ begin
     inherited Create(AOwner);
     Simplex := TSelfCheckedComponentList.Create(nil);
     FSimplexStartStepMultiplierEnabled := False;
+    FSimplexStartStepRandomEnabled := False;
+    FSimplexDirectionChangingEnabled := False;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetFinalTolerance(AFinalTolerance: Double);
