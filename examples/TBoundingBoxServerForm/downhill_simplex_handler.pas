@@ -18,13 +18,17 @@ type
   TDownHillSimplexHandler = class(TComponent, IDownhillSimplexServer)
   private
     { Minimum bounding box problem. }
-    DownhillSimplexAlgorithm1: TDownhillSimplexAlgorithm;
-    gStop: Boolean;
+    FDownhillSimplexAlgorithm: TDownhillSimplexAlgorithm;
 
+    gStop: Boolean;
     gShowAlgoDetails: Boolean;
 
-    { Angles describing rotation of coordinate system (in degrees). }
+    { Optimized values of angles describing rotation of coordinate system (in degrees). }
     gAlpha, gBeta, gGamma: Double;
+    { Original values of angles describing rotation of coordinate system (in degrees). }
+    gOriginalAlpha, gOriginalBeta, gOriginalGamma: Double;
+    FRecreateSimplexFromOriginal: Boolean;
+
     gDHS_InitParamLength: Double;
 
     { Box infomations: Volume and Coordinates}
@@ -66,6 +70,10 @@ type
     property DHS_CycleCount: Integer read Get_DHS_CycleCount;
     property DHS_EvaluationCount: Integer read Get_DHS_EvaluationCount;
     property DHS_RestartCount: Integer read Get_DHS_RestartCount;
+    //  If set simplex is recreated from original point on restarting,
+    //  otherwise from the best point found during last optimization cycle.
+    property RecreateSimplexFromOriginal: Boolean
+        read FRecreateSimplexFromOriginal write FRecreateSimplexFromOriginal;
   end;
 
 
@@ -136,39 +144,46 @@ end;
 constructor TDownHillSimplexHandler.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  DownhillSimplexAlgorithm1:= TDownhillSimplexAlgorithm.Create(Self);
+  FDownhillSimplexAlgorithm:= TDownhillSimplexAlgorithm.Create(Self);
   { Initializing algorithm - Exit Parameter }
-  DownhillSimplexAlgorithm1.FinalTolerance:= 0.00001;
-  DownhillSimplexAlgorithm1.ExitDerivative:= 0.5;
+  FDownhillSimplexAlgorithm.FinalTolerance:= 0.00001;
+  FDownhillSimplexAlgorithm.ExitDerivative:= 0.5;
+  FDownhillSimplexAlgorithm.RestartDisabled:= False;
+  //FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled:= True;
   gStop:= False;
+  FRecreateSimplexFromOriginal:= False;
 end;
 
 destructor TDownHillSimplexHandler.Destroy;
 begin
-  DownhillSimplexAlgorithm1.Free;
+  FDownhillSimplexAlgorithm.Free;
   inherited Destroy;
 end;
 
 procedure TDownHillSimplexHandler.SetExitParameters(iFinalTolerance, iExitDerivative: Double);
 begin
-  DownhillSimplexAlgorithm1.FinalTolerance:= iFinalTolerance;
-  DownhillSimplexAlgorithm1.ExitDerivative:= iExitDerivative;
+  FDownhillSimplexAlgorithm.FinalTolerance:= iFinalTolerance;
+  FDownhillSimplexAlgorithm.ExitDerivative:= iExitDerivative;
 end;
 
 procedure TDownHillSimplexHandler.OptimizeBoundingBox(iAlpha, iBeta, iGamma, iAlgoInitialStepsAngles: Double);
 var fString: string;
 begin
-  DownhillSimplexAlgorithm1.DownhillSimplexServer:= Self;
+  FDownhillSimplexAlgorithm.DownhillSimplexServer:= Self;
   { Initializing algorithm - Start Parameter }
   gAlpha:= iAlpha;
   gBeta:= iBeta;
   gGamma:= iGamma;
-  gDHS_InitParamLength:= iAlgoInitialStepsAngles;
-  DownhillSimplexAlgorithm1.ParametersNumber:= 3;
-  DownhillSimplexAlgorithm1.RestartDisabled:= False;
-  { Optimizing. }
-  DownhillSimplexAlgorithm1.AlgorithmRealization;
+  { Saves original point. }
+  gOriginalAlpha:= iAlpha;
+  gOriginalBeta:= iBeta;
+  gOriginalGamma:= iGamma;
 
+  gDHS_InitParamLength:= iAlgoInitialStepsAngles;
+  { Optimizing. }
+  FDownhillSimplexAlgorithm.AlgorithmRealization;
+
+  { Gets parameters of best solution. }
   if gShowAlgoDetails then begin
     fString:= '  Result:' + sLineBreak;
     fString:= fString + '     Modified parameters:' + Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
@@ -184,17 +199,17 @@ end;
 
 function TDownHillSimplexHandler.Get_DHS_CycleCount: Integer;
 begin
-  Result:= DownhillSimplexAlgorithm1.CycleCount;
+  Result:= FDownhillSimplexAlgorithm.CycleCount;
 end;
 
 function TDownHillSimplexHandler.Get_DHS_EvaluationCount: Integer;
 begin
-  Result:= DownhillSimplexAlgorithm1.EvaluationCount;
+  Result:= FDownhillSimplexAlgorithm.EvaluationCount;
 end;
 
 function TDownHillSimplexHandler.Get_DHS_RestartCount: Integer;
 begin
-  Result:= DownhillSimplexAlgorithm1.RestartCount;
+  Result:= FDownhillSimplexAlgorithm.RestartCount;
 end;
 
 //-----------------------------------------------------------------------------
@@ -210,7 +225,13 @@ var fString: string;
 begin
   { Sets up capacity. }
   iStartDecision.ParametersNumber:= 3;
-  { Fills variable parameters. }
+  { Simplex is created from original point. }
+  if FRecreateSimplexFromOriginal then
+  begin
+    gAlpha:= gOriginalAlpha;
+    gBeta:= gOriginalBeta;
+    gGamma:= gOriginalGamma;
+  end;
   iStartDecision.Parameters[0]:= gAlpha;
   iStartDecision.Parameters[1]:= gBeta;
   iStartDecision.Parameters[2]:= gGamma;
