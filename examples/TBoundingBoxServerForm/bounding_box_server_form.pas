@@ -362,11 +362,11 @@ begin
     Memo1.Lines.Add('');
     Memo1.Lines.Add('');
     Memo1.Lines.Add('----------------------------------------------------------------------------');
-    Memo1.Lines.Add('Minimum Volume    : ' + Format('%.2f (%6.3f %6.3f %6.3f)', [fMinVolume, fX, fY, fZ]));
+    Memo1.Lines.Add('Minimum Volume    : ' + Format('%.4f (%6.3f %6.3f %6.3f)', [fMinVolume, fX, fY, fZ]));
     Memo1.Lines.Add('----------------------------------------------------------------------------');
-    Memo1.Lines.Add('Passrate 0.1%     : ' + Format('%.2f%%', [fPassCount01 / (fPassCount01 + fFailCount01) * 100]));
+    Memo1.Lines.Add('Passrate 0.1%     : ' + Format('%.4f%%', [fPassCount01 / (fPassCount01 + fFailCount01) * 100]));
     Memo1.Lines.Add('----------------------------------------------------------------------------');
-    Memo1.Lines.Add('Passrate 1%       : ' + Format('%.2f%%', [fPassCount1 / (fPassCount1 + fFailCount1) * 100]));
+    Memo1.Lines.Add('Passrate 1%       : ' + Format('%.4f%%', [fPassCount1 / (fPassCount1 + fFailCount1) * 100]));
     Memo1.Lines.Add('----------------------------------------------------------------------------');
     Memo1.Lines.Add('Time Average      : ' + Format('%.4f', [fSumTime]));
     Memo1.Lines.Add('----------------------------------------------------------------------------');
