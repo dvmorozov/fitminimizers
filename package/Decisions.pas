@@ -14,7 +14,10 @@ unit Decisions;
 
 interface
 
-uses SysUtils, Classes, SelfCheckedComponentList, SimpMath;
+uses SysUtils, Classes, SelfCheckedComponentList;
+
+const
+    TINY = 1e-6;
 
 type
     TAbstractDecision = class(TComponent)
