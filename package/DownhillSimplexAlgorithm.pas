@@ -45,17 +45,12 @@ type
         //  Return initial characteristic length for every parameter.
         function GetInitParamLength(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
-
         //  Set inital calculation point in internal representation.
         //  The number of array element is equal to the number of parameters of task to be solved.
-        procedure FillStartDecision(Sender: TComponent;
-            StartDecision: TFloatDecision);
+        procedure FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
         //  Calculate evaluation function for the point given in internal representation.
-        procedure EvaluateDecision(Sender: TComponent;
-            Decision: TFloatDecision);
-
-        procedure UpdateResults(Sender: TComponent;
-            Decision: TFloatDecision);
+        procedure EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
+        procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
         //  Return flag of calculation termination.
         function EndOfCalculation(Sender: TComponent): Boolean;
     end;
