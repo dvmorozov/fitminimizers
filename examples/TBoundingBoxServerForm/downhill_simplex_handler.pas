@@ -10,9 +10,9 @@ uses
   Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
 {$ELSE}
   SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-  StdCtrls, StrUtils,
+  StdCtrls,
 {$ENDIF}
-  Contnrs, Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
+  Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 type
   TDownHillSimplexHandler = class(TComponent, IDownhillSimplexServer)
@@ -91,11 +91,11 @@ function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single; var iMinCoords, 
   begin
     { Computing rotation matrices.
       Matrices are initalized inside functions. }
-    GetMatrixRotX(DegToRad(iAlpha), fRotX);
-    GetMatrixRotY(DegToRad(iBeta), fRotY);
-    GetMatrixRotZ(DegToRad(iGamma), fRotZ);
+    fRotX:= MatrixRotX(DegToRad(iAlpha));
+    fRotY:= MatrixRotY(DegToRad(iBeta));
+    fRotZ:= MatrixRotZ(DegToRad(iGamma));
     { Computes rotation matrix. }
-    GetUnitMatrix(fMatr);
+    fMatr:= UnitMatrix;
     Mul3DMatrix(fRotZ, fMatr, fMatr);
     Mul3DMatrix(fRotY, fMatr, fMatr);
     Mul3DMatrix(fRotX, fMatr, fMatr);
@@ -132,7 +132,7 @@ begin
   Result:= fA * fB * fC;
 end;
 
-procedure DisplayDetails(iLevel: Integer; iString: string);
+procedure DisplayDetails(iString: string);
 begin
   BoundingBoxServerForm.Memo2.Lines.Add(iString);
 end;
@@ -188,7 +188,7 @@ begin
     fString:= '  Result:' + sLineBreak;
     fString:= fString + '     Modified parameters:' + Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
     fString:= fString + '     Volume: ' + Format('%.4f', [gBoxVolume]) + sLineBreak;
-    DisplayDetails(1, fString);
+    DisplayDetails(fString);
   end;
 end;
 
@@ -243,16 +243,16 @@ begin
     fString:= '  StartDecision:' + sLineBreak;
     fString:= fString + '     Start Parameters:' + Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
     fString:= fString + '     Start Volume: ' + Format('%.4f', [gBoxVolume]) + sLineBreak;
-    DisplayDetails(2, fString);
+    DisplayDetails(fString);
   end;
 end;
 
+{$hints off}
 function TDownHillSimplexHandler.GetInitParamLength(Sender: TComponent; ParameterNumber, ParametersCount: LongInt): Double;
 begin
   Result:= gDHS_InitParamLength;
 end;
-
-//  Calculate evaluation function for the point given in internal representation.
+{$hints on}
 
 procedure TDownHillSimplexHandler.EvaluateDecision(Sender: TComponent; iDecision: TFloatDecision);
 var fString: string;
@@ -269,7 +269,7 @@ begin
     fString:= '  EvaluateDecition:' + sLineBreak;
     fString:= fString + '     Modified parameters:' + Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
     fString:= fString + '     Volume: ' + Format('%.4f', [iDecision.Evaluation]) + sLineBreak;
-    DisplayDetails(3, fString);
+    DisplayDetails(fString);
   end;
 end;
 
@@ -284,7 +284,7 @@ begin
     fString:= 'UpdateResults:' + sLineBreak;
     fString:= fString + '    Optimized parameters:' + Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
     fString:= fString + '    Optimized Volume: ' + Format('%.4f', [iDecision.Evaluation]) + sLineBreak;
-    DisplayDetails(2, fString);
+    DisplayDetails(fString);
   end;
 end;
 

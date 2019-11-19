@@ -12,7 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils, Windows,
   {$ENDIF}
-    Contnrs, SimpMath, Math3d, downhill_simplex_handler;
+    SimpMath, Math3d, downhill_simplex_handler;
 
 {$ASSERTIONS ON}
 
@@ -71,7 +71,6 @@ type
         DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount: integer;
 
         ShowAlgoDetails: boolean;
-
         Stop: Boolean;
 
         { Executes optimization algorithm. }
@@ -148,11 +147,15 @@ end;
 procedure TBoundingBoxServerForm.OptimizeVolume(iAlpha, iBeta, iGamma: Double; iDHS_InitParamLength: Double; iShowDetails:Boolean);
 var fFinalTolerance, fExitDerivate: double;
 begin
+   // this suppresses useless hints in Lazarus
+   fFinalTolerance:= 0.00001;
+   fExitDerivate:= 0.5;
+
    if not ConvertValue(Ed_FinalTolerance.Text, fFinalTolerance) then begin
-     fFinalTolerance:= 0.00001; //default Value
+     fFinalTolerance:= 0.00001; //default value
    end;
    if not ConvertValue(Ed_ExitDerivate.Text, fExitDerivate) then begin
-     fFinalTolerance:= 0.5; //default Value
+     fExitDerivate:= 0.5;       //default value
    end;
    fDownHillSimplexHandler:= TDownHillSimplexHandler.Create(self);
    fDownHillSimplexHandler.ShowAlgoDetails:= iShowDetails;
@@ -176,8 +179,11 @@ end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
 begin
-   if not ConvertValue(Ed_IniParamLenght.Text, Result) then begin
-     Result:= 37; //default Value
+   // this suppresses useless hints in Lazarus
+   Result:= 37;
+   if not ConvertValue(Ed_IniParamLenght.Text, Result) then
+   begin
+     Result:= 37; //default value
    end;
 end;
 
@@ -185,11 +191,17 @@ function TBoundingBoxServerForm.DoOptimizeVolume(iAlpha, iBeta, iGamma: Double; 
 var
   fPerformanceFrequency, fStartTime, fEndTime: Int64;
 begin
+  // this supresses useless hints in Lazarus
+  fPerformanceFrequency := 0; fStartTime := 0; fEndTime := 0;
+  Result := 0;
+
   QueryPerformanceFrequency(fPerformanceFrequency);
   QueryPerformanceCounter(fStartTime);
   OptimizeVolume(iAlpha, iBeta, iGamma, iDHS_InitParamLength, False);
   QueryPerformanceCounter(fEndTime);
-  Result:= (fEndTime - fStartTime) / fPerformanceFrequency;
+
+  if fPerformanceFrequency <> 0 then
+      Result:= (fEndTime - fStartTime) / fPerformanceFrequency;
 end;
 
 procedure TBoundingBoxServerForm.OutputResults;
@@ -230,7 +242,7 @@ begin
     end
     else
     begin
-        //  Uses model data.
+        //  uses model data
         FileName:= FilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
@@ -242,6 +254,7 @@ procedure TBoundingBoxServerForm.PostProcessStatistics;
 const
   cCriterion01 = 0.001; // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
   cCriterion1 = 0.01;   // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
+
 var x: Integer;
   fP1, fCode: Integer;
   fString, fString2, fRateing: string;
@@ -398,7 +411,11 @@ begin
   Application.ProcessMessages;
 
   // get the optimized volume and Box size
-  LoadObjPointCloud(FileName, 0, 0, 0); //load it in original orientation
+  // load it in original orientation
+  LoadObjPointCloud(FileName, 0, 0, 0);
+  // this suppresses useless hints in Lazarus
+  fMinCoords[1]:= 0; fMinCoords[2]:= 0; fMinCoords[3]:= 0;
+  fMaxCoords[1]:= 0; fMaxCoords[2]:= 0; fMaxCoords[3]:= 0;
   fBoxVolume:= FindMinBoxByVolume(fMinCoords, fMaxCoords);
 
   // do the test for brute force orientation
@@ -467,7 +484,12 @@ begin
   Application.ProcessMessages;
 
   // get the optimized volume and Box size
-  LoadObjPointCloud(FileName, 0, 0, 0); //load it in original orientation
+  // load it in original orientation
+  LoadObjPointCloud(FileName, 0, 0, 0);
+  // this suppresses useless hints in Lazarus
+  fMinCoords[1]:= 0; fMinCoords[2]:= 0; fMinCoords[3]:= 0;
+  fMaxCoords[1]:= 0; fMaxCoords[2]:= 0; fMaxCoords[3]:= 0;
+
   fBoxVolume:= FindMinBoxByVolume(fMaxCoords, fMinCoords);
 
   // do the test for random orientation
@@ -619,11 +641,11 @@ begin
   PointCloud:= TList.Create;
   if FileExists(iFileName) then
   begin
-    GetMatrixRotX(DegToRad(iAlpha), RotX);
-    GetMatrixRotY(DegToRad(iBeta), RotY);
-    GetMatrixRotZ(DegToRad(iGamma), RotZ);
+    RotX:= MatrixRotX(DegToRad(iAlpha));
+    RotY:= MatrixRotY(DegToRad(iBeta));
+    RotZ:= MatrixRotZ(DegToRad(iGamma));
     { Computes rotation matrix. }
-    GetUnitMatrix(Matr);
+    Matr:= UnitMatrix;
     Mul3DMatrix(RotZ, Matr, Matr);
     Mul3DMatrix(RotY, Matr, Matr);
     Mul3DMatrix(RotX, Matr, Matr);

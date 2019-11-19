@@ -4,12 +4,12 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="32">
+    <Units Count="21">
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <CursorPos X="91" Y="16"/>
+        <CursorPos Y="14"/>
         <UsageCount Value="200"/>
       </Unit0>
       <Unit1>
@@ -18,8 +18,7 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="410"/>
-        <CursorPos X="69" Y="422"/>
+        <CursorPos X="18" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -27,10 +26,11 @@
       <Unit2>
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="246"/>
-        <CursorPos Y="276"/>
-        <UsageCount Value="113"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="141"/>
+        <CursorPos X="5" Y="152"/>
+        <UsageCount Value="256"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -38,330 +38,247 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="163"/>
         <CursorPos Y="179"/>
-        <UsageCount Value="80"/>
+        <UsageCount Value="49"/>
       </Unit3>
       <Unit4>
-        <Filename Value="Algorithm.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos Y="9"/>
-        <UsageCount Value="17"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="CBRCComponent.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="14"/>
-        <CursorPos X="5" Y="20"/>
-        <UsageCount Value="17"/>
-      </Unit5>
-      <Unit6>
         <Filename Value="Decisions.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="203"/>
         <CursorPos Y="220"/>
-        <UsageCount Value="80"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="MyExceptions.pas"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="15"/>
-      </Unit7>
-      <Unit8>
+        <UsageCount Value="49"/>
+      </Unit4>
+      <Unit5>
         <Filename Value="SimpMath.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="916"/>
         <CursorPos Y="935"/>
-        <UsageCount Value="79"/>
-      </Unit8>
-      <Unit9>
+        <UsageCount Value="48"/>
+      </Unit5>
+      <Unit6>
         <Filename Value="Tools.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="104" Y="9"/>
-        <UsageCount Value="81"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="FitMinimizers.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="26" Y="4"/>
-        <UsageCount Value="12"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="SelfCheckedComponentList.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="53" Y="12"/>
-        <UsageCount Value="15"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\contnrs.pp"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="67"/>
-        <CursorPos X="17" Y="83"/>
-        <UsageCount Value="11"/>
-      </Unit12>
-      <Unit13>
+        <UsageCount Value="50"/>
+      </Unit6>
+      <Unit7>
         <Filename Value="Math3d.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="80" Y="45"/>
-        <UsageCount Value="60"/>
+        <UsageCount Value="29"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="70"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\package\AlgorithmContainer.pas"/>
+        <EditorIndex Value="10"/>
+        <CursorPos X="27" Y="23"/>
+        <UsageCount Value="139"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\package\CBRCComponent.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="39" Y="16"/>
+        <UsageCount Value="70"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\package\Algorithm.pas"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="5" Y="20"/>
+        <UsageCount Value="139"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\package\RunningThread.pas"/>
+        <EditorIndex Value="11"/>
+        <CursorPos X="31" Y="79"/>
+        <UsageCount Value="138"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\package\CombEnumerator.pas"/>
+        <EditorIndex Value="9"/>
+        <CursorPos Y="20"/>
+        <UsageCount Value="138"/>
+        <Loaded Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="..\package\Decisions.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="757"/>
-        <CursorPos X="17" Y="807"/>
-        <UsageCount Value="0"/>
+        <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="667"/>
+        <CursorPos X="50" Y="684"/>
+        <UsageCount Value="138"/>
+        <Loaded Value="True"/>
       </Unit14>
       <Unit15>
-        <Filename Value="..\package\DownhillSimplexAlgorithm.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="129"/>
-        <CursorPos X="5" Y="43"/>
-        <UsageCount Value="0"/>
+        <Filename Value="..\..\package\SelfCheckedComponentList.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="126"/>
+        <CursorPos Y="149"/>
+        <UsageCount Value="125"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
+        <Filename Value="..\..\package\Decisions.pas"/>
         <EditorIndex Value="7"/>
-        <UsageCount Value="67"/>
+        <TopLine Value="88"/>
+        <CursorPos X="61" Y="103"/>
+        <UsageCount Value="125"/>
         <Loaded Value="True"/>
       </Unit16>
       <Unit17>
-        <Filename Value="..\..\package\AlgorithmContainer.pas"/>
-        <EditorIndex Value="11"/>
-        <CursorPos X="27" Y="23"/>
-        <UsageCount Value="67"/>
+        <Filename Value="..\..\package\Tools.pas"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="41" Y="37"/>
+        <UsageCount Value="16"/>
         <Loaded Value="True"/>
       </Unit17>
       <Unit18>
-        <Filename Value="..\..\package\CBRCComponent.pas"/>
-        <EditorIndex Value="10"/>
-        <CursorPos X="39" Y="16"/>
-        <UsageCount Value="67"/>
-        <Loaded Value="True"/>
+        <Filename Value="C:\lazarus\lcl\include\application.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="358"/>
+        <CursorPos Y="375"/>
+        <UsageCount Value="14"/>
       </Unit18>
       <Unit19>
-        <Filename Value="..\..\package\Algorithm.pas"/>
-        <EditorIndex Value="8"/>
-        <CursorPos X="11" Y="2"/>
-        <UsageCount Value="67"/>
+        <Filename Value="..\Math3d.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="117"/>
+        <CursorPos X="23" Y="136"/>
+        <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit19>
       <Unit20>
-        <Filename Value="..\..\package\RunningThread.pas"/>
-        <EditorIndex Value="12"/>
-        <CursorPos X="31" Y="79"/>
-        <UsageCount Value="66"/>
+        <Filename Value="..\..\package\SimpMath.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="13"/>
+        <CursorPos X="5" Y="30"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit20>
-      <Unit21>
-        <Filename Value="..\..\package\CombEnumerator.pas"/>
-        <EditorIndex Value="9"/>
-        <CursorPos Y="15"/>
-        <UsageCount Value="66"/>
-        <Loaded Value="True"/>
-      </Unit21>
-      <Unit22>
-        <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="238"/>
-        <CursorPos X="50" Y="253"/>
-        <UsageCount Value="66"/>
-        <Loaded Value="True"/>
-      </Unit22>
-      <Unit23>
-        <Filename Value="..\..\package\DownHillSimplexHandler.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="68" Y="15"/>
-        <UsageCount Value="1"/>
-      </Unit23>
-      <Unit24>
-        <Filename Value="C:\lazarus\components\lazdebuggergdbmi\cmdlinedebugger.pp"/>
-        <UnitName Value="CmdLineDebugger"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="30" Y="226"/>
-        <UsageCount Value="1"/>
-      </Unit24>
-      <Unit25>
-        <Filename Value="DownHillSimplexHandler.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="21"/>
-        <UsageCount Value="1"/>
-      </Unit25>
-      <Unit26>
-        <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="750"/>
-        <CursorPos X="14" Y="774"/>
-        <UsageCount Value="1"/>
-      </Unit26>
-      <Unit27>
-        <Filename Value="..\..\package\SelfCheckedComponentList.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="126"/>
-        <CursorPos Y="149"/>
-        <UsageCount Value="53"/>
-        <Loaded Value="True"/>
-      </Unit27>
-      <Unit28>
-        <Filename Value="..\..\package\Decisions.pas"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="196"/>
-        <CursorPos Y="216"/>
-        <UsageCount Value="53"/>
-        <Loaded Value="True"/>
-      </Unit28>
-      <Unit29>
-        <Filename Value="..\..\package\Tools.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="105"/>
-        <CursorPos X="21" Y="122"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
-      </Unit29>
-      <Unit30>
-        <Filename Value="C:\lazarus\lcl\interfaces\win32\win32object.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="374"/>
-        <CursorPos Y="390"/>
-        <UsageCount Value="10"/>
-      </Unit30>
-      <Unit31>
-        <Filename Value="C:\lazarus\lcl\include\application.inc"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="358"/>
-        <CursorPos Y="375"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
-      </Unit31>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
     </OtherDefines>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="115" Column="25" TopLine="88"/>
+        <Caret Line="633" Column="25" TopLine="606"/>
       </Position1>
       <Position2>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="80" Column="10" TopLine="68"/>
+        <Caret Line="694" Column="25" TopLine="667"/>
       </Position2>
       <Position3>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="197" Column="47" TopLine="169"/>
+        <Caret Line="52" Column="35" TopLine="35"/>
       </Position3>
       <Position4>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="247" Column="23" TopLine="223"/>
+        <Caret Line="204" Column="25" TopLine="176"/>
       </Position4>
       <Position5>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
+        <Caret Line="224" Column="25" TopLine="196"/>
       </Position5>
       <Position6>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="70" Column="17" TopLine="42"/>
+        <Caret Line="295" Column="29" TopLine="268"/>
       </Position6>
       <Position7>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="72" Column="17" TopLine="44"/>
+        <Caret Line="422" Column="43" TopLine="394"/>
       </Position7>
       <Position8>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="108" Column="26" TopLine="82"/>
+        <Caret Line="543" Column="45" TopLine="516"/>
       </Position8>
       <Position9>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="72" Column="25" TopLine="55"/>
+        <Caret Line="633" Column="25" TopLine="606"/>
       </Position9>
       <Position10>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="131" Column="64" TopLine="104"/>
+        <Caret Line="694" Column="25" TopLine="667"/>
       </Position10>
       <Position11>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="132" Column="35" TopLine="105"/>
       </Position11>
       <Position12>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="568" Column="32" TopLine="546"/>
+        <Caret Line="60" Column="45" TopLine="39"/>
       </Position12>
       <Position13>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="70" Column="17" TopLine="53"/>
+        <Caret Line="62" Column="20" TopLine="39"/>
       </Position13>
       <Position14>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
+        <Caret Line="201" Column="25" TopLine="176"/>
       </Position14>
       <Position15>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="70" Column="17" TopLine="42"/>
+        <Caret Line="204" Column="25" TopLine="176"/>
       </Position15>
       <Position16>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="72" Column="17" TopLine="44"/>
+        <Caret Line="224" Column="25" TopLine="196"/>
       </Position16>
       <Position17>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="108" Column="26" TopLine="82"/>
+        <Caret Line="295" Column="29" TopLine="268"/>
       </Position17>
       <Position18>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="122" Column="53" TopLine="95"/>
+        <Caret Line="422" Column="43" TopLine="394"/>
       </Position18>
       <Position19>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="128" Column="39" TopLine="101"/>
+        <Caret Line="543" Column="45" TopLine="516"/>
       </Position19>
       <Position20>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="129" Column="20" TopLine="102"/>
+        <Caret Line="633" Column="25" TopLine="606"/>
       </Position20>
       <Position21>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="131" Column="56" TopLine="104"/>
+        <Caret Line="691" Column="74" TopLine="670"/>
       </Position21>
       <Position22>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="132" Column="27" TopLine="105"/>
       </Position22>
       <Position23>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="181" Column="27" TopLine="159"/>
+        <Caret Line="52" Column="35" TopLine="24"/>
       </Position23>
       <Position24>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="253" Column="62" TopLine="233"/>
+        <Caret Line="204" Column="25" TopLine="176"/>
       </Position24>
       <Position25>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
+        <Caret Line="224" Column="25" TopLine="196"/>
       </Position25>
       <Position26>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="96" Column="40" TopLine="70"/>
+        <Caret Line="295" Column="29" TopLine="268"/>
       </Position26>
       <Position27>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="134" Column="72" TopLine="107"/>
+        <Caret Line="422" Column="43" TopLine="394"/>
       </Position27>
       <Position28>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="187" Column="26" TopLine="159"/>
+        <Caret Line="543" Column="45" TopLine="516"/>
       </Position28>
       <Position29>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="208" Column="26" TopLine="180"/>
+        <Caret Line="633" Column="25" TopLine="606"/>
       </Position29>
-      <Position30>
-        <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="256" TopLine="238"/>
-      </Position30>
     </JumpHistory>
   </ProjectSession>
-  <Debugging>
-    <Watches Count="1">
-      <Item1>
-        <Expression Value="Simplex.Count"/>
-      </Item1>
-    </Watches>
-  </Debugging>
 </CONFIG>
