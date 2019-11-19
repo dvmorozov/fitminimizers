@@ -68,8 +68,11 @@ type
         FCycleCount: LongInt;
         FEvaluationCount: LongInt;
         FRestartCount: LongInt;
-        FFinalTolerance: Double;
         FRestartDisabled: Boolean;
+        //  Set exit values
+        FMaxCycles: integer;
+        FMaxRestarts: integer;
+        FFinalTolerance: Double;
         FinalTolDefined: Boolean;
         FExitDerivative: Double;
         FParametersNumber: LongInt;
@@ -98,8 +101,7 @@ type
         //  Replace selected solution with modified one.
         procedure ReplaceDecision(OldDecision, NewDecision:
             TDownhillSimplexDecision);
-        //  Return indicies of the best solution, solution
-        //  next to the best and worst solution.
+        //  Return indicies of the best solution, solution next to the best and worst solution.
         procedure GetIndicativeDecisions(
             var Highest, NextHighest, Lowest: LongInt); virtual;
         //  For each parameter index computes sum of values for all vertexes.
@@ -122,6 +124,8 @@ type
         property EvaluationCount: Integer read FEvaluationCount;
         //  The total number of algorithm restarts during optimization.
         property RestartCount: Integer read FRestartCount;
+        property MaxCycles: Integer read FMaxCycles write FMaxCycles;
+        property MaxRestarts: Integer read FMaxRestarts write FMaxRestarts;
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
@@ -133,13 +137,12 @@ type
         property RestartDisabled: Boolean read FRestartDisabled
             write FRestartDisabled;
         //  Total number of parameters of the problem to be solved.
-        //  The number is defined after executing CreateSimplexVertices.
+        //  The number is defined after executing CreateSimplexVertices, should not be set up by client.
         property ParametersNumber: LongInt
             read FParametersNumber;
         //  If difference in evaluation of best decision for the cycle
         //  is less than given value then exit.
-        property ExitDerivative: Double read FExitDerivative
-            write FExitDerivative;
+        property ExitDerivative: Double read FExitDerivative write FExitDerivative;
         //  Enables using SimplexStartStepMultiplier on optimization restarting.
         //  The flag should not be used together with other SimplexXXXX flags.
         property SimplexStartStepMultiplierEnabled: Boolean
@@ -607,6 +610,7 @@ begin
                          or ((not FSimplexDirectionChangingEnabled) and (not FSimplexStartStepMultiplierEnabled)
                               and (Abs(CurLoEval - SavedLoEval) > ExitDerivative))
                          )
+                        and (FRestartCount < FMaxRestarts)
                     then
                     begin
                         //  Saves minimum value of goal function among simplex vertices.
@@ -654,7 +658,7 @@ begin
 
     with DownhillSimplexServer do
     begin
-        while not EndOfCalculation(Self) do
+        while (not EndOfCalculation(Self)) and (FCycleCount < FMaxCycles) do
         begin
             Highest := 0;
             NextHighest := 0;
@@ -671,7 +675,8 @@ begin
 
             if FinalTolDefined and (Tolerance < FinalTolerance) then
             begin
-                if GetBestDecision.Evaluation < SavedLoEval then
+                if (GetBestDecision.Evaluation < SavedLoEval)
+                and (FRestartCount < FMaxRestarts) then
                 begin
                     SavedLoEval := GetBestDecision.Evaluation;
                     Restart;
@@ -703,6 +708,8 @@ begin
     FSimplexStartStepMultiplierEnabled := False;
     FSimplexStartStepRandomEnabled := False;
     FSimplexDirectionChangingEnabled := False;
+    FMaxCycles := MaxInt;
+    FMaxRestarts := MaxInt;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetFinalTolerance(AFinalTolerance: Double);
