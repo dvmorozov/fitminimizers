@@ -34,27 +34,25 @@ procedure Translation(A, B, C: Double);
 procedure Transition(Al, Bt, Gm: Double);
 procedure Pro(A, B, C: Double);
 
+{ Don't use these procedures, use equivalent functions instead. See below. }
 procedure GetZerosMatrix(var Matr: TMatrix);
 procedure GetUnitMatrix(var Matr: TMatrix);
-
 procedure GetReverseMatrix(var Matr: TMatrix);
-
-
 procedure GetMatrixTransition(Al, Bt, Gm: Double; var Matr: TMatrix);
-
 procedure GetMatrixTrans(A, B, C: Double; var Matr: TMatrix);
-
 procedure GetMatrixDilat(A, B, C: Double; var Matr: TMatrix);
-
-
 procedure GetMatrixRotX(Angle: Double; var Matr: TMatrix);
 procedure GetMatrixRotY(Angle: Double; var Matr: TMatrix);
 procedure GetMatrixRotZ(Angle: Double; var Matr: TMatrix);
 
+{ Equivalent functions allowing to avoid useless hints in Lazarus. }
+function UnitMatrix: TMatrix;
+function MatrixRotX(Angle: Double): TMatrix;
+function MatrixRotY(Angle: Double): TMatrix;
+function MatrixRotZ(Angle: Double): TMatrix;
 
 procedure MulVectMatr(Matr: TMatrix; var Vector: T3Vector);
 procedure Mul3DMatrix(var A, B: TMatrix; var Matr: TMatrix);
-
 
 function Rad(Angle: Double): Double;
 
@@ -62,7 +60,6 @@ function Rad(Angle: Double): Double;
 var
     TempMatr2, TempRotMatr: TMatrix;
     RotXMatr, RotYMatr, RotZMatr, DilatMatr, TempMatr: TMatrix;
-
 
 implementation
 
@@ -81,15 +78,8 @@ begin
 end;
 
 procedure GetUnitMatrix(var Matr: TMatrix);
-var
-    i, j: Integer;
 begin
-    for i := 1 to 4 do
-        for j := 1 to 4 do
-            if i = j then
-                Matr[i, j] := 1
-            else
-                Matr[i, j] := 0;
+    Matr := UnitMatrix;
 end;
 
 procedure GetReverseMatrix(var Matr: TMatrix);
@@ -121,6 +111,34 @@ end;
 
 procedure GetMatrixRotX(Angle: Double; var Matr: TMatrix);
 begin
+    Matr := MatrixRotX(Angle);
+end;
+
+procedure GetMatrixRotY(Angle: Double; var Matr: TMatrix);
+begin
+    Matr := MatrixRotY(Angle);
+end;
+
+procedure GetMatrixRotZ(Angle: Double; var Matr: TMatrix);
+begin
+    Matr := MatrixRotZ(Angle);
+end;
+
+function UnitMatrix: TMatrix;
+var
+    i, j: Integer;
+begin
+    for i := 1 to 4 do
+        for j := 1 to 4 do
+            if i = j then
+                Result[i, j] := 1
+            else
+                Result[i, j] := 0;
+end;
+
+function MatrixRotX(Angle: Double): TMatrix;
+var Matr: TMatrix;
+begin
     GetZerosMatrix(Matr);
     Matr[1, 1] := 1;
     Matr[2, 2] := Cos(Angle);
@@ -128,9 +146,11 @@ begin
     Matr[3, 2] := (-1) * Sin(Angle);
     Matr[3, 3] := Cos(Angle);
     Matr[4, 4] := 1;
+    Result := Matr;
 end;
 
-procedure GetMatrixRotY(Angle: Double; var Matr: TMatrix);
+function MatrixRotY(Angle: Double): TMatrix;
+var Matr: TMatrix;
 begin
     GetZerosMatrix(Matr);
     Matr[1, 1] := Cos(Angle);
@@ -139,9 +159,11 @@ begin
     Matr[3, 1] := Sin(Angle);
     Matr[3, 3] := Cos(Angle);
     Matr[4, 4] := 1;
+    Result := Matr;
 end;
 
-procedure GetMatrixRotZ(Angle: Double; var Matr: TMatrix);
+function MatrixRotZ(Angle: Double): TMatrix;
+var Matr: TMatrix;
 begin
     GetZerosMatrix(Matr);
     Matr[1, 1] := Cos(Angle);
@@ -150,6 +172,7 @@ begin
     Matr[2, 2] := Cos(Angle);
     Matr[3, 3] := 1;
     Matr[4, 4] := 1;
+    Result := Matr;
 end;
 
 procedure GetMatrixRefXY(var Matr: TMatrix);
