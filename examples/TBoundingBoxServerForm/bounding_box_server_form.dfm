@@ -1,7 +1,7 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
-  Left = 551
+  Left = 461
   Height = 590
-  Top = 219
+  Top = 185
   Width = 1098
   BorderStyle = bsSingle
   Caption = 'TBoundingBoxServerForm Demo'
@@ -68,9 +68,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     ParentColor = False
   end
   object BitBtn1: TBitBtn
-    Left = 608
-    Height = 58
-    Top = 8
+    Left = 616
+    Height = 57
+    Top = 9
     Width = 240
     Anchors = [akTop, akRight]
     Caption = 'Find Minimum Bounding Box'
@@ -99,7 +99,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 2
   end
   object ButtonBruteForce: TButton
-    Left = 866
+    Left = 872
     Height = 25
     Top = 8
     Width = 130
@@ -122,7 +122,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 4
   end
   object ButtonStop: TButton
-    Left = 1015
+    Left = 1017
     Height = 58
     Top = 8
     Width = 69
@@ -132,9 +132,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 5
   end
   object ButtonRandomTest: TButton
-    Left = 866
+    Left = 872
     Height = 25
-    Top = 39
+    Top = 41
     Width = 130
     Anchors = [akTop, akRight]
     Caption = 'Random Test'
