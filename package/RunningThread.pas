@@ -25,7 +25,7 @@ type
     TEndRunningProcedure = procedure of object;
 
     TRunningThread = class(TThread)
-    { If process was terminated by means of object destruction then termination procedure is not called. }
+        { If process was terminated by means of object destruction then termination procedure is not called. }
     public
         RunningProcedure: TRunningProcedure;
         EndRunningProcedure: TEndRunningProcedure;
@@ -49,9 +49,9 @@ type
 
     published
         property OnRunningProcedure: TRunningProcedure
-                read FOnRunningProcedure        write FOnRunningProcedure;
+            read FOnRunningProcedure write FOnRunningProcedure;
         property OnEndRunningProcedure: TEndRunningProcedure
-                read FOnEndRunningProcedure     write FOnEndRunningProcedure;
+            read FOnEndRunningProcedure write FOnEndRunningProcedure;
     end;
 
 procedure Register;
@@ -60,7 +60,7 @@ implementation
 
 procedure Register;
 begin
-    RegisterComponents('Common',[TRunner]);
+    RegisterComponents('Common', [TRunner]);
     (*???
     RegisterPropertyEditor(TypeInfo(TRunningProcedure),TRunner,'OnRunningProcedure',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TEndRunningProcedure),TRunner,'OnEndRunningProcedure',TMethodProperty);
@@ -69,8 +69,10 @@ end;
 
 procedure TRunningThread.Execute;
 begin
-    if Assigned(RunningProcedure) then RunningProcedure;
-    if (not Terminated) and Assigned(EndRunningProcedure) then EndRunningProcedure;
+    if Assigned(RunningProcedure) then
+        RunningProcedure;
+    if (not Terminated) and Assigned(EndRunningProcedure) then
+        EndRunningProcedure;
 end;
 
 constructor TRunner.Create(AOwner: TComponent);
@@ -102,6 +104,7 @@ procedure TRunner.Resume;
 begin
     RunningThread.Resume;
 end;
+
 {$warnings on}
 
 procedure TRunner.Synchronize(AProcedure: TThreadMethod);
@@ -110,5 +113,3 @@ begin
 end;
 
 end.
-
-
