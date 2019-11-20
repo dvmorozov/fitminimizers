@@ -107,14 +107,16 @@ end;
 
 function TCombEnumerator.GetCombNumberStartStop(
     const StartIndex, StopIndex: LongInt): LongInt;
-var i: LongInt;
+var
+    i: LongInt;
 begin
     Result := 0;
     for i := StartIndex to StopIndex do
     begin
         if (Result <> 0) and (NumbersOfValues[i] <> 0) then
             Result := Result * NumbersOfValues[i]
-        else Result := Result + NumbersOfValues[i];
+        else
+            Result := Result + NumbersOfValues[i];
     end;
 end;
 
@@ -134,7 +136,8 @@ begin
 end;
 
 procedure TCombEnumerator.SetCurrentComb(const ACurrentComb: LongInt);
-var TempCurrentComb, TempCombNumber: LongInt;
+var
+    TempCurrentComb, TempCombNumber: LongInt;
     i: LongInt;
 begin
     Assert(not ((ACurrentComb < 0) or (ACurrentComb >= CombNumber)));
@@ -182,7 +185,8 @@ begin
 end;
 
 procedure TCombSelector.ClearListOfNumbersOfValues;
-var i: LongInt;
+var
+    i: LongInt;
 begin
     inherited ClearListOfNumbersOfValues;
     for i := 0 to Length(FValuesList) - 1 do
@@ -191,7 +195,8 @@ begin
 end;
 
 procedure TCombSelector.SetCurrentComb(const ACurrentComb: LongInt);
-var i: LongInt;
+var
+    i: LongInt;
 begin
     inherited SetCurrentComb(ACurrentComb);
     for i := 0 to ValuesNumber - 1 do
@@ -200,5 +205,3 @@ begin
 end;
 
 end.
-
-

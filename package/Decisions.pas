@@ -62,11 +62,11 @@ type
         procedure InvertParameter(const GeneNum, ParamNum: LongInt);
             virtual; abstract;
         //  Change values of parameters on the opposite.
-        procedure InvertBlock(const StartGeneNum, EndGeneNum, StartParamNum,
-            EndParamNum: LongInt); virtual;
+        procedure InvertBlock(
+            const StartGeneNum, EndGeneNum, StartParamNum, EndParamNum: LongInt); virtual;
         //  Swap parameters of the solution.
-        procedure ExchangeParameters(
-            const GeneNum1, ParamNum1, GeneNum2, ParamNum2: LongInt); virtual; abstract;
+        procedure ExchangeParameters(const GeneNum1,
+            ParamNum1, GeneNum2, ParamNum2: LongInt); virtual; abstract;
         //  Exchanging parameter values with other solution.
         procedure ExchangeWithOuter(const Decision: TAbstractDecision;
             MyGeneNum, OuterGeneNum, ParamNum: LongInt); virtual; abstract;
@@ -74,8 +74,9 @@ type
             StartGeneNum, EndGeneNum, StartParamNum, EndParamNum: LongInt); virtual;
 
         //  Copy values of parameters into given positions.
-        procedure CopyParameter(const SrcGeneNum, SrcParamNum, DestGeneNum,
-            DestParamNum: LongInt); virtual; abstract;
+        procedure CopyParameter(
+            const SrcGeneNum, SrcParamNum, DestGeneNum, DestParamNum: LongInt);
+            virtual; abstract;
         procedure CopyBlock(const StartGeneNum, EndGeneNum, StartParamNum,
             EndParamNum, GeneOffset, ParamOffset: LongInt); virtual; abstract;
 
@@ -155,10 +156,10 @@ type
         function Coincide(const Decision: TAbstractDecision): Boolean; override;
 
         procedure InvertParameter(const GeneNum, ParamNum: LongInt); override;
-        procedure ExchangeParameters(
-            const GeneNum1, ParamNum1, GeneNum2, ParamNum2: LongInt); override;
-        procedure CopyParameter(const SrcGeneNum, SrcParamNum, DestGeneNum,
-            DestParamNum: LongInt); override;
+        procedure ExchangeParameters(const GeneNum1,
+            ParamNum1, GeneNum2, ParamNum2: LongInt); override;
+        procedure CopyParameter(
+            const SrcGeneNum, SrcParamNum, DestGeneNum, DestParamNum: LongInt); override;
         procedure ExchangeWithOuter(const Decision: TAbstractDecision;
             MyGeneNum, OuterGeneNum, ParamNum: LongInt); override;
         //  EndGeneNum must be >= StartGeneNum, EndParamNum must be >= StartParamNum!
@@ -614,8 +615,8 @@ begin
                 Index2 := Index2 - ParametersNumber * (Index2 div ParametersNumber);
 
             if Index2 < 0 then
-                Index2 := (ParametersNumber - 1) + (Index2 + ParametersNumber *
-                    (Abs(Index2) div ParametersNumber));
+                Index2 := (ParametersNumber - 1) +
+                    (Index2 + ParametersNumber * (Abs(Index2) div ParametersNumber));
 
             FParameters[Index1, Index2] := SavedBlock[i, j];
         end;
@@ -704,8 +705,8 @@ begin
 
     Flag := True;
     Min := 0;       //  Avoiding warning. Min is initialized when the first
-                    //  point is found having evaluation value greater or
-                    //  equal to the lower limit (see below).
+    //  point is found having evaluation value greater or
+    //  equal to the lower limit (see below).
     for i := StartIndex to Count - 1 do
     begin
         Decision := TAbstractDecision(Items[i]);
