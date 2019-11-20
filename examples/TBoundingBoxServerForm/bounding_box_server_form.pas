@@ -131,7 +131,10 @@ var fSearchResult: TSearchRec;
     fExt: string;
 begin
   fDownHillSimplexHandler:= nil;
+  // reads file list from the directory adjacent to the program directory
   FilePath:= ExtractFilePath(ParamStr(0));
+  FilePath:= IncludeTrailingPathDelimiter(FilePath) + '..' + PathDelim;
+  FilePath:= ExpandFileName(FilePath) + 'Models' + PathDelim;
   ComboBoxFiles.Items.Clear;
   if FindFirst(FilePath + '*.*', faAnyFile, fSearchResult) = 0 then begin
     repeat
