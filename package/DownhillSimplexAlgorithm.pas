@@ -580,7 +580,7 @@ begin
 
     with DownhillSimplexServer do
     begin
-        while not EndOfCalculation(Self) do
+        while (not EndOfCalculation(Self)) and (FCycleCount < FMaxCycles) do
         begin
             Highest := 0;
             NextHighest := 0;
