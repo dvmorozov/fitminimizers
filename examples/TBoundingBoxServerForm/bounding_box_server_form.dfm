@@ -1,7 +1,7 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
-  Left = 461
+  Left = 355
   Height = 590
-  Top = 185
+  Top = 171
   Width = 1098
   BorderStyle = bsSingle
   Caption = 'TBoundingBoxServerForm Demo'
