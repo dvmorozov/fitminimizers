@@ -23,7 +23,7 @@ uses
     Classes, RunningThread, Algorithm, Tools;
 
 type
-    { Defines abstract methods to control any type of algorithms. } 
+    { Defines abstract methods to control any type of algorithms. }
     TAlgorithmContainer = class(TComponent)
     protected
         Algorithm: TAlgorithm;
@@ -55,7 +55,7 @@ type
         destructor Destroy; override;
         procedure Suspend; virtual;
         procedure Resume; virtual;
-        
+
         procedure Run; override;
     end;
 
