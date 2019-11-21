@@ -182,16 +182,16 @@ end;
 
 procedure TDownhillSimplexAlgorithm.Restart;
 var
-    TempDecision: TDownhillSimplexDecision;
+    Best, Temp: TDownhillSimplexDecision;
 begin
     Inc(FRestartCount);
     //  Searches for solution having minimum value of goal function.
     //  Reevaluates it to put the "server" into proper state.
     //  This solution can be used (depending on server configuration)
     //  as starting point in creating new simplex.
-    TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
+    Best := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
-        EvaluateDecision(Self, TempDecision);
+        EvaluateDecision(Self, Best);
     Inc(FEvaluationCount);
 
     //  Initial simplex size is reduced by the factor if it's enabled.
@@ -201,15 +201,26 @@ begin
     end;
 
     //  Creates new starting point for recreating simplex.
-    TempDecision := CreateAppropriateDecision;
+    Temp := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
-        FillStartDecision(Self, TempDecision);
-        EvaluateDecision(Self, TempDecision);
-        Inc(FEvaluationCount);
+        FillStartDecision(Self, Temp);
+        //  It is up to the "server" to propose new starting point.
+        //  In the case if it is different from the best point
+        //  found on previous cycle, goal function should be computed.
+        if not Best.Coincide(Temp) then
+        begin
+            EvaluateDecision(Self, Temp);
+            Inc(FEvaluationCount);
+        end
+        else
+        begin
+            UtilizeObject(Temp);
+            Temp := Best;
+        end;
     end;
-    //  Recreates simplex vertexes.
-    CreateSimplexVertices(TempDecision);
+    //  Recreates simplex points.
+    CreateSimplexVertices(Temp);
 end;
 
 procedure TDownhillSimplexAlgorithm.Start;

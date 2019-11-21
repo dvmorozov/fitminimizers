@@ -152,6 +152,8 @@ type
         { Returns initial characteristic length for every parameter. }
         function GetInitParamLength(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double; virtual;
+        { Fills coordinates of initial simplex vertex. Only parameters
+          are set up, the method doesn't compute goal function! }
         procedure FillStartDecision(Sender: TComponent;
             StartDecision: TFloatDecision); virtual;
         { Calculates function value for set of parameters of solution object. }
