@@ -36,8 +36,7 @@ type
 
     published
         //  Value of estimation function with random additive value depending on the "temperature".
-        property FluctEvaluation: Double read FFluctEvaluation
-            write FFluctEvaluation;
+        property FluctEvaluation: Double read FFluctEvaluation write FFluctEvaluation;
     end;
 
     IDownhillSimplexServer = interface
@@ -84,7 +83,8 @@ type
         BestDecision: TDownhillSimplexDecision;
 
         function TryNewDecision(const Highest: LongInt; Factor: Double): Double; virtual;
-        function MoveWorstDecision(const Highest: LongInt; Factor: Double): TDownhillSimplexDecision;
+        function MoveWorstDecision(const Highest: LongInt;
+            Factor: Double): TDownhillSimplexDecision;
         //  Return new object-solution of the type appropriate for given algorithm.
         function CreateAppropriateDecision: TDownhillSimplexDecision; virtual;
         //  Return vertex of the simplex containing minimum value of goal function.
@@ -93,7 +93,8 @@ type
         //  Replace selected solution with modified one.
         procedure ReplaceDecision(OldDecision, NewDecision: TDownhillSimplexDecision);
         //  Return indicies of the best solution, solution next to the best and worst solution.
-        procedure GetIndicativeDecisions(var Highest, NextHighest, Lowest: LongInt); virtual;
+        procedure GetIndicativeDecisions(var Highest, NextHighest, Lowest: LongInt);
+            virtual;
         //  For each parameter index computes sum of values for all vertexes.
         procedure GetParametersSum;
         procedure Start;
@@ -119,17 +120,14 @@ type
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
-        property FinalTolerance: Double read FFinalTolerance
-            write SetFinalTolerance;
+        property FinalTolerance: Double read FFinalTolerance write SetFinalTolerance;
         //  Disables algorithm restarting after reaching local minimum.
         //  Restarting can in some configuration spaces help to get to
         //  better solution.
-        property RestartDisabled: Boolean read FRestartDisabled
-            write FRestartDisabled;
+        property RestartDisabled: Boolean read FRestartDisabled write FRestartDisabled;
         //  Total number of parameters of the problem to be solved.
         //  The number is defined after executing CreateSimplexVertices, should not be set up by client.
-        property ParametersNumber: LongInt
-            read FParametersNumber;
+        property ParametersNumber: LongInt read FParametersNumber;
         //  If difference in evaluation of best decision for the cycle
         //  is less than given value then exit.
         property ExitDerivative: Double read FExitDerivative write FExitDerivative;
@@ -184,16 +182,16 @@ end;
 
 procedure TDownhillSimplexAlgorithm.Restart;
 var
-    TempDecision: TDownhillSimplexDecision;
+    Best, Temp: TDownhillSimplexDecision;
 begin
     Inc(FRestartCount);
     //  Searches for solution having minimum value of goal function.
     //  Reevaluates it to put the "server" into proper state.
     //  This solution can be used (depending on server configuration)
     //  as starting point in creating new simplex.
-    TempDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
+    Best := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
-        EvaluateDecision(Self, TempDecision);
+        EvaluateDecision(Self, Best);
     Inc(FEvaluationCount);
 
     //  Initial simplex size is reduced by the factor if it's enabled.
@@ -203,15 +201,26 @@ begin
     end;
 
     //  Creates new starting point for recreating simplex.
-    TempDecision := CreateAppropriateDecision;
+    Temp := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
-        FillStartDecision(Self, TempDecision);
-        EvaluateDecision(Self, TempDecision);
-        Inc(FEvaluationCount);
+        FillStartDecision(Self, Temp);
+        //  It is up to the "server" to propose new starting point.
+        //  In the case if it is different from the best point
+        //  found on previous cycle, goal function should be computed.
+        if not Best.Coincide(Temp) then
+        begin
+            EvaluateDecision(Self, Temp);
+            Inc(FEvaluationCount);
+        end
+        else
+        begin
+            UtilizeObject(Temp);
+            Temp := Best;
+        end;
     end;
-    //  Recreates simplex vertexes.
-    CreateSimplexVertices(TempDecision);
+    //  Recreates simplex points.
+    CreateSimplexVertices(Temp);
 end;
 
 procedure TDownhillSimplexAlgorithm.Start;
@@ -260,7 +269,8 @@ var
     TempDecision: TDownhillSimplexDecision;
     SimplexStartStepDirection, SimplexStartStepRandom: Double;
 begin
-    if FSimplexStartStepRandomEnabled then Randomize;
+    if FSimplexStartStepRandomEnabled then
+        Randomize;
 
     with DownhillSimplexServer do
     begin
@@ -287,7 +297,8 @@ begin
             if FSimplexDirectionChangingEnabled then
             begin
                 //  Inverts direction.
-                if FRestartCount and (1 shl i) <> 0 then SimplexStartStepDirection := -1;
+                if FRestartCount and (1 shl i) <> 0 then
+                    SimplexStartStepDirection := -1;
             end;
 
             SimplexStartStepRandom := 1;
@@ -297,7 +308,7 @@ begin
             TempDecision.Parameters[i] := TempDecision.Parameters[i] +
                 //  Takes into account all multipliers. All of them
                 //  should have default value 1.
-                SimplexStartStepRandom *
+                SimplexStartStepRandom * 
                 SimplexStartStepDirection *
                 SimplexStartStepMultiplier *
                 GetInitParamLength(Self, i, StartDecision.ParametersNumber);
@@ -399,14 +410,12 @@ begin
     end;    //  for i := 2 to Simplex.Count - 1 do...
 end;
 
-function TDownhillSimplexAlgorithm.CreateAppropriateDecision:
-TDownhillSimplexDecision;
+function TDownhillSimplexAlgorithm.CreateAppropriateDecision: TDownhillSimplexDecision;
 begin
     Result := TDownhillSimplexDecision.Create(nil);
 end;
 
-function TDownhillSimplexSAAlgorithm.CreateAppropriateDecision:
-TDownhillSimplexDecision;
+function TDownhillSimplexSAAlgorithm.CreateAppropriateDecision: TDownhillSimplexDecision;
 begin
     Result := TDownhillSimplexSADecision.Create(nil);
 end;
@@ -540,12 +549,13 @@ begin
                         begin
                             for j := 0 to ParametersNumber - 1 do
                             begin
-                                LowestParamValue := TDownhillSimplexDecision(
-                                    Simplex.Items[Lowest]).Parameters[j];
-                                CurParamValue:= TDownhillSimplexDecision(
-                                    Simplex.Items[i]).Parameters[j];
+                                LowestParamValue :=
+                                    TDownhillSimplexDecision(Simplex.Items[Lowest]).Parameters[j];
+                                CurParamValue :=
+                                    TDownhillSimplexDecision(Simplex.Items[i]).Parameters[j];
                                 //  Computes middle point of simplex edge.
-                                TDownhillSimplexDecision(Simplex.Items[i]).Parameters[j] :=
+                                TDownhillSimplexDecision(
+                                    Simplex.Items[i]).Parameters[j] :=
                                     0.5 * (CurParamValue + LowestParamValue);
                             end;
                             EvaluateDecision(Self,
@@ -678,8 +688,10 @@ begin
 
             if FinalTolDefined and (Tolerance < FinalTolerance) then
             begin
-                if (GetBestDecision.Evaluation < SavedLoEval)
-                and (FRestartCount < FMaxRestarts) then
+                if (GetBestDecision.Evaluation < SavedLoEval) and
+                    (FRestartCount < FMaxRestarts) then
+
+
                 begin
                     SavedLoEval := GetBestDecision.Evaluation;
                     Restart;
