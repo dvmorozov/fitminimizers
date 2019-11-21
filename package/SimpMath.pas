@@ -63,8 +63,7 @@ type
         function GetNormImComp(index: LongInt): Double;
 
         //  Imaginary parts of vector components.
-        property ImComps[index: LongInt]: Double
-            read GetImComp write SetImComp;
+        property ImComps[index: LongInt]: Double read GetImComp write SetImComp;
         //  Imaginary parts of normalized vector components.
         property NormImComps[index: LongInt]: Double read GetNormImComp;
     end;
@@ -108,8 +107,7 @@ type
         procedure SetImComp(index: LongInt; AImComp: Double); virtual; abstract;
         function GetNormImComp(index: LongInt): Double; virtual; abstract;
     public
-        property ImComps[index: LongInt]: Double
-            read GetImComp write SetImComp;
+        property ImComps[index: LongInt]: Double read GetImComp write SetImComp;
         property NormImComps[index: LongInt]: Double read GetNormImComp;
     end;
 
@@ -123,7 +121,7 @@ procedure ConvertDekartToAphine(const A, B, C, Alpha, Beta, Gamma: Double;
 //  Convert vector from affine to cartesian coordinates.
 //  Parameter Alpha isn't used (see conditions below).
 //  Conversion is done in following assumptions:
-//  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians), 
+//  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians),
 //  besides Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3.
 //  2. Axis e1 of affine coordinate system coincides with the axis e1 of cartesian coordinate system.
 //  3. Axis e2 of affine coordinate system belongs to the e1e2 plane of cartesian coordinate system.
@@ -136,8 +134,7 @@ procedure IncPhi(Inc: Double; var Phi: Double);
 procedure IncTheta(Inc: Double; var Theta: Double);
 
 //  Put given value into the interval.
-procedure PutValueIntoInterval(const MinLimit, MaxLimit: Double;
-    var Value: Double);
+procedure PutValueIntoInterval(const MinLimit, MaxLimit: Double; var Value: Double);
 //  Return True if Value belongs to the given interval, False otherwise.
 function IsValueIntoInterval(const MinLimit, MaxLimit, Value: Double): Boolean;
 //  Return scalar (inner) product in orthonormal coordinate system.
@@ -153,7 +150,7 @@ function GetScalarMulAN(const Vect1, Vect2: TDoubleVector3;
 //  Return angle between vectors.
 function GetAngle(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
-//  Return cross product in affine coordinate system.   
+//  Return cross product in affine coordinate system.
 //  Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetVectorMulA(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): TDoubleVector3;
@@ -216,8 +213,7 @@ function GaussPoint(const A,    //  Integral of function by definition area.
 function LorentzPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 function PseudoVoigtPoint(const A, Sigma, Eta, x0, x: Double): Double;
-function AsymPseudoVoigtPoint(const A, Sigma, Eta, x0, x, DeltaSigma:
-    Double): Double;
+function AsymPseudoVoigtPoint(const A, Sigma, Eta, x0, x, DeltaSigma: Double): Double;
 function TwoBranchesPseudoVoigtPoint(
     const A, Sigma, Eta, SigmaRight, EtaRight, x0, x: Double): Double;
 procedure Gauss(PointsArray: TwoDimArray; const A, Sigma, x0: Double);
@@ -273,9 +269,10 @@ function GetScalarMulA(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
 begin
     Result := Vect1[1] * Vect2[1] * Sqr(A) + Vect1[2] * Vect2[2] *
-        Sqr(B) + Vect1[3] * Vect2[3] * Sqr(C) + (Vect1[2] * Vect2[1] + Vect1[1] * Vect2[2]) *
-        A * B * Cos(Gamma) + (Vect1[1] * Vect2[3] + Vect1[3] * Vect2[1]) *
-        C * A * Cos(Beta) + (Vect1[3] * Vect2[2] + Vect1[2] * Vect2[3]) * B * C * Cos(Alpha);
+        Sqr(B) + Vect1[3] * Vect2[3] * Sqr(C) + (Vect1[2] * Vect2[1] +
+        Vect1[1] * Vect2[2]) * A * B * Cos(Gamma) +
+        (Vect1[1] * Vect2[3] + Vect1[3] * Vect2[1]) * C * A * Cos(Beta) +
+        (Vect1[3] * Vect2[2] + Vect1[2] * Vect2[3]) * B * C * Cos(Alpha);
 end;
 
 function GetScalarMulAN(const Vect1, Vect2: TDoubleVector3;
@@ -506,15 +503,12 @@ begin
     Assert(Sigma >= 0);
     Assert((Eta >= 0) and (Eta <= 1));
 
-    Result := A * ((1 - Eta) * (2 * Sqrt(Ln(2)) /
-        (Sigma * Sqrt(pi)) * exp(-4 * Ln(2) * Sqr(x0 - x) /
-        Sqr(Sigma))) + Eta *
-        ((2 / (pi * Sigma)) * (1 /
-        (1 + Sqr(2 * (x - x0) / Sigma)))));
+    Result := A * ((1 - Eta) * (2 * Sqrt(Ln(2)) / (Sigma * Sqrt(pi)) *
+        exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(Sigma))) + Eta *
+        ((2 / (pi * Sigma)) * (1 / (1 + Sqr(2 * (x - x0) / Sigma)))));
 end;
 
-function AsymPseudoVoigtPoint(const A, Sigma, Eta, x0, x, DeltaSigma:
-    Double): Double;
+function AsymPseudoVoigtPoint(const A, Sigma, Eta, x0, x, DeltaSigma: Double): Double;
 begin
     Assert(A >= 0);
     Assert(Sigma >= 0);
@@ -523,18 +517,14 @@ begin
     if (x >= x0) then
     begin
         Result := A * ((1 - Eta) *
-            (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(
-            (Sigma + DeltaSigma)))) + Eta *
-            ((1 / (1 + Sqr(2 * (x - x0) /
-            (Sigma + DeltaSigma))))));
+            (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr((Sigma + DeltaSigma)))) +
+            Eta * ((1 / (1 + Sqr(2 * (x - x0) / (Sigma + DeltaSigma))))));
     end
     else
     begin
         Result := A * ((1 - Eta) *
-            (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(
-            (Sigma - DeltaSigma)))) + Eta *
-            ((1 / (1 + Sqr(2 * (x - x0) /
-            (Sigma - DeltaSigma))))));
+            (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr((Sigma - DeltaSigma)))) +
+            Eta * ((1 / (1 + Sqr(2 * (x - x0) / (Sigma - DeltaSigma))))));
     end;
 end;
 
@@ -551,15 +541,25 @@ begin
     begin
         Result := A * ((1 - EtaRight) *
             (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(SigmaRight))) +
-            EtaRight * ((1 /
-            (1 + Sqr(2 * (x - x0) / SigmaRight)))));
+            EtaRight * ((1 / (1 + Sqr(2 * (x - x0) / SigmaRight)))));
     end
     else
     begin
         Result := A * ((1 - Eta) *
-            (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(Sigma))) +
-            Eta * ((1 /
-            (1 + Sqr(2 * (x - x0) / Sigma)))));
+            (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(Sigma))) + Eta *
+            ((1 / (1 + Sqr(2 * (x - x0) / Sigma)))));
+
+
+
+
+
+
+
+
+
+
+
+
     end;
 end;
 
