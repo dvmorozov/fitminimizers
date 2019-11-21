@@ -258,18 +258,12 @@ begin
     iStartDecision.Parameters[0] := gAlpha;
     iStartDecision.Parameters[1] := gBeta;
     iStartDecision.Parameters[2] := gGamma;
-    { Computes evaluation function. }
-    gBoxVolume := ComputeRotatedBoxVolume(gAlpha, gBeta, gGamma,
-        gBoxMinCoords, gBoxMaxCoords);
-    iStartDecision.Evaluation := gBoxVolume;
 
     if gShowAlgoDetails then
     begin
         fString := '  StartDecision:' + sLineBreak;
         fString := fString + '     Start Parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
-        fString := fString + '     Start Volume: ' + Format('%.4f', [gBoxVolume]) +
-            sLineBreak;
         DisplayDetails(fString);
     end;
 end;
