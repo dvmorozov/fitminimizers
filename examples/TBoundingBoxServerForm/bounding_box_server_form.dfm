@@ -67,14 +67,14 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Caption = 'Exit derivative:'
     ParentColor = False
   end
-  object BitBtn1: TBitBtn
+  object BitBtnFindMinimumBoundingBox: TBitBtn
     Left = 616
     Height = 57
     Top = 9
     Width = 240
     Anchors = [akTop, akRight]
     Caption = 'Find Minimum Bounding Box'
-    OnClick = BitBtn1Click
+    OnClick = BitBtnFindMinimumBoundingBoxClick
     TabOrder = 0
   end
   object Memo1: TMemo

@@ -40,13 +40,13 @@ type
         Label6: TLabel;
         Memo1: TMemo;
         Memo2: TMemo;
-        BitBtn1: TBitBtn;
+        BitBtnFindMinimumBoundingBox: TBitBtn;
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
         function GetIniParamLenght: Double;
         procedure OutputResults;
-        procedure BitBtn1Click(Sender: TObject);
+        procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
         procedure PostProcessStatistics;
         procedure ButtonBruteForceClick(Sender: TObject);
@@ -256,7 +256,7 @@ begin
     Application.ProcessMessages;
 end;
 
-procedure TBoundingBoxServerForm.BitBtn1Click(Sender: TObject);
+procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
     FileName: string;
 begin
