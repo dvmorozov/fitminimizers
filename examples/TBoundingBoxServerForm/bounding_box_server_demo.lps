@@ -18,10 +18,8 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="639"/>
-        <CursorPos X="10" Y="646"/>
-        <FoldState Value=" T0wJ87H"/>
+        <TopLine Value="636"/>
+        <CursorPos X="29" Y="644"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -29,9 +27,10 @@
       <Unit2>
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="238"/>
-        <CursorPos X="40" Y="286"/>
+        <TopLine Value="153"/>
+        <CursorPos X="63" Y="168"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -72,9 +71,9 @@
       <Unit8>
         <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="435"/>
+        <TopLine Value="433"/>
         <CursorPos X="57" Y="150"/>
-        <UsageCount Value="70"/>
+        <UsageCount Value="71"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
