@@ -12,7 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils, Windows,
   {$ENDIF}
-    SimpMath, Math3d, downhill_simplex_handler;
+    RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
 {$ASSERTIONS ON}
 
@@ -54,30 +54,22 @@ type
         procedure ButtonRandomTestClick(Sender: TObject);
         function DoOptimizeVolume(iAlpha, iBeta, iGamma: Double;
             iDHS_InitParamLength: Double): double;
-        function FindMinBoxByVolume(var iMinCoords, iMaxCoords: TDoubleVector3): double;
+        { Computes minimum box volume starting from a few initial points. }
+        function FindMinBoxByVolume: double;
     private
         { Minimum bounding box problem. }
         fDownHillSimplexHandler: TDownHillSimplexHandler;
 
         FilePath: String;
 
-        { Angles describing rotation of coordinate system (in degrees). }
-        Alpha, Beta, Gamma: Double;
-
-        { Vectors containing triplets of maximum and minimum coordinates of
-          model points. They are used to compute bounding box volume. }
-        BoxMinCoords, BoxMaxCoords: TDoubleVector3;
-        BoxVolume: Double;
-
         // optimization results of several algo runs
         OptiResultBoxMinCoords, OptiResultBoxMaxCoords: TDoubleVector3;
         OptiResultBoxVolume: Double;
 
-        { DownHillSimplex Algorythm statistical details}
-        DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount: integer;
-
-        ShowAlgoDetails: boolean;
+        ShowAlgoDetails: Boolean;
+        ShowPassed: Boolean;
         Stop: Boolean;
+
 
         { Executes optimization algorithm. }
         procedure OptimizeVolume(iAlpha, iBeta, iGamma: Double;
@@ -170,6 +162,12 @@ procedure TBoundingBoxServerForm.OptimizeVolume(iAlpha, iBeta, iGamma: Double;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
+    // removes results of previous computations
+    if fDownHillSimplexHandler <> nil then
+    begin
+        fDownHillSimplexHandler.Free;
+    end;
+
     // this suppresses useless hints in Lazarus
     fFinalTolerance := 0.00001;
     fExitDerivate := 0.5;
@@ -187,20 +185,6 @@ begin
     fDownHillSimplexHandler.SetExitParameters(fFinalTolerance, fExitDerivate);
     fDownHillSimplexHandler.OptimizeBoundingBox(iAlpha, iBeta, iGamma,
         iDHS_InitParamLength);
-    // get the optiomization results
-    Alpha := fDownHillSimplexHandler.Alpha;
-    Beta := fDownHillSimplexHandler.Beta;
-    Gamma := fDownHillSimplexHandler.Gamma;
-    // get box details
-    BoxVolume := fDownHillSimplexHandler.BoxVolume;
-    BoxMinCoords := fDownHillSimplexHandler.BoxMinCoords;
-    BoxMaxCoords := fDownHillSimplexHandler.BoxMaxCoords;
-    // algorithm statistics
-    DHS_CycleCount := fDownHillSimplexHandler.DHS_CycleCount;
-    DHS_EvaluationCount := fDownHillSimplexHandler.DHS_EvaluationCount;
-    DHS_RestartCount := fDownHillSimplexHandler.DHS_RestartCount;
-    fDownHillSimplexHandler.Free;
-    fDownHillSimplexHandler := nil;
 end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
@@ -237,23 +221,26 @@ procedure TBoundingBoxServerForm.OutputResults;
 var
     fDelta: TDoubleVector3;
 begin
-    Memo1.Lines.Add('');
-    if CheckBoxRandomData.Checked then
-        Memo1.Lines.Add('Random Points')
-    else
-        Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
-    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
-    Memo1.Lines.Add('');
-    Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [OptiResultBoxVolume]));
-    Memo1.Lines.Add(Format('Rotation Angles   :   Alpha: %.4f Beta: %.4f Gamma: %.4f',
-        [Alpha, Beta, Gamma]));
-    fDelta[1] := OptiResultBoxMaxCoords[1] - OptiResultBoxMinCoords[1];
-    fDelta[2] := OptiResultBoxMaxCoords[2] - OptiResultBoxMinCoords[2];
-    fDelta[3] := OptiResultBoxMaxCoords[3] - OptiResultBoxMinCoords[3];
-    SortUp(fDelta[1], fDelta[2], fDelta[3]);
-    Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
-        [fDelta[1], fDelta[2], fDelta[3]]));
-    Application.ProcessMessages;
+    with fDownHillSimplexHandler do
+    begin
+        Memo1.Lines.Add('');
+        if CheckBoxRandomData.Checked then
+            Memo1.Lines.Add('Random Points')
+        else
+            Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
+        Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
+        Memo1.Lines.Add('');
+        Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [OptiResultBoxVolume]));
+        Memo1.Lines.Add(Format('Rotation Angles   :   Alpha: %.4f Beta: %.4f Gamma: %.4f',
+            [Alpha, Beta, Gamma]));
+        fDelta[1] := OptiResultBoxMaxCoords[1] - OptiResultBoxMinCoords[1];
+        fDelta[2] := OptiResultBoxMaxCoords[2] - OptiResultBoxMinCoords[2];
+        fDelta[3] := OptiResultBoxMaxCoords[3] - OptiResultBoxMinCoords[3];
+        SortUp(fDelta[1], fDelta[2], fDelta[3]);
+        Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
+            [fDelta[1], fDelta[2], fDelta[3]]));
+        Application.ProcessMessages;
+    end;
 end;
 
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
@@ -378,13 +365,9 @@ begin
                             fRateing := 'F01';
                             Passed := False;
                         end;
-                        if not Passed then
+                        if not Passed or ShowPassed then
                         begin
                             // Only "failed" tests are added to the resulting list.
-                            fSL.Add(Memo2.Lines[x] + ' - ' + fRateing);
-                        end
-                        else begin
-                            // Also add "passed" tests to the resulting list.
                             fSL.Add(Memo2.Lines[x] + ' - ' + fRateing);
                         end;
                     end;
@@ -471,11 +454,12 @@ var
     fAlpha, fBeta, fGamma: Single;
     fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume, fTime: Single;
     fBoxVolume: Double;
-    fMinCoords, fMaxCoords, fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
+    fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
     ShowAlgoDetails := False;
+    ShowPassed := True;
     Stop := False;
     fMaxDeltaVolume := -1.0e20;
     fMinDeltaVolume := 1.0e20;
@@ -486,14 +470,7 @@ begin
     // get the optimized volume and Box size
     // load it in original orientation
     LoadObjPointCloud(FileName, 0, 0, 0);
-    // this suppresses useless hints in Lazarus
-    fMinCoords[1] := 0;
-    fMinCoords[2] := 0;
-    fMinCoords[3] := 0;
-    fMaxCoords[1] := 0;
-    fMaxCoords[2] := 0;
-    fMaxCoords[3] := 0;
-    fBoxVolume := FindMinBoxByVolume(fMinCoords, fMaxCoords);
+    fBoxVolume := FindMinBoxByVolume;
 
     // do the test for brute force orientation
     for x := 0 to (179 div cSteps) do
@@ -512,39 +489,43 @@ begin
                     begin
                         //  Computes difference in volumes calculated
                         //  for original and rotated orientation.
-                        fDeltaVolume := (BoxVolume - fBoxVolume);
-                        //  Computes lengths of edges of bounding box.
-                        fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                        fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                        fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                        //  Sorts edges.
-                        SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
-                        fResult := Format(
-                            ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                            [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2],
-                            fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, fTime,
-                            DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
-                        if fDeltaVolume > fMaxDeltaVolume then
+                        with fDownHillSimplexHandler do
                         begin
-                            fMaxDeltaVolume := fDeltaVolume;
-                            fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                            fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                            fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                            SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]);
+                            fDeltaVolume := (BoxVolume - fBoxVolume);
+                            //  Computes lengths of edges of bounding box.
+                            fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                            fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                            fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                            //  Sorts edges.
+                            SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
+                            fResult := Format(
+                                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
+                                [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2],
+                                fDeltaCord[3], Alpha, Beta, Gamma,
+                                fAlpha, fBeta, fGamma, fTime,
+                                DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
+                            if fDeltaVolume > fMaxDeltaVolume then
+                            begin
+                                fMaxDeltaVolume := fDeltaVolume;
+                                fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                                fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                                fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                                SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]);
+                            end;
+                            if fDeltaVolume < fMinDeltaVolume then
+                            begin
+                                fMinDeltaVolume := fDeltaVolume;
+                                fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                                fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                                fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                                SortUp(fMinDeltaCord[1], fMinDeltaCord[2], fMinDeltaCord[3]);
+                            end;
+                            Memo2.Lines.Add(fResult);
+                            Label2.Caption :=
+                                Format('MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)', [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
+                                fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1], fMaxDeltaCord[2],
+                                fMaxDeltaCord[3]]);
                         end;
-                        if fDeltaVolume < fMinDeltaVolume then
-                        begin
-                            fMinDeltaVolume := fDeltaVolume;
-                            fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                            fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                            fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                            SortUp(fMinDeltaCord[1], fMinDeltaCord[2], fMinDeltaCord[3]);
-                        end;
-                        Memo2.Lines.Add(fResult);
-                        Label2.Caption :=
-                            Format('MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)', [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
-                            fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1], fMaxDeltaCord[2],
-                            fMaxDeltaCord[3]]);
                     end;
                     Application.ProcessMessages;
                 end;
@@ -559,7 +540,7 @@ var
     fAlpha, fBeta, fGamma: Single;
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume, fTime: Single;
     fBoxVolume: Double;
-    fMinCoords, fMaxCoords, fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
+    fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
@@ -574,15 +555,7 @@ begin
     // get the optimized volume and Box size
     // load it in original orientation
     LoadObjPointCloud(FileName, 0, 0, 0);
-    // this suppresses useless hints in Lazarus
-    fMinCoords[1] := 0;
-    fMinCoords[2] := 0;
-    fMinCoords[3] := 0;
-    fMaxCoords[1] := 0;
-    fMaxCoords[2] := 0;
-    fMaxCoords[3] := 0;
-
-    fBoxVolume := FindMinBoxByVolume(fMaxCoords, fMinCoords);
+    fBoxVolume := FindMinBoxByVolume;
 
     // do the test for random orientation
     Randomize;
@@ -598,38 +571,42 @@ begin
             fTime := DoOptimizeVolume(0, 0, 0, GetIniParamLenght);
             if not Stop then
             begin
-                fDeltaVolume := (BoxVolume - fBoxVolume);
-                fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
-                fResult := Format(
-                    ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                    [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2],
-                    fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, fTime,
-                    DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
-                if fDeltaVolume > fMaxDeltaVolume then
+                with fDownHillSimplexHandler do
                 begin
-                    fMaxDeltaVolume := fDeltaVolume;
-                    fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                    fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                    fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                    SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]);
+                    fDeltaVolume := (BoxVolume - fBoxVolume);
+                    fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                    fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                    fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                    SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
+                    fResult := Format(
+                        ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
+                        [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2],
+                        fDeltaCord[3], Alpha, Beta, Gamma,
+                        fAlpha, fBeta, fGamma, fTime,
+                        DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
+                    if fDeltaVolume > fMaxDeltaVolume then
+                    begin
+                        fMaxDeltaVolume := fDeltaVolume;
+                        fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                        fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                        fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                        SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]);
+                    end;
+                    if fDeltaVolume < fMinDeltaVolume then
+                    begin
+                        fMinDeltaVolume := fDeltaVolume;
+                        fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                        fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                        fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                        SortUp(fMinDeltaCord[1], fMinDeltaCord[2], fMinDeltaCord[3]);
+                    end;
+                    Memo2.Lines.Add(fResult);
+                    Label2.Caption := Format(
+                        'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
+                        [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
+                        fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1], fMaxDeltaCord[2],
+                        fMaxDeltaCord[3]]);
                 end;
-                if fDeltaVolume < fMinDeltaVolume then
-                begin
-                    fMinDeltaVolume := fDeltaVolume;
-                    fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                    fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                    fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                    SortUp(fMinDeltaCord[1], fMinDeltaCord[2], fMinDeltaCord[3]);
-                end;
-                Memo2.Lines.Add(fResult);
-                Label2.Caption := Format(
-                    'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                    [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
-                    fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1], fMaxDeltaCord[2],
-                    fMaxDeltaCord[3]]);
             end;
             Application.ProcessMessages;
         end;
@@ -644,8 +621,7 @@ begin
         fDownHillSimplexHandler.Stop;
 end;
 
-function TBoundingBoxServerForm.FindMinBoxByVolume(
-    var iMinCoords, iMaxCoords: TDoubleVector3): Double;
+function TBoundingBoxServerForm.FindMinBoxByVolume: Double;
 const cStartAngle5Runs: array[0..4] of TDoubleVector3 = (
     (0, 0, 0),
     (45, 45, 45),
@@ -667,16 +643,14 @@ const cStartAngle9Runs: array[0..8] of TDoubleVector3 = (
     i: integer;
     fRuns: integer;
     fStartAngle, fBoxSize: TDoubleVector3;
-    fBoxVolume, fTime, fMinBoxAlpha, fMinBoxBeta, fMinBoxGamma: Double;
+    fBoxVolume, fTime: Double;
     fResult: string;
+    iMinCoords, iMaxCoords: TDoubleVector3;
 begin
     fRuns:= 3;
     if PointCloud.Count < 100000 then fRuns:= 5;
     if PointCloud.Count < 25000 then fRuns:= 9;
 
-    fMinBoxAlpha := 0;
-    fMinBoxBeta := 0;
-    fMinBoxGamma := 0;
     fBoxVolume:= 1e30;
     for i:= 0 to fRuns-1 do begin
       if not Stop then begin
@@ -684,25 +658,25 @@ begin
         else fStartAngle:= cStartAngle9Runs[i];
         // Optimization Run to get the minimum Volume
         fTime := DoOptimizeVolume(fStartAngle[1], fStartAngle[2], fStartAngle[3], GetIniParamLenght);
-        if BoxVolume < fBoxVolume then
+        with fDownHillSimplexHandler do
         begin
-            fBoxVolume := BoxVolume;
-            fMinBoxAlpha := Alpha;
-            fMinBoxBeta := Beta;
-            fMinBoxGamma := Gamma;
-            iMaxCoords := BoxMaxCoords;
-            iMinCoords := BoxMinCoords;
+            if BoxVolume < fBoxVolume then
+            begin
+                fBoxVolume := BoxVolume;
+                iMaxCoords := BoxMaxCoords;
+                iMinCoords := BoxMinCoords;
+            end;
+            fBoxSize[1]:= BoxMaxCoords[1] - BoxMinCoords[1];
+            fBoxSize[2]:= BoxMaxCoords[2] - BoxMinCoords[2];
+            fBoxSize[3]:= BoxMaxCoords[3] - BoxMinCoords[3];
+            SortUp(fBoxSize[1], fBoxSize[2], fBoxSize[3]);
+            fResult := Format(
+                ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
+                [i+1, BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3], Alpha, Beta,
+                Gamma, fTime, DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
+            Memo1.Lines.Add(fResult);
+            Application.ProcessMessages;
         end;
-        fBoxSize[1]:= BoxMaxCoords[1] - BoxMinCoords[1];
-        fBoxSize[2]:= BoxMaxCoords[2] - BoxMinCoords[2];
-        fBoxSize[3]:= BoxMaxCoords[3] - BoxMinCoords[3];
-        SortUp(fBoxSize[1], fBoxSize[2], fBoxSize[3]);
-        fResult := Format(
-            ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
-            [i+1, BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3], Alpha, Beta,
-            Gamma, fTime, DHS_CycleCount, DHS_EvaluationCount, DHS_RestartCount]);
-        Memo1.Lines.Add(fResult);
-        Application.ProcessMessages;
       end;
     end;
 
@@ -711,9 +685,6 @@ begin
     OptiResultBoxVolume := fBoxVolume;
     OptiResultBoxMaxCoords := iMaxCoords;
     OptiResultBoxMinCoords := iMinCoords;
-    Alpha := fMinBoxAlpha;
-    Beta := fMinBoxBeta;
-    Gamma := fMinBoxGamma;
     OutputResults;
 end;
 

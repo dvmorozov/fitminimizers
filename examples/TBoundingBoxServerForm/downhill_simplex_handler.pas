@@ -31,8 +31,10 @@ type
 
         gDHS_InitParamLength: Double;
 
-        { Box infomations: Volume and Coordinates}
+        { Box infomations: volume and coordinates}
         gBoxVolume: Double;
+        { Vectors containing triplets of maximum and minimum coordinates of
+          model points. They are used to compute bounding box volume. }
         gBoxMinCoords, gBoxMaxCoords: TDoubleVector3;
 
         function Get_DHS_CycleCount: Integer;
@@ -63,12 +65,15 @@ type
         procedure SetExitParameters(iFinalTolerance, iExitDerivative: Double);
         procedure Stop;
         property ShowAlgoDetails: Boolean read gShowAlgoDetails write gShowAlgoDetails;
+        { Optimized values of angles describing rotation of coordinate system (in degrees). }
         property Alpha: Double read gAlpha;
         property Beta: Double read gBeta;
         property Gamma: Double read gGamma;
+        { Box infomations: volume and coordinates. }
         property BoxVolume: Double read gBoxVolume;
         property BoxMinCoords: TDoubleVector3 read gBoxMinCoords;
         property BoxMaxCoords: TDoubleVector3 read gBoxMaxCoords;
+        { DownHillSimplex algorithm statistical details. }
         property DHS_CycleCount: Integer read Get_DHS_CycleCount;
         property DHS_EvaluationCount: Integer read Get_DHS_EvaluationCount;
         property DHS_RestartCount: Integer read Get_DHS_RestartCount;
