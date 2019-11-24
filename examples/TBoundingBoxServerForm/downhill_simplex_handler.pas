@@ -212,7 +212,8 @@ begin
     begin
         fString := '  Result:' + sLineBreak;
         fString := fString + '     Modified parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) +
+            sLineBreak;
         fString := fString + '     Volume: ' + Format('%.4f', [gBoxVolume]) + sLineBreak;
         DisplayDetails(fString);
     end;
@@ -268,7 +269,8 @@ begin
     begin
         fString := '  StartDecision:' + sLineBreak;
         fString := fString + '     Start Parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) +
+            sLineBreak;
         DisplayDetails(fString);
     end;
 end;
@@ -300,7 +302,8 @@ begin
     begin
         fString := '  EvaluateDecition:' + sLineBreak;
         fString := fString + '     Modified parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) +
+            sLineBreak;
         fString := fString + '     Volume: ' + Format('%.4f', [iDecision.Evaluation]) +
             sLineBreak;
         DisplayDetails(fString);
@@ -320,7 +323,8 @@ begin
     begin
         fString := 'UpdateResults:' + sLineBreak;
         fString := fString + '    Optimized parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) +
+            sLineBreak;
         fString := fString + '    Optimized Volume: ' +
             Format('%.4f', [iDecision.Evaluation]) + sLineBreak;
         DisplayDetails(fString);
