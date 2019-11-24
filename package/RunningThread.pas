@@ -43,9 +43,7 @@ type
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
         procedure Run;
-        procedure Suspend;
-        procedure Resume;
-        procedure Synchronize(AProcedure: TThreadMethod);
+        procedure Wait;
 
     published
         { Computation method running in separate thread. }
@@ -97,20 +95,10 @@ begin
     RunningThread.Resume;
 end;
 
-procedure TRunner.Suspend;
+procedure TRunner.Wait;
 begin
-    RunningThread.Suspend;
-end;
-
-procedure TRunner.Resume;
-begin
-    RunningThread.Resume;
+    RunningThread.WaitFor;
 end;
 {$warnings on}
-
-procedure TRunner.Synchronize(AProcedure: TThreadMethod);
-begin
-    RunningThread.Synchronize(AProcedure);
-end;
 
 end.
