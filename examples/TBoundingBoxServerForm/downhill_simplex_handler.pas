@@ -15,10 +15,15 @@ uses
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 type
+    TDownHillSimplexHandler = class;
+    { External method displaying attributes of container instance. }
+    THandlerOutputProcedure = procedure(Handler: TDownHillSimplexHandler) of object;
+
     TDownHillSimplexHandler = class(TComponent, IDownhillSimplexServer)
     private
         { Minimum bounding box problem. }
         FDownhillSimplexAlgorithm: TDownhillSimplexAlgorithm;
+        FHandlerOutputProcedure: THandlerOutputProcedure;
 
         gStop: Boolean;
         gShowAlgoDetails: Boolean;
@@ -73,6 +78,7 @@ type
         procedure OptimizeBoundingBox;
         { Interrupts computing. }
         procedure Stop;
+        procedure DisplayOutput;
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
         property Alpha: Double read gAlpha;
         property Beta: Double read gBeta;
@@ -85,9 +91,8 @@ type
         property DHS_CycleCount: Integer read Get_DHS_CycleCount;
         property DHS_EvaluationCount: Integer read Get_DHS_EvaluationCount;
         property DHS_RestartCount: Integer read Get_DHS_RestartCount;
-
-        property RecreateSimplexFromOriginal: Boolean
-            read FRecreateSimplexFromOriginal write FRecreateSimplexFromOriginal;
+        property HandlerOutputProcedure: THandlerOutputProcedure
+            write FHandlerOutputProcedure;
         property ComputationTime: Single read FComputationTime;
     end;
 
@@ -241,6 +246,12 @@ begin
         fString := fString + '     Volume: ' + Format('%.4f', [gBoxVolume]) + sLineBreak;
         DisplayDetails(fString);
     end;
+end;
+
+procedure TDownHillSimplexHandler.DisplayOutput;
+begin
+    if FHandlerOutputProcedure <> nil then
+        FHandlerOutputProcedure(Self);
 end;
 
 procedure TDownHillSimplexHandler.Stop;
