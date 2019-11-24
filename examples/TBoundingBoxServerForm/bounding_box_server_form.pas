@@ -79,7 +79,7 @@ type
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(iAlpha, iBeta, iGamma: Double;
             iDHS_InitParamLength: Double;
-            iShowDetails: Boolean): TDownHillSimplexHandler;
+            iShowDetails: Boolean; RunId: Integer): TDownHillSimplexHandler;
 
         procedure LoadObjPointCloud(iFileName: String; iAlpha, iBeta, iGamma: single);
         procedure GenerateRandomPointCloud;
@@ -166,7 +166,8 @@ begin
 end;
 
 function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
-    iDHS_InitParamLength: Double; iShowDetails: Boolean): TDownHillSimplexHandler;
+    iDHS_InitParamLength: Double; iShowDetails: Boolean;
+    RunId: Integer): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
@@ -184,7 +185,7 @@ begin
     end;
     Result := TDownHillSimplexHandler.Create(self,
         iAlpha, iBeta, iGamma, iDHS_InitParamLength,
-        fFinalTolerance, fExitDerivate, iShowDetails);
+        fFinalTolerance, fExitDerivate, iShowDetails, RunId);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
@@ -246,7 +247,7 @@ begin
         FileName := FilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True);
+    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
     Handler.OptimizeBoundingBox;
     { Removes and frees inserted container. }
     FHandlers.Remove(Handler);
@@ -443,6 +444,7 @@ var
     fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
+    RunId: Integer;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
@@ -460,6 +462,7 @@ begin
     { Computes optimized volume and box sizes. }
     FindMinBoxByVolume;
 
+    RunId := 1;
     { Does the test for brute force orientation. }
     for x := 0 to (179 div cSteps) do
         for y := 0 to (179 div cSteps) do
@@ -473,7 +476,7 @@ begin
 
                     LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
                     Handler :=
-                        CreateHandler(0, 0, 0, GetIniParamLenght, False);
+                        CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId);
                     Handler.OptimizeBoundingBox;
                     if not Stop then
                     begin
@@ -525,6 +528,7 @@ begin
                     end;
                     { Removes and frees inserted container. }
                     FHandlers.Remove(Handler);
+                    Inc(RunId);
                     Application.ProcessMessages;
                 end;
             end;
@@ -567,7 +571,7 @@ begin
             LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
 
             Handler :=
-                CreateHandler(0, 0, 0, GetIniParamLenght, False);
+                CreateHandler(0, 0, 0, GetIniParamLenght, False, x);
             Handler.OptimizeBoundingBox;
             if not Stop then
             begin
@@ -651,8 +655,8 @@ begin
         fBoxSize[3] := BoxMaxCoords[3] - BoxMinCoords[3];
         SortUp(fBoxSize[1], fBoxSize[2], fBoxSize[3]);
         fResult := Format(
-            ' Run : %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
-            [BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3],
+            ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
+            [RunId, BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3],
             Alpha, Beta, Gamma, ComputationTime, DHS_CycleCount, DHS_EvaluationCount,
             DHS_RestartCount]);
         Memo1.Lines.Add(fResult);
@@ -711,7 +715,7 @@ begin
             { Runs optimization to get the minimum volume. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
-                fStartAngle[3], GetIniParamLenght, False);
+                fStartAngle[3], GetIniParamLenght, False, i + 1);
             Handler.HandlerOutputProcedure := @OuputFindMinBoxByVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);

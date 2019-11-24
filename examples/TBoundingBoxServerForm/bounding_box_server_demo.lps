@@ -18,8 +18,9 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="850"/>
-        <CursorPos X="46" Y="869"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="699"/>
+        <CursorPos X="64" Y="718"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -27,10 +28,9 @@
       <Unit2>
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="338"/>
-        <CursorPos X="39" Y="361"/>
+        <TopLine Value="86"/>
+        <CursorPos X="45" Y="102"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -174,7 +174,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="1685"/>
         <CursorPos X="3" Y="1589"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit22>
       <Unit23>
@@ -188,127 +188,123 @@
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
     </OtherDefines>
-    <JumpHistory Count="30" HistoryIndex="28">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="66" Column="23" TopLine="54"/>
+        <Caret Line="616" Column="13" TopLine="600"/>
       </Position1>
       <Position2>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="165" Column="15" TopLine="137"/>
+        <Caret Line="660" Column="9" TopLine="634"/>
       </Position2>
       <Position3>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="251" Column="39" TopLine="233"/>
+        <Caret Line="137" TopLine="112"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\package\RunningThread.pas"/>
-        <Caret Line="27" Column="32" TopLine="21"/>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="726" TopLine="710"/>
       </Position4>
       <Position5>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="728" Column="20" TopLine="707"/>
+        <Caret Line="91" Column="9" TopLine="65"/>
       </Position5>
       <Position6>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="718" Column="31" TopLine="702"/>
+        <Caret Line="87" Column="23" TopLine="64"/>
       </Position6>
       <Position7>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="720" Column="42" TopLine="703"/>
+        <Caret Line="789" Column="36" TopLine="762"/>
       </Position7>
       <Position8>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="727" Column="32" TopLine="711"/>
+        <Caret Line="790" Column="36" TopLine="763"/>
       </Position8>
       <Position9>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="720" Column="34" TopLine="699"/>
+        <Caret Line="791" Column="36" TopLine="764"/>
       </Position9>
       <Position10>
         <Filename Value="..\..\package\RunningThread.pas"/>
-        <Caret Line="46" Column="24" TopLine="34"/>
+        <Caret Line="88" Column="13" TopLine="59"/>
       </Position10>
       <Position11>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="722" Column="23" TopLine="699"/>
+        <Filename Value="..\..\package\RunningThread.pas"/>
+        <Caret Line="110" Column="3" TopLine="79"/>
       </Position11>
       <Position12>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="226" Column="5" TopLine="206"/>
+        <Caret Line="721" Column="54" TopLine="703"/>
       </Position12>
       <Position13>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="457" Column="5" TopLine="431"/>
+        <Filename Value="downhill_simplex_handler.pas"/>
+        <Caret Line="285" Column="40" TopLine="264"/>
       </Position13>
       <Position14>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="529" Column="21" TopLine="501"/>
+        <Filename Value="downhill_simplex_handler.pas"/>
+        <Caret Line="84" Column="29" TopLine="65"/>
       </Position14>
       <Position15>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="552" Column="5" TopLine="529"/>
+        <Filename Value="downhill_simplex_handler.pas"/>
+        <Caret Line="72" Column="23" TopLine="58"/>
       </Position15>
       <Position16>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="616" Column="13" TopLine="600"/>
+        <Caret Line="655" Column="21" TopLine="645"/>
       </Position16>
       <Position17>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="660" Column="9" TopLine="634"/>
+        <Caret Line="187" Column="56" TopLine="172"/>
       </Position17>
       <Position18>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="137" TopLine="112"/>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="713" Column="27" TopLine="698"/>
       </Position18>
       <Position19>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="726" TopLine="710"/>
+        <Caret Line="82" Column="50" TopLine="65"/>
       </Position19>
       <Position20>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="91" Column="9" TopLine="65"/>
+        <Caret Line="188" Column="60" TopLine="167"/>
       </Position20>
       <Position21>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="87" Column="23" TopLine="64"/>
+        <Caret Line="250" Column="65" TopLine="234"/>
       </Position21>
       <Position22>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="789" Column="36" TopLine="762"/>
+        <Caret Line="479" Column="36" TopLine="511"/>
       </Position22>
       <Position23>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="790" Column="36" TopLine="763"/>
+        <Caret Line="571" Column="67" TopLine="493"/>
       </Position23>
       <Position24>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="791" Column="36" TopLine="764"/>
+        <Caret Line="714" Column="30" TopLine="687"/>
       </Position24>
       <Position25>
-        <Filename Value="..\..\package\RunningThread.pas"/>
-        <Caret Line="88" Column="13" TopLine="59"/>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="80" Column="31" TopLine="65"/>
       </Position25>
       <Position26>
-        <Filename Value="..\..\package\RunningThread.pas"/>
-        <Caret Line="110" Column="3" TopLine="79"/>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="168" Column="46" TopLine="158"/>
       </Position26>
       <Position27>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="721" Column="54" TopLine="703"/>
+        <Caret Line="250" Column="29" TopLine="232"/>
       </Position27>
       <Position28>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="285" Column="40" TopLine="264"/>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="531" Column="32" TopLine="504"/>
       </Position28>
       <Position29>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="84" Column="29" TopLine="65"/>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="574" Column="30" TopLine="559"/>
       </Position29>
-      <Position30>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="251" Column="48" TopLine="223"/>
-      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
