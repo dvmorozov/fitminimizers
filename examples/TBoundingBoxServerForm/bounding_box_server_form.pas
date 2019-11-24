@@ -178,15 +178,12 @@ begin
     begin
         fExitDerivate := 0.5;       //default value
     end;
-    Result := TDownHillSimplexHandler.Create(self);
+    Result := TDownHillSimplexHandler.Create(self,
+        iAlpha, iBeta, iGamma, iDHS_InitParamLength,
+        fFinalTolerance, fExitDerivate, iShowDetails);
     //  Adds to the list for asynchronous operations.
     FDownHillSimplexHandlerList.Add(Result);
-    with Result do
-    begin
-        ShowAlgoDetails := iShowDetails;
-        SetExitParameters(fFinalTolerance, fExitDerivate);
-        OptimizeBoundingBox(iAlpha, iBeta, iGamma, iDHS_InitParamLength);
-    end;
+    Result.OptimizeBoundingBox;
 end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
