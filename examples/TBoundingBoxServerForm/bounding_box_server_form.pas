@@ -12,7 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils, Windows,
   {$ENDIF}
-    RunningThread, SimpMath, Math3d, downhill_simplex_handler;
+    Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
 {$ASSERTIONS ON}
 
@@ -44,6 +44,7 @@ type
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
+        procedure FormDestroy(Sender: TObject);
         function GetIniParamLenght: Double;
         { Prints final results among a few runs. }
         procedure OutputResults;
@@ -55,6 +56,7 @@ type
         procedure ButtonRandomTestClick(Sender: TObject);
         function DoOptimizeVolume(iAlpha, iBeta, iGamma: Double;
             iDHS_InitParamLength: Double; var fTime: Single): TDownHillSimplexHandler;
+        procedure StopComputing;
         { Computes minimum box volume starting from a few initial points. }
         function FindMinBoxByVolume: double;
     private
@@ -67,8 +69,8 @@ type
         ShowAlgoDetails: Boolean;
         ShowPassed: Boolean;
         Stop: Boolean;
-
-        DownHillSimplexHandler: TDownHillSimplexHandler;
+        { Keeps all instances of "handler" class in the case of multithreaded computing. }
+        FDownHillSimplexHandlerList: TComponentList;
 
         { Executes optimization algorithm. Returns handler instance which
           should be destroyed by calling method. }
@@ -154,6 +156,8 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
+    FDownHillSimplexHandlerList := TComponentList.Create();
+    FDownHillSimplexHandlerList.OwnsObjects := True;
 end;
 
 function TBoundingBoxServerForm.OptimizeVolume(iAlpha, iBeta, iGamma: Double;
@@ -174,6 +178,8 @@ begin
         fExitDerivate := 0.5;       //default value
     end;
     Result := TDownHillSimplexHandler.Create(self);
+    //  Adds to the list for asynchronous operations.
+    FDownHillSimplexHandlerList.Add(Result);
     with Result do
     begin
         ShowAlgoDetails := iShowDetails;
@@ -190,6 +196,12 @@ begin
     begin
         Result := 37; //default value
     end;
+end;
+
+procedure TBoundingBoxServerForm.FormDestroy(Sender: TObject);
+begin
+    StopComputing;
+    FDownHillSimplexHandlerList.Destroy;
 end;
 
 function TBoundingBoxServerForm.DoOptimizeVolume(iAlpha, iBeta, iGamma: Double;
@@ -252,10 +264,8 @@ begin
         FileName := FilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
-    DownHillSimplexHandler := OptimizeVolume(0, 0, 0, GetIniParamLenght, True);
-    DownHillSimplexHandler.Destroy;
-    DownHillSimplexHandler := nil;
-
+    //  Removes and frees inserted container.
+    FDownHillSimplexHandlerList.Remove(OptimizeVolume(0, 0, 0, GetIniParamLenght, True));
     OutputResults;
 end;
 
@@ -448,6 +458,7 @@ var
     fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume, fTime: Single;
     fBoxVolume: Double;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
+    fDownHillSimplexHandler: TDownHillSimplexHandler;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
@@ -478,12 +489,12 @@ begin
 
                     LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
                     fTime := 0;
-                    DownHillSimplexHandler := DoOptimizeVolume(0, 0, 0, GetIniParamLenght, fTime);
+                    fDownHillSimplexHandler := DoOptimizeVolume(0, 0, 0, GetIniParamLenght, fTime);
                     if not Stop then
                     begin
                         //  Computes difference in volumes calculated
                         //  for original and rotated orientation.
-                        with DownHillSimplexHandler do
+                        with fDownHillSimplexHandler do
                         begin
                             fDeltaVolume := (BoxVolume - fBoxVolume);
                             //  Computes lengths of edges of bounding box.
@@ -521,8 +532,8 @@ begin
                                 fMaxDeltaCord[3]]);
                         end;
                     end;
-                    DownHillSimplexHandler.Destroy;
-                    DownHillSimplexHandler := nil;
+                    //  Removes and frees inserted container.
+                    FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
                     Application.ProcessMessages;
                 end;
             end;
@@ -537,6 +548,7 @@ var
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume, fTime: Single;
     fBoxVolume: Double;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
+    fDownHillSimplexHandler: TDownHillSimplexHandler;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
@@ -565,10 +577,10 @@ begin
             LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
 
             fTime := 0;
-            DownHillSimplexHandler := DoOptimizeVolume(0, 0, 0, GetIniParamLenght, fTime);
+            fDownHillSimplexHandler := DoOptimizeVolume(0, 0, 0, GetIniParamLenght, fTime);
             if not Stop then
             begin
-                with DownHillSimplexHandler do
+                with fDownHillSimplexHandler do
                 begin
                     fDeltaVolume := (BoxVolume - fBoxVolume);
                     fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
@@ -605,19 +617,26 @@ begin
                         fMaxDeltaCord[3]]);
                 end;
             end;
-            DownHillSimplexHandler.Destroy;
-            DownHillSimplexHandler := nil;
+            //  Removes and frees inserted container.
+            FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
             Application.ProcessMessages;
         end;
     end;
     PostProcessStatistics;
 end;
 
-procedure TBoundingBoxServerForm.ButtonStopClick(Sender: TObject);
+procedure TBoundingBoxServerForm.StopComputing;
+var i: LongInt;
 begin
     Stop := True;
-    if assigned(DownHillSimplexHandler) then
-        DownHillSimplexHandler.Stop;
+    //  Stops all containers.
+    for i := 0 to FDownHillSimplexHandlerList.Count - 1 do
+        TDownHillSimplexHandler(FDownHillSimplexHandlerList[i]).Stop;
+end;
+
+procedure TBoundingBoxServerForm.ButtonStopClick(Sender: TObject);
+begin
+     StopComputing;
 end;
 
 function TBoundingBoxServerForm.FindMinBoxByVolume: Double;
@@ -646,6 +665,7 @@ const cStartAngle9Runs: array[0..8] of TDoubleVector3 = (
     fTime: Single;
     fResult: string;
     iMinCoords, iMaxCoords: TDoubleVector3;
+    fDownHillSimplexHandler: TDownHillSimplexHandler;
 begin
     fRuns:= 3;
     if PointCloud.Count < 100000 then fRuns:= 5;
@@ -657,10 +677,10 @@ begin
         else fStartAngle:= cStartAngle9Runs[i];
 
         fTime := 0;
-        // Optimization Run to get the minimum Volume
-        DownHillSimplexHandler := DoOptimizeVolume(
+        // Optimization Run to get the minimum volume.
+        fDownHillSimplexHandler := DoOptimizeVolume(
             fStartAngle[1], fStartAngle[2], fStartAngle[3], GetIniParamLenght, fTime);
-        with DownHillSimplexHandler do
+        with fDownHillSimplexHandler do
         begin
             if BoxVolume < fBoxVolume then
             begin
@@ -679,8 +699,8 @@ begin
             Memo1.Lines.Add(fResult);
             Application.ProcessMessages;
         end;
-        DownHillSimplexHandler.Destroy;
-        DownHillSimplexHandler := nil;
+        //  Removes and frees container.
+        FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
       end;
     end;
 
