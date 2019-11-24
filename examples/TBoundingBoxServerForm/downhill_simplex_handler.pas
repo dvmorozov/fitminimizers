@@ -49,19 +49,19 @@ type
         function Get_DHS_RestartCount: Integer;
 
         { IDownhillSimplexServer }
-        //  Return initial characteristic length for every parameter.
+        { Returns initial characteristic length for every parameter. }
         function GetInitParamLength(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
-        //  Set inital calculation point in internal representation.
-        //  The number of array element is equal to the number of
-        //  variable parameters of task being solved.
+        { Sets inital calculation point in internal representation.
+          The number of array element is equal to the number of
+          variable parameters of task being solved. }
         procedure FillStartDecision(Sender: TComponent; iStartDecision: TFloatDecision);
-        //  Calculate evaluation function for the point given in internal
-        //  representation.
+        { Calculates evaluation function for the point given in internal
+          representation. }
         procedure EvaluateDecision(Sender: TComponent; iDecision: TFloatDecision);
-        //  Displays current minimum.
+        { Displays current minimum. }
         procedure UpdateResults(Sender: TComponent; iDecision: TFloatDecision);
-        //  Return flag of calculation termination.
+        { Returns flag of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
 
     public
@@ -78,6 +78,9 @@ type
         procedure OptimizeBoundingBox;
         { Interrupts computing. }
         procedure Stop;
+        { Displays results of optimization.
+          The procedure should not have parameters because it is called from
+          separate thread. This is wrapper for call of FHandlerOutputProcedure. }
         procedure DisplayOutput;
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
         property Alpha: Double read gAlpha;
@@ -114,8 +117,8 @@ function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
     var
         fRotX, fRotY, fRotZ, fMatr: TMatrix;
     begin
-    { Computing rotation matrices.
-      Matrices are initalized inside functions. }
+        { Computing rotation matrices.
+          Matrices are initalized inside functions. }
         fRotX := MatrixRotX(DegToRad(iAlpha));
         fRotY := MatrixRotY(DegToRad(iBeta));
         fRotZ := MatrixRotZ(DegToRad(iGamma));
@@ -182,15 +185,15 @@ constructor TDownHillSimplexHandler.Create(
 begin
     inherited Create(AOwner);
     FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
-    { Initializing algorithm - Exit Parameter }
+    { Initializing algorithm exit parameters. }
     FDownhillSimplexAlgorithm.FinalTolerance := 0.00001;
     FDownhillSimplexAlgorithm.ExitDerivative := 0.5;
     FDownhillSimplexAlgorithm.RestartDisabled := False;
-    //FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled:= True;
+    { FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled := True; }
     FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
     FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
-
-    { Initializing algorithm - Start Parameter }
+    FRecreateSimplexFromOriginal := False;
+    { Initializing algorithm initial parameters. }
     gAlpha := iAlpha;
     gBeta := iBeta;
     gGamma := iGamma;
@@ -198,12 +201,10 @@ begin
     gOriginalAlpha := iAlpha;
     gOriginalBeta := iBeta;
     gOriginalGamma := iGamma;
-
+    { Initializes auxiliary attributes. }
     gShowAlgoDetails := iShowDetails;
     gDHS_InitParamLength := iAlgoInitialStepsAngles;
     gStop := False;
-
-    FRecreateSimplexFromOriginal := False;
 end;
 
 destructor TDownHillSimplexHandler.Destroy;
@@ -217,7 +218,7 @@ var
     fString: string;
     fPerformanceFrequency, fStartTime, fEndTime: Int64;
 begin
-    // this supresses useless hints in Lazarus
+    { This supresses useless hints in Lazarus. }
     fPerformanceFrequency := 0;
     fStartTime := 0;
     fEndTime := 0;
@@ -276,10 +277,6 @@ end;
 //-----------------------------------------------------------------------------
 //--------- TDownHillSimplexHandler - Interface DownHillSimplexServer ---------
 //-----------------------------------------------------------------------------
-
-//  Set inital calculation point in internal representation.
-//  The number of array element is equal to the number of
-//  parameters of task to be solved.
 
 procedure TDownHillSimplexHandler.FillStartDecision(Sender: TComponent;
     iStartDecision: TFloatDecision);
@@ -364,8 +361,6 @@ begin
         DisplayDetails(fString);
     end;
 end;
-
-//  Return flag of termination.
 
 function TDownHillSimplexHandler.EndOfCalculation(Sender: TComponent): Boolean;
 begin
