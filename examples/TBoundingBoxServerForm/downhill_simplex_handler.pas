@@ -71,6 +71,7 @@ type
           The procedure should not have parameters because it is called
           from separate thread. }
         procedure OptimizeBoundingBox;
+        { Interrupts computing. }
         procedure Stop;
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
         property Alpha: Double read gAlpha;
