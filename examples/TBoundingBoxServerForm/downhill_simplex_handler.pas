@@ -58,16 +58,20 @@ type
         procedure UpdateResults(Sender: TComponent; iDecision: TFloatDecision);
         //  Return flag of calculation termination.
         function EndOfCalculation(Sender: TComponent): Boolean;
+
     public
-        { Public declarations }
-        constructor Create(AOwner: TComponent); override;
+        { If set simplex is recreated from original point on restarting,
+          otherwise from the best point found during last optimization cycle. }
+        constructor Create(AOwner: TComponent; iAlpha, iBeta, iGamma,
+            iAlgoInitialStepsAngles: Double;
+            iFinalTolerance, iExitDerivative: Double;
+            iShowDetails: Boolean); reintroduce;
         destructor Destroy; override;
-        { Initializes performance counters and starts optimization. }
-        procedure OptimizeBoundingBox(iAlpha, iBeta, iGamma,
-            iAlgoInitialStepsAngles: Double);
-        procedure SetExitParameters(iFinalTolerance, iExitDerivative: Double);
+        { Initializes performance counters and starts optimization.
+          The procedure should not have parameters because it is called
+          from separate thread. }
+        procedure OptimizeBoundingBox;
         procedure Stop;
-        property ShowAlgoDetails: Boolean read gShowAlgoDetails write gShowAlgoDetails;
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
         property Alpha: Double read gAlpha;
         property Beta: Double read gBeta;
@@ -80,8 +84,7 @@ type
         property DHS_CycleCount: Integer read Get_DHS_CycleCount;
         property DHS_EvaluationCount: Integer read Get_DHS_EvaluationCount;
         property DHS_RestartCount: Integer read Get_DHS_RestartCount;
-        //  If set simplex is recreated from original point on restarting,
-        //  otherwise from the best point found during last optimization cycle.
+
         property RecreateSimplexFromOriginal: Boolean
             read FRecreateSimplexFromOriginal write FRecreateSimplexFromOriginal;
         property ComputationTime: Single read FComputationTime;
@@ -166,7 +169,11 @@ end;
 //-------------------------- TDownHillSimplexHandler --------------------------
 //-----------------------------------------------------------------------------
 
-constructor TDownHillSimplexHandler.Create(AOwner: TComponent);
+constructor TDownHillSimplexHandler.Create(
+    AOwner: TComponent; iAlpha, iBeta, iGamma,
+    iAlgoInitialStepsAngles: Double;
+    iFinalTolerance, iExitDerivative: Double;
+    iShowDetails: Boolean);
 begin
     inherited Create(AOwner);
     FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
@@ -175,7 +182,22 @@ begin
     FDownhillSimplexAlgorithm.ExitDerivative := 0.5;
     FDownhillSimplexAlgorithm.RestartDisabled := False;
     //FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled:= True;
+    FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
+    FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
+
+    { Initializing algorithm - Start Parameter }
+    gAlpha := iAlpha;
+    gBeta := iBeta;
+    gGamma := iGamma;
+    { Saves original point. }
+    gOriginalAlpha := iAlpha;
+    gOriginalBeta := iBeta;
+    gOriginalGamma := iGamma;
+
+    gShowAlgoDetails := iShowDetails;
+    gDHS_InitParamLength := iAlgoInitialStepsAngles;
     gStop := False;
+
     FRecreateSimplexFromOriginal := False;
 end;
 
@@ -185,15 +207,7 @@ begin
     inherited Destroy;
 end;
 
-procedure TDownHillSimplexHandler.SetExitParameters(iFinalTolerance,
-    iExitDerivative: Double);
-begin
-    FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
-    FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
-end;
-
-procedure TDownHillSimplexHandler.OptimizeBoundingBox(iAlpha, iBeta,
-    iGamma, iAlgoInitialStepsAngles: Double);
+procedure TDownHillSimplexHandler.OptimizeBoundingBox;
 var
     fString: string;
     fPerformanceFrequency, fStartTime, fEndTime: Int64;
@@ -205,16 +219,7 @@ begin
     FComputationTime := 0;
 
     FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
-    { Initializing algorithm - Start Parameter }
-    gAlpha := iAlpha;
-    gBeta := iBeta;
-    gGamma := iGamma;
-    { Saves original point. }
-    gOriginalAlpha := iAlpha;
-    gOriginalBeta := iBeta;
-    gOriginalGamma := iGamma;
 
-    gDHS_InitParamLength := iAlgoInitialStepsAngles;
     { Initializing performance counters. }
     QueryPerformanceFrequency(fPerformanceFrequency);
     QueryPerformanceCounter(fStartTime);
