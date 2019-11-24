@@ -10,94 +10,119 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
 {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls,
+    StdCtrls, Windows,
 {$ENDIF}
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 type
+    TDownHillSimplexHandler = class;
+    { External method displaying attributes of container instance. }
+    THandlerOutputProcedure = procedure(Handler: TDownHillSimplexHandler) of object;
+
     TDownHillSimplexHandler = class(TComponent, IDownhillSimplexServer)
     private
         { Minimum bounding box problem. }
         FDownhillSimplexAlgorithm: TDownhillSimplexAlgorithm;
+        FHandlerOutputProcedure: THandlerOutputProcedure;
 
-        gStop: Boolean;
-        gShowAlgoDetails: Boolean;
+        FStop: Boolean;
+        FShowAlgoDetails: Boolean;
 
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
-        gAlpha, gBeta, gGamma: Double;
+        FAlpha, FBeta, FGamma: Double;
         { Original values of angles describing rotation of coordinate system (in degrees). }
-        gOriginalAlpha, gOriginalBeta, gOriginalGamma: Double;
+        FOriginalAlpha, FOriginalBeta, FOriginalGamma: Double;
         FRecreateSimplexFromOriginal: Boolean;
 
-        gDHS_InitParamLength: Double;
+        FInitParamLength: Double;
 
-        { Box infomations: Volume and Coordinates}
-        gBoxVolume: Double;
-        gBoxMinCoords, gBoxMaxCoords: TDoubleVector3;
+        { Box infomations: volume and coordinates}
+        FBoxVolume: Double;
+        { Vectors containing triplets of maximum and minimum coordinates of
+          model points. They are used to compute bounding box volume. }
+        FBoxMinCoords, FBoxMaxCoords: TDoubleVector3;
+        { Computation time. }
+        FComputationTime: Single;
+        { Unique container id. It is used only to reference results. }
+        FRunId: Integer;
 
-        function Get_DHS_CycleCount: Integer;
-        function Get_DHS_EvaluationCount: Integer;
-        function Get_DHS_RestartCount: Integer;
+        function GetCycleCount: Integer;
+        function GetEvaluationCount: Integer;
+        function GetRestartCount: Integer;
 
-        { IDownhillSimplexServer }
-        //  Return initial characteristic length for every parameter.
+        { IDownhillSimplexServer implementation. }
+
+        { Returns initial characteristic length for every parameter. }
         function GetInitParamLength(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
-        //  Set inital calculation point in internal representation.
-        //  The number of array element is equal to the number of
-        //  variable parameters of task being solved.
+        { Sets inital calculation point in internal representation.
+          The number of array element is equal to the number of
+          variable parameters of task being solved. }
         procedure FillStartDecision(Sender: TComponent; iStartDecision: TFloatDecision);
-        //  Calculate evaluation function for the point given in internal
-        //  representation.
+        { Calculates evaluation function for the point given in internal
+          representation. }
         procedure EvaluateDecision(Sender: TComponent; iDecision: TFloatDecision);
-        //  Displays current minimum.
+        { Displays current minimum. }
         procedure UpdateResults(Sender: TComponent; iDecision: TFloatDecision);
-        //  Return flag of calculation termination.
+        { Returns flag of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
+
     public
-        { Public declarations }
-        constructor Create(AOwner: TComponent); override;
+        { If set simplex is recreated from original point on restarting,
+          otherwise from the best point found during last optimization cycle. }
+        constructor Create(AOwner: TComponent; iAlpha, iBeta, iGamma,
+            iAlgoInitialStepsAngles: Double;
+            iFinalTolerance, iExitDerivative: Double;
+            iShowDetails: Boolean; RunId: Integer); reintroduce;
         destructor Destroy; override;
-        procedure OptimizeBoundingBox(iAlpha, iBeta, iGamma,
-            iAlgoInitialStepsAngles: Double);
-        procedure SetExitParameters(iFinalTolerance, iExitDerivative: Double);
+        { Initializes performance counters and starts optimization.
+          The procedure should not have parameters because it is called
+          from separate thread. }
+        procedure OptimizeBoundingBox;
+        { Interrupts computing. }
         procedure Stop;
-        property ShowAlgoDetails: Boolean read gShowAlgoDetails write gShowAlgoDetails;
-        property Alpha: Double read gAlpha;
-        property Beta: Double read gBeta;
-        property Gamma: Double read gGamma;
-        property BoxVolume: Double read gBoxVolume;
-        property BoxMinCoords: TDoubleVector3 read gBoxMinCoords;
-        property BoxMaxCoords: TDoubleVector3 read gBoxMaxCoords;
-        property DHS_CycleCount: Integer read Get_DHS_CycleCount;
-        property DHS_EvaluationCount: Integer read Get_DHS_EvaluationCount;
-        property DHS_RestartCount: Integer read Get_DHS_RestartCount;
-        //  If set simplex is recreated from original point on restarting,
-        //  otherwise from the best point found during last optimization cycle.
-        property RecreateSimplexFromOriginal: Boolean
-            read FRecreateSimplexFromOriginal write FRecreateSimplexFromOriginal;
+        { Displays results of optimization.
+          The procedure should not have parameters because it is called from
+          separate thread. This is wrapper for call of FHandlerOutputProcedure. }
+        procedure DisplayOutput;
+        { Optimized values of angles describing rotation of coordinate system (in degrees). }
+        property Alpha: Double read FAlpha;
+        property Beta: Double read FBeta;
+        property Gamma: Double read FGamma;
+        { Box infomations: volume and coordinates. }
+        property BoxVolume: Double read FBoxVolume;
+        property BoxMinCoords: TDoubleVector3 read FBoxMinCoords;
+        property BoxMaxCoords: TDoubleVector3 read FBoxMaxCoords;
+        { DownHillSimplex algorithm statistical details. }
+        property CycleCount: Integer read GetCycleCount;
+        property EvaluationCount: Integer read GetEvaluationCount;
+        property RestartCount: Integer read GetRestartCount;
+        property HandlerOutputProcedure: THandlerOutputProcedure
+            write FHandlerOutputProcedure;
+        property ComputationTime: Single read FComputationTime;
+        property RunId: Integer read FRunId;
     end;
 
+function DegToRad(iDeg: Double): Double;
 
 implementation
 
 uses bounding_box_server_form;
 
+function DegToRad(iDeg: Double): Double;
+begin
+    Result := iDeg * PI / 180.0;
+end;
+
 function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
     var iMinCoords, iMaxCoords: T3Vector): Double;
 
     function GetRotationMatrix(iAlpha, iBeta, iGamma: Single): TMatrix;
-
-        function DegToRad(iDeg: Double): Double;
-        begin
-            Result := iDeg * PI / 180.0;
-        end;
-
     var
         fRotX, fRotY, fRotZ, fMatr: TMatrix;
     begin
-    { Computing rotation matrices.
-      Matrices are initalized inside functions. }
+        { Computing rotation matrices.
+          Matrices are initalized inside functions. }
         fRotX := MatrixRotX(DegToRad(iAlpha));
         fRotY := MatrixRotY(DegToRad(iBeta));
         fRotZ := MatrixRotZ(DegToRad(iGamma));
@@ -116,7 +141,6 @@ var
     fPoint: p3DVector;
     fVector: T3Vector;
 begin
-    Application.ProcessMessages;
     { Computes volume of bounding box. }
     fMatr := GetRotationMatrix(iAlpha, iBeta, iGamma);
     fPoint := PointCloud[0];
@@ -157,17 +181,35 @@ end;
 //-------------------------- TDownHillSimplexHandler --------------------------
 //-----------------------------------------------------------------------------
 
-constructor TDownHillSimplexHandler.Create(AOwner: TComponent);
+constructor TDownHillSimplexHandler.Create(
+    AOwner: TComponent; iAlpha, iBeta, iGamma,
+    iAlgoInitialStepsAngles: Double;
+    iFinalTolerance, iExitDerivative: Double;
+    iShowDetails: Boolean; RunId: Integer);
 begin
     inherited Create(AOwner);
     FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
-    { Initializing algorithm - Exit Parameter }
+    { Initializing algorithm exit parameters. }
     FDownhillSimplexAlgorithm.FinalTolerance := 0.00001;
     FDownhillSimplexAlgorithm.ExitDerivative := 0.5;
     FDownhillSimplexAlgorithm.RestartDisabled := False;
-    //FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled:= True;
-    gStop := False;
+    { FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled := True; }
+    FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
+    FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
     FRecreateSimplexFromOriginal := False;
+    { Initializing algorithm initial parameters. }
+    FAlpha := iAlpha;
+    FBeta := iBeta;
+    FGamma := iGamma;
+    { Saves original point. }
+    FOriginalAlpha := iAlpha;
+    FOriginalBeta := iBeta;
+    FOriginalGamma := iGamma;
+    { Initializes auxiliary attributes. }
+    FShowAlgoDetails := iShowDetails;
+    FInitParamLength := iAlgoInitialStepsAngles;
+    FStop := False;
+    FRunId := RunId;
 end;
 
 destructor TDownHillSimplexHandler.Destroy;
@@ -176,59 +218,63 @@ begin
     inherited Destroy;
 end;
 
-procedure TDownHillSimplexHandler.SetExitParameters(iFinalTolerance,
-    iExitDerivative: Double);
-begin
-    FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
-    FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
-end;
-
-procedure TDownHillSimplexHandler.OptimizeBoundingBox(iAlpha, iBeta,
-    iGamma, iAlgoInitialStepsAngles: Double);
+procedure TDownHillSimplexHandler.OptimizeBoundingBox;
 var
     fString: string;
+    fPerformanceFrequency, fStartTime, fEndTime: Int64;
 begin
-    FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
-    { Initializing algorithm - Start Parameter }
-    gAlpha := iAlpha;
-    gBeta := iBeta;
-    gGamma := iGamma;
-    { Saves original point. }
-    gOriginalAlpha := iAlpha;
-    gOriginalBeta := iBeta;
-    gOriginalGamma := iGamma;
+    { This supresses useless hints in Lazarus. }
+    fPerformanceFrequency := 0;
+    fStartTime := 0;
+    fEndTime := 0;
+    FComputationTime := 0;
 
-    gDHS_InitParamLength := iAlgoInitialStepsAngles;
+    FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
+
+    { Initializing performance counters. }
+    QueryPerformanceFrequency(fPerformanceFrequency);
+    QueryPerformanceCounter(fStartTime);
     { Optimizing. }
     FDownhillSimplexAlgorithm.AlgorithmRealization;
+    { Calculating computation time. }
+    QueryPerformanceCounter(fEndTime);
+    if fPerformanceFrequency <> 0 then
+        FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
 
     { Gets parameters of best solution. }
-    if gShowAlgoDetails then
+    if FShowAlgoDetails then
     begin
         fString := '  Result:' + sLineBreak;
         fString := fString + '     Modified parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
-        fString := fString + '     Volume: ' + Format('%.4f', [gBoxVolume]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
+            sLineBreak;
+        fString := fString + '     Volume: ' + Format('%.4f', [FBoxVolume]) + sLineBreak;
         DisplayDetails(fString);
     end;
 end;
 
-procedure TDownHillSimplexHandler.Stop;
+procedure TDownHillSimplexHandler.DisplayOutput;
 begin
-    gStop := True;
+    if FHandlerOutputProcedure <> nil then
+        FHandlerOutputProcedure(Self);
 end;
 
-function TDownHillSimplexHandler.Get_DHS_CycleCount: Integer;
+procedure TDownHillSimplexHandler.Stop;
+begin
+    FStop := True;
+end;
+
+function TDownHillSimplexHandler.GetCycleCount: Integer;
 begin
     Result := FDownhillSimplexAlgorithm.CycleCount;
 end;
 
-function TDownHillSimplexHandler.Get_DHS_EvaluationCount: Integer;
+function TDownHillSimplexHandler.GetEvaluationCount: Integer;
 begin
     Result := FDownhillSimplexAlgorithm.EvaluationCount;
 end;
 
-function TDownHillSimplexHandler.Get_DHS_RestartCount: Integer;
+function TDownHillSimplexHandler.GetRestartCount: Integer;
 begin
     Result := FDownhillSimplexAlgorithm.RestartCount;
 end;
@@ -236,10 +282,6 @@ end;
 //-----------------------------------------------------------------------------
 //--------- TDownHillSimplexHandler - Interface DownHillSimplexServer ---------
 //-----------------------------------------------------------------------------
-
-//  Set inital calculation point in internal representation.
-//  The number of array element is equal to the number of
-//  parameters of task to be solved.
 
 procedure TDownHillSimplexHandler.FillStartDecision(Sender: TComponent;
     iStartDecision: TFloatDecision);
@@ -251,19 +293,20 @@ begin
     { Simplex is created from original point. }
     if FRecreateSimplexFromOriginal then
     begin
-        gAlpha := gOriginalAlpha;
-        gBeta := gOriginalBeta;
-        gGamma := gOriginalGamma;
+        FAlpha := FOriginalAlpha;
+        FBeta := FOriginalBeta;
+        FGamma := FOriginalGamma;
     end;
-    iStartDecision.Parameters[0] := gAlpha;
-    iStartDecision.Parameters[1] := gBeta;
-    iStartDecision.Parameters[2] := gGamma;
+    iStartDecision.Parameters[0] := FAlpha;
+    iStartDecision.Parameters[1] := FBeta;
+    iStartDecision.Parameters[2] := FGamma;
 
-    if gShowAlgoDetails then
+    if FShowAlgoDetails then
     begin
         fString := '  StartDecision:' + sLineBreak;
         fString := fString + '     Start Parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
+            sLineBreak;
         DisplayDetails(fString);
     end;
 end;
@@ -272,9 +315,8 @@ end;
 function TDownHillSimplexHandler.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
-    Result := gDHS_InitParamLength;
+    Result := FInitParamLength;
 end;
-
 {$hints on}
 
 procedure TDownHillSimplexHandler.EvaluateDecision(Sender: TComponent;
@@ -283,19 +325,20 @@ var
     fString: string;
 begin
     { Fills variable parameters from the object. }
-    gAlpha := iDecision.Parameters[0];
-    gBeta := iDecision.Parameters[1];
-    gGamma := iDecision.Parameters[2];
+    FAlpha := iDecision.Parameters[0];
+    FBeta := iDecision.Parameters[1];
+    FGamma := iDecision.Parameters[2];
     { Computes evaluation function. }
-    gBoxVolume := ComputeRotatedBoxVolume(gAlpha, gBeta, gGamma,
-        gBoxMinCoords, gBoxMaxCoords);
-    iDecision.Evaluation := gBoxVolume;
+    FBoxVolume := ComputeRotatedBoxVolume(FAlpha, FBeta, FGamma,
+        FBoxMinCoords, FBoxMaxCoords);
+    iDecision.Evaluation := FBoxVolume;
 
-    if gShowAlgoDetails then
+    if FShowAlgoDetails then
     begin
         fString := '  EvaluateDecition:' + sLineBreak;
         fString := fString + '     Modified parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
+            sLineBreak;
         fString := fString + '     Volume: ' + Format('%.4f', [iDecision.Evaluation]) +
             sLineBreak;
         DisplayDetails(fString);
@@ -307,27 +350,26 @@ procedure TDownHillSimplexHandler.UpdateResults(Sender: TComponent;
 var
     fString: string;
 begin
-    gAlpha := iDecision.Parameters[0];
-    gBeta := iDecision.Parameters[1];
-    gGamma := iDecision.Parameters[2];
+    FAlpha := iDecision.Parameters[0];
+    FBeta := iDecision.Parameters[1];
+    FGamma := iDecision.Parameters[2];
 
-    if gShowAlgoDetails then
+    if FShowAlgoDetails then
     begin
         fString := 'UpdateResults:' + sLineBreak;
         fString := fString + '    Optimized parameters:' +
-            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [gAlpha, gBeta, gGamma]) + sLineBreak;
+            Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
+            sLineBreak;
         fString := fString + '    Optimized Volume: ' +
             Format('%.4f', [iDecision.Evaluation]) + sLineBreak;
         DisplayDetails(fString);
     end;
 end;
 
-//  Return flag of termination.
-
 function TDownHillSimplexHandler.EndOfCalculation(Sender: TComponent): Boolean;
 begin
     { Set up True to interrupt computation. }
-    Result := gStop;
+    Result := FStop;
 end;
 
 end.
