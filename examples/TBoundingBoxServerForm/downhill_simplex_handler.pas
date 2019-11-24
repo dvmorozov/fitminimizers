@@ -43,6 +43,8 @@ type
         gBoxMinCoords, gBoxMaxCoords: TDoubleVector3;
         { Computation time. }
         FComputationTime: Single;
+        { Unique container id. It is used only to reference results. }
+        FRunId: Integer;
 
         function Get_DHS_CycleCount: Integer;
         function Get_DHS_EvaluationCount: Integer;
@@ -70,7 +72,7 @@ type
         constructor Create(AOwner: TComponent; iAlpha, iBeta, iGamma,
             iAlgoInitialStepsAngles: Double;
             iFinalTolerance, iExitDerivative: Double;
-            iShowDetails: Boolean); reintroduce;
+            iShowDetails: Boolean; RunId: Integer); reintroduce;
         destructor Destroy; override;
         { Initializes performance counters and starts optimization.
           The procedure should not have parameters because it is called
@@ -97,6 +99,7 @@ type
         property HandlerOutputProcedure: THandlerOutputProcedure
             write FHandlerOutputProcedure;
         property ComputationTime: Single read FComputationTime;
+        property RunId: Integer read FRunId;
     end;
 
 function DegToRad(iDeg: Double): Double;
@@ -181,7 +184,7 @@ constructor TDownHillSimplexHandler.Create(
     AOwner: TComponent; iAlpha, iBeta, iGamma,
     iAlgoInitialStepsAngles: Double;
     iFinalTolerance, iExitDerivative: Double;
-    iShowDetails: Boolean);
+    iShowDetails: Boolean; RunId: Integer);
 begin
     inherited Create(AOwner);
     FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
@@ -205,6 +208,7 @@ begin
     gShowAlgoDetails := iShowDetails;
     gDHS_InitParamLength := iAlgoInitialStepsAngles;
     gStop := False;
+    FRunId := RunId;
 end;
 
 destructor TDownHillSimplexHandler.Destroy;
