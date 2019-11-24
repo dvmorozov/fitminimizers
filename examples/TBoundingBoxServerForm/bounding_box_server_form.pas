@@ -62,8 +62,8 @@ type
         ShowAlgoDetails: Boolean;
         ShowPassed: Boolean;
         Stop: Boolean;
-        { Keeps all instances of "handler" class in the case of multithreaded computing. }
-        FDownHillSimplexHandlerList: TComponentList;
+        { Keeps all instances of "handler" class for asynchronous operations. }
+        FHandlers: TComponentList;
         { Best values obtained for a few optimization runs. }
         fBoxVolume: Double;
         iMinCoords, iMaxCoords: TDoubleVector3;
@@ -162,8 +162,7 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
-    FDownHillSimplexHandlerList := TComponentList.Create();
-    FDownHillSimplexHandlerList.OwnsObjects := True;
+    FHandlers := TComponentList.Create(True);
 end;
 
 function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
@@ -187,7 +186,7 @@ begin
         iAlpha, iBeta, iGamma, iDHS_InitParamLength,
         fFinalTolerance, fExitDerivate, iShowDetails);
     //  Adds to the list for asynchronous operations.
-    FDownHillSimplexHandlerList.Add(Result);
+    FHandlers.Add(Result);
 end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
@@ -203,7 +202,7 @@ end;
 procedure TBoundingBoxServerForm.FormDestroy(Sender: TObject);
 begin
     StopComputing;
-    FDownHillSimplexHandlerList.Destroy;
+    FHandlers.Destroy;
 end;
 
 procedure TBoundingBoxServerForm.OutputResults;
@@ -250,7 +249,7 @@ begin
     Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True);
     Handler.OptimizeBoundingBox;
     //  Removes and frees inserted container.
-    FDownHillSimplexHandlerList.Remove(Handler);
+    FHandlers.Remove(Handler);
     OutputResults;
 end;
 
@@ -526,7 +525,7 @@ begin
                         end;
                     end;
                     //  Removes and frees inserted container.
-                    FDownHillSimplexHandlerList.Remove(Handler);
+                    FHandlers.Remove(Handler);
                     Application.ProcessMessages;
                 end;
             end;
@@ -613,7 +612,7 @@ begin
                 end;
             end;
             //  Removes and frees inserted container.
-            FDownHillSimplexHandlerList.Remove(Handler);
+            FHandlers.Remove(Handler);
             Application.ProcessMessages;
         end;
     end;
@@ -626,8 +625,8 @@ var
 begin
     Stop := True;
     //  Stops all containers.
-    for i := 0 to FDownHillSimplexHandlerList.Count - 1 do
-        TDownHillSimplexHandler(FDownHillSimplexHandlerList[i]).Stop;
+    for i := 0 to FHandlers.Count - 1 do
+        TDownHillSimplexHandler(FHandlers[i]).Stop;
 end;
 
 procedure TBoundingBoxServerForm.ButtonStopClick(Sender: TObject);
@@ -661,7 +660,7 @@ begin
         Application.ProcessMessages;
     end;
     //  Removes and frees container.
-    FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
+    FHandlers.Remove(fDownHillSimplexHandler);
 end;
 
 procedure TBoundingBoxServerForm.FindMinBoxByVolume;
@@ -690,6 +689,8 @@ var
     fRuns: integer;
     fStartAngle: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
+    Runners: TComponentList;
+    Runner: TRunner;
 begin
     fRuns := 3;
     if PointCloud.Count < 100000 then
@@ -697,6 +698,8 @@ begin
     if PointCloud.Count < 25000 then
         fRuns := 9;
     fBoxVolume := 1e30;
+
+    Runners := TComponentList.Create(True);
     for i := 0 to fRuns - 1 do
     begin
         if not Stop then
@@ -706,15 +709,26 @@ begin
             else
                 fStartAngle := cStartAngle9Runs[i];
 
-            // Optimization Run to get the minimum volume.
+            //  Optimization Run to get the minimum volume.
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False);
             Handler.HandlerOutputProcedure := @OuputFindMinBoxByVolume;
-            Handler.OptimizeBoundingBox;
-            OuputFindMinBoxByVolume(Handler);
+            //  Creates runner.
+            Runner := TRunner.Create(nil);
+            Runner.OnComputingProcedure := @Handler.OptimizeBoundingBox;
+            Runner.OnOutputProcedure := @Handler.DisplayOutput;
+            Runners.Add(Runner);
+            Runner.Run;
         end;
     end;
+    //  Waits for threads finishing.
+    for i := 0 to Runners.Count - 1 do
+    begin
+        Runner := TRunner(Runners[i]);
+        Runner.Wait;
+    end;
+    Runners.Destroy;
 
     OptiResultBoxVolume := fBoxVolume;
     OptiResultBoxMaxCoords := iMaxCoords;

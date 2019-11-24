@@ -134,7 +134,6 @@ var
     fPoint: p3DVector;
     fVector: T3Vector;
 begin
-    Application.ProcessMessages;
     { Computes volume of bounding box. }
     fMatr := GetRotationMatrix(iAlpha, iBeta, iGamma);
     fPoint := PointCloud[0];
