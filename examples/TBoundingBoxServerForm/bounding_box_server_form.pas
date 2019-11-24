@@ -64,13 +64,19 @@ type
         Stop: Boolean;
         { Keeps all instances of "handler" class in the case of multithreaded computing. }
         FDownHillSimplexHandlerList: TComponentList;
+        { Best values obtained for a few optimization runs. }
+        fBoxVolume: Double;
+        iMinCoords, iMaxCoords: TDoubleVector3;
 
         function GetIniParamLenght: Double;
         { Prints final results among a few runs. }
         procedure OutputResults;
         procedure StopComputing;
         { Computes minimum box volume starting from a few initial points. }
-        function FindMinBoxByVolume: double;
+        procedure FindMinBoxByVolume;
+        { Displays computation results and removes container. Should be
+          member of form because works with form controls. }
+        procedure OuputFindMinBoxByVolume(fDownHillSimplexHandler: TDownHillSimplexHandler);
         { Executes optimization algorithm. Returns handler instance which
           should be destroyed by calling method. }
         function OptimizeVolume(iAlpha, iBeta, iGamma: Double;
@@ -436,7 +442,6 @@ var
     FileName, fResult: string;
     fAlpha, fBeta, fGamma: Single;
     fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume: Single;
-    fBoxVolume: Double;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     fDownHillSimplexHandler: TDownHillSimplexHandler;
 begin
@@ -454,7 +459,7 @@ begin
     // get the optimized volume and Box size
     // load it in original orientation
     LoadObjPointCloud(FileName, 0, 0, 0);
-    fBoxVolume := FindMinBoxByVolume;
+    FindMinBoxByVolume;
 
     // do the test for brute force orientation
     for x := 0 to (179 div cSteps) do
@@ -532,7 +537,6 @@ var
     FileName, fResult: string;
     fAlpha, fBeta, fGamma: Single;
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume: Single;
-    fBoxVolume: Double;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     fDownHillSimplexHandler: TDownHillSimplexHandler;
 begin
@@ -549,7 +553,7 @@ begin
     // get the optimized volume and Box size
     // load it in original orientation
     LoadObjPointCloud(FileName, 0, 0, 0);
-    fBoxVolume := FindMinBoxByVolume;
+    FindMinBoxByVolume;
 
     // do the test for random orientation
     Randomize;
@@ -628,7 +632,36 @@ begin
     StopComputing;
 end;
 
-function TBoundingBoxServerForm.FindMinBoxByVolume: Double;
+procedure TBoundingBoxServerForm.OuputFindMinBoxByVolume(fDownHillSimplexHandler: TDownHillSimplexHandler);
+var
+    fResult: string;
+    fBoxSize: TDoubleVector3;
+begin
+    with fDownHillSimplexHandler do
+    begin
+        if BoxVolume < fBoxVolume then
+        begin
+            fBoxVolume := BoxVolume;
+            iMaxCoords := BoxMaxCoords;
+            iMinCoords := BoxMinCoords;
+        end;
+        fBoxSize[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+        fBoxSize[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+        fBoxSize[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+        SortUp(fBoxSize[1], fBoxSize[2], fBoxSize[3]);
+        fResult := Format(
+            ' Run : %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
+            [BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3],
+            Alpha, Beta, Gamma, ComputationTime, DHS_CycleCount, DHS_EvaluationCount,
+            DHS_RestartCount]);
+        Memo1.Lines.Add(fResult);
+        Application.ProcessMessages;
+    end;
+    //  Removes and frees container.
+    FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
+end;
+
+procedure TBoundingBoxServerForm.FindMinBoxByVolume;
 const
     cStartAngle5Runs: array[0..4] of TDoubleVector3 = (
         (0, 0, 0),
@@ -652,10 +685,7 @@ const
 var
     i: integer;
     fRuns: integer;
-    fStartAngle, fBoxSize: TDoubleVector3;
-    fBoxVolume: Double;
-    fResult: string;
-    iMinCoords, iMaxCoords: TDoubleVector3;
+    fStartAngle: TDoubleVector3;
     fDownHillSimplexHandler: TDownHillSimplexHandler;
 begin
     fRuns := 3;
@@ -677,32 +707,9 @@ begin
             fDownHillSimplexHandler :=
                 OptimizeVolume(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False);
-            with fDownHillSimplexHandler do
-            begin
-                if BoxVolume < fBoxVolume then
-                begin
-                    fBoxVolume := BoxVolume;
-                    iMaxCoords := BoxMaxCoords;
-                    iMinCoords := BoxMinCoords;
-                end;
-                fBoxSize[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                fBoxSize[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                fBoxSize[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                SortUp(fBoxSize[1], fBoxSize[2], fBoxSize[3]);
-                fResult := Format(
-                    ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                    [i + 1, BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3],
-                    Alpha, Beta, Gamma, ComputationTime, DHS_CycleCount, DHS_EvaluationCount,
-                    DHS_RestartCount]);
-                Memo1.Lines.Add(fResult);
-                Application.ProcessMessages;
-            end;
-            //  Removes and frees container.
-            FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
+            OuputFindMinBoxByVolume(fDownHillSimplexHandler);
         end;
     end;
-
-    Result := fBoxVolume;
 
     OptiResultBoxVolume := fBoxVolume;
     OptiResultBoxMaxCoords := iMaxCoords;
