@@ -50,6 +50,7 @@ function UnitMatrix: TMatrix;
 function MatrixRotX(Angle: Double): TMatrix;
 function MatrixRotY(Angle: Double): TMatrix;
 function MatrixRotZ(Angle: Double): TMatrix;
+function MatrixTrans(A, B, C: Double): TMatrix;
 
 procedure MulVectMatr(Matr: TMatrix; var Vector: T3Vector);
 procedure Mul3DMatrix(var A, B: TMatrix; var Matr: TMatrix);
@@ -175,6 +176,20 @@ begin
     Result := Matr;
 end;
 
+function MatrixTrans(A, B, C: Double): TMatrix;
+var Matr: TMatrix;
+begin
+    GetZerosMatrix(Matr);
+    Matr[1, 1] := 1;
+    Matr[2, 2] := 1;
+    Matr[3, 3] := 1;
+    Matr[4, 1] := A;
+    Matr[4, 2] := B;
+    Matr[4, 3] := C;
+    Matr[4, 4] := 1;
+    Result := Matr;
+end;
+
 procedure GetMatrixRefXY(var Matr: TMatrix);
 begin
     GetZerosMatrix(Matr);
@@ -213,14 +228,7 @@ end;
 
 procedure GetMatrixTrans(A, B, C: Double; var Matr: TMatrix);
 begin
-    GetZerosMatrix(Matr);
-    Matr[1, 1] := 1;
-    Matr[2, 2] := 1;
-    Matr[3, 3] := 1;
-    Matr[4, 1] := A;
-    Matr[4, 2] := B;
-    Matr[4, 3] := C;
-    Matr[4, 4] := 1;
+    Matr := MatrixTrans(A, B, C);
 end;
 
 procedure GetMatrixTransition(Al, Bt, Gm: Double; var Matr: TMatrix);
@@ -235,7 +243,6 @@ begin
     Matr[3, 2] := Cos(Al) * Sin(Bt);
     Matr[3, 3] := Sin(Al) * Sin(Bt);
     Matr[4, 4] := 1;
-
 end;
 
 procedure GetMatrixPro(A, B, C: Double; var Matr: TMatrix);

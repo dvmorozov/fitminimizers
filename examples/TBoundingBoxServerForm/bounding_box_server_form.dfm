@@ -13,6 +13,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   Position = poDefault
   LCLVersion = '1.8.4.0'
   object Label1: TLabel
