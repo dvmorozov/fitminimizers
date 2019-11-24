@@ -84,7 +84,6 @@ type
 
         procedure LoadObjPointCloud(iFileName: String; iAlpha, iBeta, iGamma: single);
         procedure GenerateRandomPointCloud;
-        function DegToRad(Deg: Double): Double;
 
     public
         { Public declarations }
@@ -92,6 +91,8 @@ type
 
 var
     BoundingBoxServerForm: TBoundingBoxServerForm;
+    { Data can be accessed from different threads.
+      That's ok until data aren't changed. }
     PointCloud: TList;
 
 implementation
@@ -824,11 +825,6 @@ begin
         end;
         CloseFile(F);
     end;
-end;
-
-function TBoundingBoxServerForm.DegToRad(Deg: Double): Double;
-begin
-    Result := Deg * Pi / 180.0;
 end;
 
 {$warnings off}
