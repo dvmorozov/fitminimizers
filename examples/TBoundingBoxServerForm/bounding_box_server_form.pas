@@ -77,9 +77,8 @@ type
         { Displays computation results and removes container. Should be
           member of form because works with form controls. }
         procedure OuputFindMinBoxByVolume(fDownHillSimplexHandler: TDownHillSimplexHandler);
-        { Executes optimization algorithm. Returns handler instance which
-          should be destroyed by calling method. }
-        function OptimizeVolume(iAlpha, iBeta, iGamma: Double;
+        { Creates and returns container instance which should be destroyed by calling method. }
+        function CreateHandler(iAlpha, iBeta, iGamma: Double;
             iDHS_InitParamLength: Double;
             iShowDetails: Boolean): TDownHillSimplexHandler;
 
@@ -167,7 +166,7 @@ begin
     FDownHillSimplexHandlerList.OwnsObjects := True;
 end;
 
-function TBoundingBoxServerForm.OptimizeVolume(iAlpha, iBeta, iGamma: Double;
+function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
     iDHS_InitParamLength: Double; iShowDetails: Boolean): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
@@ -189,7 +188,6 @@ begin
         fFinalTolerance, fExitDerivate, iShowDetails);
     //  Adds to the list for asynchronous operations.
     FDownHillSimplexHandlerList.Add(Result);
-    Result.OptimizeBoundingBox;
 end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
@@ -232,6 +230,7 @@ end;
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
     FileName: string;
+    Handler: TDownHillSimplexHandler;
 begin
     ShowAlgoDetails := True;
     Stop := False;
@@ -248,8 +247,10 @@ begin
         FileName := FilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
+    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True);
+    Handler.OptimizeBoundingBox;
     //  Removes and frees inserted container.
-    FDownHillSimplexHandlerList.Remove(OptimizeVolume(0, 0, 0, GetIniParamLenght, True));
+    FDownHillSimplexHandlerList.Remove(Handler);
     OutputResults;
 end;
 
@@ -443,7 +444,7 @@ var
     fAlpha, fBeta, fGamma: Single;
     fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
-    fDownHillSimplexHandler: TDownHillSimplexHandler;
+    Handler: TDownHillSimplexHandler;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
@@ -473,13 +474,14 @@ begin
                     fGamma := z * cSteps;
 
                     LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
-                    fDownHillSimplexHandler :=
-                        OptimizeVolume(0, 0, 0, GetIniParamLenght, False);
+                    Handler :=
+                        CreateHandler(0, 0, 0, GetIniParamLenght, False);
+                    Handler.OptimizeBoundingBox;
                     if not Stop then
                     begin
                         //  Computes difference in volumes calculated
                         //  for original and rotated orientation.
-                        with fDownHillSimplexHandler do
+                        with Handler do
                         begin
                             fDeltaVolume := (BoxVolume - fBoxVolume);
                             //  Computes lengths of edges of bounding box.
@@ -524,7 +526,7 @@ begin
                         end;
                     end;
                     //  Removes and frees inserted container.
-                    FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
+                    FDownHillSimplexHandlerList.Remove(Handler);
                     Application.ProcessMessages;
                 end;
             end;
@@ -538,7 +540,7 @@ var
     fAlpha, fBeta, fGamma: Single;
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
-    fDownHillSimplexHandler: TDownHillSimplexHandler;
+    Handler: TDownHillSimplexHandler;
 begin
     FileName := FilePath + ComboBoxFiles.Text;
 
@@ -566,11 +568,12 @@ begin
             fGamma := Random * 180;
             LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
 
-            fDownHillSimplexHandler :=
-                OptimizeVolume(0, 0, 0, GetIniParamLenght, False);
+            Handler :=
+                CreateHandler(0, 0, 0, GetIniParamLenght, False);
+            Handler.OptimizeBoundingBox;
             if not Stop then
             begin
-                with fDownHillSimplexHandler do
+                with Handler do
                 begin
                     fDeltaVolume := (BoxVolume - fBoxVolume);
                     fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
@@ -610,7 +613,7 @@ begin
                 end;
             end;
             //  Removes and frees inserted container.
-            FDownHillSimplexHandlerList.Remove(fDownHillSimplexHandler);
+            FDownHillSimplexHandlerList.Remove(Handler);
             Application.ProcessMessages;
         end;
     end;
@@ -686,7 +689,7 @@ var
     i: integer;
     fRuns: integer;
     fStartAngle: TDoubleVector3;
-    fDownHillSimplexHandler: TDownHillSimplexHandler;
+    Handler: TDownHillSimplexHandler;
 begin
     fRuns := 3;
     if PointCloud.Count < 100000 then
@@ -704,10 +707,12 @@ begin
                 fStartAngle := cStartAngle9Runs[i];
 
             // Optimization Run to get the minimum volume.
-            fDownHillSimplexHandler :=
-                OptimizeVolume(fStartAngle[1], fStartAngle[2],
+            Handler :=
+                CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False);
-            OuputFindMinBoxByVolume(fDownHillSimplexHandler);
+            Handler.HandlerOutputProcedure := @OuputFindMinBoxByVolume;
+            Handler.OptimizeBoundingBox;
+            OuputFindMinBoxByVolume(Handler);
         end;
     end;
 
