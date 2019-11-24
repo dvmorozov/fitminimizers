@@ -45,6 +45,7 @@ type
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
         function GetIniParamLenght: Double;
+        { Prints final results among a few runs. }
         procedure OutputResults;
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
@@ -53,13 +54,10 @@ type
         procedure ButtonStopClick(Sender: TObject);
         procedure ButtonRandomTestClick(Sender: TObject);
         function DoOptimizeVolume(iAlpha, iBeta, iGamma: Double;
-            iDHS_InitParamLength: Double): double;
+            iDHS_InitParamLength: Double; var fTime: Single): TDownHillSimplexHandler;
         { Computes minimum box volume starting from a few initial points. }
         function FindMinBoxByVolume: double;
     private
-        { Minimum bounding box problem. }
-        fDownHillSimplexHandler: TDownHillSimplexHandler;
-
         FilePath: String;
 
         // optimization results of several algo runs
@@ -70,10 +68,12 @@ type
         ShowPassed: Boolean;
         Stop: Boolean;
 
+        DownHillSimplexHandler: TDownHillSimplexHandler;
 
-        { Executes optimization algorithm. }
-        procedure OptimizeVolume(iAlpha, iBeta, iGamma: Double;
-            iDHS_InitParamLength: Double; iShowDetails: Boolean);
+        { Executes optimization algorithm. Returns handler instance which
+          should be destroyed by calling method. }
+        function OptimizeVolume(iAlpha, iBeta, iGamma: Double;
+            iDHS_InitParamLength: Double; iShowDetails: Boolean): TDownHillSimplexHandler;
 
         procedure LoadObjPointCloud(iFileName: String; iAlpha, iBeta, iGamma: single);
         procedure GenerateRandomPointCloud;
@@ -138,7 +138,6 @@ var
     fSearchResult: TSearchRec;
     fExt: string;
 begin
-    fDownHillSimplexHandler := nil;
     // reads file list from the directory adjacent to the program directory
     FilePath := ExtractFilePath(ParamStr(0));
     FilePath := IncludeTrailingPathDelimiter(FilePath) + '..' + PathDelim;
@@ -157,17 +156,11 @@ begin
     ComboBoxFiles.ItemIndex := 0;
 end;
 
-procedure TBoundingBoxServerForm.OptimizeVolume(iAlpha, iBeta, iGamma: Double;
-    iDHS_InitParamLength: Double; iShowDetails: Boolean);
+function TBoundingBoxServerForm.OptimizeVolume(iAlpha, iBeta, iGamma: Double;
+    iDHS_InitParamLength: Double; iShowDetails: Boolean): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
-    // removes results of previous computations
-    if fDownHillSimplexHandler <> nil then
-    begin
-        fDownHillSimplexHandler.Free;
-    end;
-
     // this suppresses useless hints in Lazarus
     fFinalTolerance := 0.00001;
     fExitDerivate := 0.5;
@@ -180,11 +173,13 @@ begin
     begin
         fExitDerivate := 0.5;       //default value
     end;
-    fDownHillSimplexHandler := TDownHillSimplexHandler.Create(self);
-    fDownHillSimplexHandler.ShowAlgoDetails := iShowDetails;
-    fDownHillSimplexHandler.SetExitParameters(fFinalTolerance, fExitDerivate);
-    fDownHillSimplexHandler.OptimizeBoundingBox(iAlpha, iBeta, iGamma,
-        iDHS_InitParamLength);
+    Result := TDownHillSimplexHandler.Create(self);
+    with Result do
+    begin
+        ShowAlgoDetails := iShowDetails;
+        SetExitParameters(fFinalTolerance, fExitDerivate);
+        OptimizeBoundingBox(iAlpha, iBeta, iGamma, iDHS_InitParamLength);
+    end;
 end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
@@ -198,7 +193,7 @@ begin
 end;
 
 function TBoundingBoxServerForm.DoOptimizeVolume(iAlpha, iBeta, iGamma: Double;
-    iDHS_InitParamLength: Double): Double;
+    iDHS_InitParamLength: Double; var fTime: Single): TDownHillSimplexHandler;
 var
     fPerformanceFrequency, fStartTime, fEndTime: Int64;
 begin
@@ -206,41 +201,36 @@ begin
     fPerformanceFrequency := 0;
     fStartTime := 0;
     fEndTime := 0;
-    Result := 0;
+    fTime := 0;
 
     QueryPerformanceFrequency(fPerformanceFrequency);
     QueryPerformanceCounter(fStartTime);
-    OptimizeVolume(iAlpha, iBeta, iGamma, iDHS_InitParamLength, False);
+    Result := OptimizeVolume(iAlpha, iBeta, iGamma, iDHS_InitParamLength, False);
     QueryPerformanceCounter(fEndTime);
 
     if fPerformanceFrequency <> 0 then
-        Result := (fEndTime - fStartTime) / fPerformanceFrequency;
+        fTime := (fEndTime - fStartTime) / fPerformanceFrequency;
 end;
 
 procedure TBoundingBoxServerForm.OutputResults;
 var
     fDelta: TDoubleVector3;
 begin
-    with fDownHillSimplexHandler do
-    begin
-        Memo1.Lines.Add('');
-        if CheckBoxRandomData.Checked then
-            Memo1.Lines.Add('Random Points')
-        else
-            Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
-        Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
-        Memo1.Lines.Add('');
-        Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [OptiResultBoxVolume]));
-        Memo1.Lines.Add(Format('Rotation Angles   :   Alpha: %.4f Beta: %.4f Gamma: %.4f',
-            [Alpha, Beta, Gamma]));
-        fDelta[1] := OptiResultBoxMaxCoords[1] - OptiResultBoxMinCoords[1];
-        fDelta[2] := OptiResultBoxMaxCoords[2] - OptiResultBoxMinCoords[2];
-        fDelta[3] := OptiResultBoxMaxCoords[3] - OptiResultBoxMinCoords[3];
-        SortUp(fDelta[1], fDelta[2], fDelta[3]);
-        Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
-            [fDelta[1], fDelta[2], fDelta[3]]));
-        Application.ProcessMessages;
-    end;
+    Memo1.Lines.Add('');
+    if CheckBoxRandomData.Checked then
+        Memo1.Lines.Add('Random Points')
+    else
+        Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
+    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
+    Memo1.Lines.Add('');
+    Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [OptiResultBoxVolume]));
+    fDelta[1] := OptiResultBoxMaxCoords[1] - OptiResultBoxMinCoords[1];
+    fDelta[2] := OptiResultBoxMaxCoords[2] - OptiResultBoxMinCoords[2];
+    fDelta[3] := OptiResultBoxMaxCoords[3] - OptiResultBoxMinCoords[3];
+    SortUp(fDelta[1], fDelta[2], fDelta[3]);
+    Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
+        [fDelta[1], fDelta[2], fDelta[3]]));
+    Application.ProcessMessages;
 end;
 
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
@@ -262,7 +252,10 @@ begin
         FileName := FilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
-    OptimizeVolume(0, 0, 0, GetIniParamLenght, True);
+    DownHillSimplexHandler := OptimizeVolume(0, 0, 0, GetIniParamLenght, True);
+    DownHillSimplexHandler.Destroy;
+    DownHillSimplexHandler := nil;
+
     OutputResults;
 end;
 
@@ -484,12 +477,13 @@ begin
                     fGamma := z * cSteps;
 
                     LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
-                    fTime := DoOptimizeVolume(0, 0, 0, GetIniParamLenght);
+                    fTime := 0;
+                    DownHillSimplexHandler := DoOptimizeVolume(0, 0, 0, GetIniParamLenght, fTime);
                     if not Stop then
                     begin
                         //  Computes difference in volumes calculated
                         //  for original and rotated orientation.
-                        with fDownHillSimplexHandler do
+                        with DownHillSimplexHandler do
                         begin
                             fDeltaVolume := (BoxVolume - fBoxVolume);
                             //  Computes lengths of edges of bounding box.
@@ -527,6 +521,8 @@ begin
                                 fMaxDeltaCord[3]]);
                         end;
                     end;
+                    DownHillSimplexHandler.Destroy;
+                    DownHillSimplexHandler := nil;
                     Application.ProcessMessages;
                 end;
             end;
@@ -568,10 +564,11 @@ begin
             fGamma := Random * 180;
             LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
 
-            fTime := DoOptimizeVolume(0, 0, 0, GetIniParamLenght);
+            fTime := 0;
+            DownHillSimplexHandler := DoOptimizeVolume(0, 0, 0, GetIniParamLenght, fTime);
             if not Stop then
             begin
-                with fDownHillSimplexHandler do
+                with DownHillSimplexHandler do
                 begin
                     fDeltaVolume := (BoxVolume - fBoxVolume);
                     fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
@@ -608,6 +605,8 @@ begin
                         fMaxDeltaCord[3]]);
                 end;
             end;
+            DownHillSimplexHandler.Destroy;
+            DownHillSimplexHandler := nil;
             Application.ProcessMessages;
         end;
     end;
@@ -617,8 +616,8 @@ end;
 procedure TBoundingBoxServerForm.ButtonStopClick(Sender: TObject);
 begin
     Stop := True;
-    if assigned(fDownHillSimplexHandler) then
-        fDownHillSimplexHandler.Stop;
+    if assigned(DownHillSimplexHandler) then
+        DownHillSimplexHandler.Stop;
 end;
 
 function TBoundingBoxServerForm.FindMinBoxByVolume: Double;
@@ -643,22 +642,25 @@ const cStartAngle9Runs: array[0..8] of TDoubleVector3 = (
     i: integer;
     fRuns: integer;
     fStartAngle, fBoxSize: TDoubleVector3;
-    fBoxVolume, fTime: Double;
+    fBoxVolume: Double;
+    fTime: Single;
     fResult: string;
     iMinCoords, iMaxCoords: TDoubleVector3;
 begin
     fRuns:= 3;
     if PointCloud.Count < 100000 then fRuns:= 5;
     if PointCloud.Count < 25000 then fRuns:= 9;
-
     fBoxVolume:= 1e30;
     for i:= 0 to fRuns-1 do begin
       if not Stop then begin
         if fRuns <= 5 then fStartAngle:= cStartAngle5Runs[i]
         else fStartAngle:= cStartAngle9Runs[i];
+
+        fTime := 0;
         // Optimization Run to get the minimum Volume
-        fTime := DoOptimizeVolume(fStartAngle[1], fStartAngle[2], fStartAngle[3], GetIniParamLenght);
-        with fDownHillSimplexHandler do
+        DownHillSimplexHandler := DoOptimizeVolume(
+            fStartAngle[1], fStartAngle[2], fStartAngle[3], GetIniParamLenght, fTime);
+        with DownHillSimplexHandler do
         begin
             if BoxVolume < fBoxVolume then
             begin
@@ -677,6 +679,8 @@ begin
             Memo1.Lines.Add(fResult);
             Application.ProcessMessages;
         end;
+        DownHillSimplexHandler.Destroy;
+        DownHillSimplexHandler := nil;
       end;
     end;
 

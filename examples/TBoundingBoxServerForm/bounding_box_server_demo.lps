@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="10"/>
     <BuildModes Active="Default"/>
-    <Units Count="26">
+    <Units Count="25">
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="433"/>
-        <CursorPos X="24" Y="462"/>
+        <TopLine Value="645"/>
+        <CursorPos X="20" Y="659"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -29,8 +29,8 @@
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="62"/>
-        <CursorPos X="18" Y="74"/>
+        <TopLine Value="17"/>
+        <CursorPos X="11" Y="156"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -39,41 +39,41 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="163"/>
         <CursorPos Y="179"/>
-        <UsageCount Value="43"/>
+        <UsageCount Value="38"/>
       </Unit3>
       <Unit4>
         <Filename Value="Decisions.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="203"/>
         <CursorPos Y="220"/>
-        <UsageCount Value="43"/>
+        <UsageCount Value="38"/>
       </Unit4>
       <Unit5>
         <Filename Value="SimpMath.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="916"/>
         <CursorPos Y="935"/>
-        <UsageCount Value="42"/>
+        <UsageCount Value="37"/>
       </Unit5>
       <Unit6>
         <Filename Value="Tools.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="104" Y="9"/>
-        <UsageCount Value="44"/>
+        <UsageCount Value="39"/>
       </Unit6>
       <Unit7>
         <Filename Value="Math3d.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="80" Y="45"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="18"/>
       </Unit7>
       <Unit8>
         <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
         <EditorIndex Value="3"/>
         <TopLine Value="433"/>
         <CursorPos X="57" Y="150"/>
-        <UsageCount Value="85"/>
+        <UsageCount Value="108"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
@@ -89,19 +89,19 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="5" Y="67"/>
-        <UsageCount Value="64"/>
+        <UsageCount Value="59"/>
       </Unit10>
       <Unit11>
         <Filename Value="..\..\package\Algorithm.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="59" Y="13"/>
-        <UsageCount Value="133"/>
+        <UsageCount Value="128"/>
       </Unit11>
       <Unit12>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="18"/>
-        <CursorPos X="24" Y="31"/>
+        <TopLine Value="25"/>
+        <CursorPos X="33" Y="31"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -110,7 +110,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="174"/>
         <CursorPos X="5" Y="207"/>
-        <UsageCount Value="132"/>
+        <UsageCount Value="127"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
@@ -125,7 +125,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="234"/>
         <CursorPos X="42" Y="248"/>
-        <UsageCount Value="119"/>
+        <UsageCount Value="114"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\package\Decisions.pas"/>
@@ -140,139 +140,181 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="31" Y="13"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="7"/>
       </Unit17>
       <Unit18>
         <Filename Value="C:\lazarus\lcl\include\application.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="358"/>
         <CursorPos Y="375"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="3"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\Math3d.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="117"/>
         <CursorPos X="23" Y="136"/>
-        <UsageCount Value="95"/>
+        <UsageCount Value="90"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\package\SimpMath.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="562"/>
         <CursorPos Y="562"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="3"/>
       </Unit20>
       <Unit21>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\inc\mathh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="74"/>
         <CursorPos X="29" Y="90"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="0"/>
       </Unit21>
       <Unit22>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\inc\systemh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="117"/>
         <CursorPos X="5" Y="134"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="0"/>
       </Unit22>
       <Unit23>
         <Filename Value="..\..\package\FitMinimizers.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="44" Y="12"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="17"/>
       </Unit23>
       <Unit24>
-        <Filename Value="..\..\package\MyExceptions.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="5" Y="27"/>
-        <UsageCount Value="4"/>
-      </Unit24>
-      <Unit25>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1651"/>
         <CursorPos X="17" Y="1667"/>
-        <UsageCount Value="22"/>
-      </Unit25>
+        <UsageCount Value="17"/>
+      </Unit24>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
     </OtherDefines>
-    <JumpHistory Count="18" HistoryIndex="17">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="475" Column="15" TopLine="448"/>
+        <Caret Line="57" Column="32" TopLine="32"/>
       </Position1>
       <Position2>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="476" Column="15" TopLine="448"/>
+        <Caret Line="208" Column="15" TopLine="188"/>
       </Position2>
       <Position3>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="477" Column="15" TopLine="449"/>
+        <Caret Line="528" Column="53" TopLine="505"/>
       </Position3>
       <Position4>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="481" Column="48" TopLine="454"/>
+        <Caret Line="204" Column="10" TopLine="188"/>
       </Position4>
       <Position5>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="4" Column="97"/>
+        <Caret Line="485" Column="61" TopLine="472"/>
       </Position5>
       <Position6>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="481" Column="25" TopLine="465"/>
+        <Caret Line="57" Column="27" TopLine="42"/>
       </Position6>
       <Position7>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="58" Column="36" TopLine="43"/>
+        <Caret Line="196" Column="52" TopLine="167"/>
       </Position7>
       <Position8>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="459" Column="5" TopLine="431"/>
+        <Caret Line="611" Column="45" TopLine="528"/>
       </Position8>
       <Position9>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="474" Column="37" TopLine="454"/>
+        <Caret Line="71" Column="9" TopLine="55"/>
       </Position9>
       <Position10>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="544" Column="5" TopLine="516"/>
+        <Caret Line="195" Column="49" TopLine="191"/>
       </Position10>
       <Position11>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="559" Column="37" TopLine="542"/>
+        <Caret Line="72" Column="32" TopLine="54"/>
       </Position11>
       <Position12>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="625" Column="51" TopLine="627"/>
+        <Caret Line="50" Column="33" TopLine="34"/>
       </Position12>
       <Position13>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="666" TopLine="649"/>
+        <Caret Line="72" Column="32" TopLine="45"/>
       </Position13>
       <Position14>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="646" Column="58" TopLine="624"/>
+        <Caret Line="8" Column="83"/>
       </Position14>
       <Position15>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="269" Column="67" TopLine="252"/>
+        <Caret Line="72" Column="9" TopLine="44"/>
       </Position15>
       <Position16>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="69" Column="15" TopLine="39"/>
+        <Caret Line="216" Column="71" TopLine="197"/>
       </Position16>
       <Position17>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="184" Column="44" TopLine="156"/>
+        <Caret Line="220" Column="33" TopLine="197"/>
       </Position17>
       <Position18>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="250" Column="20" TopLine="70"/>
+        <Caret Line="529" Column="51" TopLine="498"/>
       </Position18>
+      <Position19>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="570" Column="42" TopLine="556"/>
+      </Position19>
+      <Position20>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="623" Column="9" TopLine="594"/>
+      </Position20>
+      <Position21>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="692" Column="14" TopLine="668"/>
+      </Position21>
+      <Position22>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="693" Column="16" TopLine="668"/>
+      </Position22>
+      <Position23>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="48" Column="50" TopLine="35"/>
+      </Position23>
+      <Position24>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="49" Column="32" TopLine="35"/>
+      </Position24>
+      <Position25>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="227" TopLine="211"/>
+      </Position25>
+      <Position26>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="260" TopLine="231"/>
+      </Position26>
+      <Position27>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="644" Column="18" TopLine="638"/>
+      </Position27>
+      <Position28>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="491" Column="2" TopLine="465"/>
+      </Position28>
+      <Position29>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="480" Column="32" TopLine="467"/>
+      </Position29>
+      <Position30>
+        <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="567" Column="24" TopLine="551"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
