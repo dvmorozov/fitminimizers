@@ -24,8 +24,7 @@ type
     end;
 
     { TBoundingBoxServerForm }
-    { Demonstrates the simplest way of integration of algorithm into application.
-      The form directly implements IDownhillSimplexServer interface. }
+    { Demonstrates the simplest way of integration of algorithm into application. }
     TBoundingBoxServerForm = class(TForm)
         ComboBoxFiles: TComboBox;
         CheckBoxRandomData: TCheckBox;
@@ -55,7 +54,7 @@ type
     private
         FilePath: String;
 
-        // optimization results of several algo runs
+        { Optimization results of several algorithm runs. }
         OptiResultBoxMinCoords, OptiResultBoxMaxCoords: TDoubleVector3;
         OptiResultBoxVolume: Double;
 
@@ -147,7 +146,7 @@ var
     fSearchResult: TSearchRec;
     fExt: string;
 begin
-    // reads file list from the directory adjacent to the program directory
+    { Reads file list from the directory adjacent to the program directory. }
     FilePath := ExtractFilePath(ParamStr(0));
     FilePath := IncludeTrailingPathDelimiter(FilePath) + '..' + PathDelim;
     FilePath := ExpandFileName(FilePath) + 'Models' + PathDelim;
@@ -171,28 +170,28 @@ function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
-    // this suppresses useless hints in Lazarus
+    { This suppresses useless hints in Lazarus. }
     fFinalTolerance := 0.00001;
     fExitDerivate := 0.5;
 
     if not ConvertValue(Ed_FinalTolerance.Text, fFinalTolerance) then
     begin
-        fFinalTolerance := 0.00001; //default value
+        fFinalTolerance := 0.00001; // default value
     end;
     if not ConvertValue(Ed_ExitDerivate.Text, fExitDerivate) then
     begin
-        fExitDerivate := 0.5;       //default value
+        fExitDerivate := 0.5;       // default value
     end;
     Result := TDownHillSimplexHandler.Create(self,
         iAlpha, iBeta, iGamma, iDHS_InitParamLength,
         fFinalTolerance, fExitDerivate, iShowDetails);
-    //  Adds to the list for asynchronous operations.
+    { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
 
 function TBoundingBoxServerForm.GetIniParamLenght: Double;
 begin
-    // this suppresses useless hints in Lazarus
+    { This suppresses useless hints in Lazarus. }
     Result := 37;
     if not ConvertValue(Ed_IniParamLenght.Text, Result) then
     begin
@@ -203,7 +202,7 @@ end;
 procedure TBoundingBoxServerForm.FormDestroy(Sender: TObject);
 begin
     StopComputing;
-    FHandlers.Destroy;
+    FHandlers.Free;
 end;
 
 procedure TBoundingBoxServerForm.OutputResults;
@@ -243,21 +242,20 @@ begin
     end
     else
     begin
-        //  uses model data
+        { Uses model data. }
         FileName := FilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
     Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True);
     Handler.OptimizeBoundingBox;
-    //  Removes and frees inserted container.
+    { Removes and frees inserted container. }
     FHandlers.Remove(Handler);
     OutputResults;
 end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
 const
-    cCriterion01 = 0.001;
-    // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
+    cCriterion01 = 0.001; // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
     cCriterion1 = 0.01;   // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
 
 var
@@ -271,7 +269,7 @@ var
     Passed: Boolean;
 begin
     fMinVolume := 1e20;
-    //get optimized MinVolume
+    { Gets optimized MinVolume. }
     for x := 0 to Memo2.Lines.Count - 1 do
     begin
         fString := Trim(Memo2.Lines[x]);
@@ -310,7 +308,7 @@ begin
             end;
         end;
     end;
-    //get optimized Volume Pass/Fail statistics
+    { Get optimized Volume Pass/Fail statistics. }
     fPassCount01 := 0;
     fFailCount01 := 0;
     fPassCount1 := 0;
@@ -356,7 +354,7 @@ begin
                         end;
                         if not Passed or ShowPassed then
                         begin
-                            // Only "failed" tests are added to the resulting list.
+                            { Only "failed" tests are added to the resulting list. }
                             fSL.Add(Memo2.Lines[x] + ' - ' + fRateing);
                         end;
                     end;
@@ -368,7 +366,7 @@ begin
     Memo2.Text := fSL.Text;
     Memo2.Lines.EndUpdate;
 
-    // get Time to proccess
+    { Get Time to proccess. }
     fSumTime := 0;
     fSumTimeCount := 0;
     for x := 0 to Memo2.Lines.Count - 1 do
@@ -457,12 +455,12 @@ begin
     Memo2.Lines.Clear;
     Application.ProcessMessages;
 
-    // get the optimized volume and Box size
-    // load it in original orientation
+    { Loads model data in original orientation. }
     LoadObjPointCloud(FileName, 0, 0, 0);
+    { Computes optimized volume and box sizes. }
     FindMinBoxByVolume;
 
-    // do the test for brute force orientation
+    { Does the test for brute force orientation. }
     for x := 0 to (179 div cSteps) do
         for y := 0 to (179 div cSteps) do
             for z := 0 to (179 div cSteps) do
@@ -479,16 +477,16 @@ begin
                     Handler.OptimizeBoundingBox;
                     if not Stop then
                     begin
-                        //  Computes difference in volumes calculated
-                        //  for original and rotated orientation.
+                        { Computes difference in volumes calculated
+                          for original and rotated orientation. }
                         with Handler do
                         begin
                             fDeltaVolume := (BoxVolume - fBoxVolume);
-                            //  Computes lengths of edges of bounding box.
+                            { Computes lengths of edges of bounding box. }
                             fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
                             fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
                             fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                            //  Sorts edges.
+                            { Sorts edges. }
                             SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
                             fResult :=
                                 Format(
@@ -525,7 +523,7 @@ begin
                                 fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]]);
                         end;
                     end;
-                    //  Removes and frees inserted container.
+                    { Removes and frees inserted container. }
                     FHandlers.Remove(Handler);
                     Application.ProcessMessages;
                 end;
@@ -552,12 +550,12 @@ begin
     Memo2.Lines.Clear;
     Application.ProcessMessages;
 
-    // get the optimized volume and Box size
-    // load it in original orientation
+    { Loads model data in original orientation. }
     LoadObjPointCloud(FileName, 0, 0, 0);
+    { Computes optimized volume and box sizes. }
     FindMinBoxByVolume;
 
-    // do the test for random orientation
+    { Does the test for random orientation. }
     Randomize;
     for x := 0 to 99999 do
     begin
@@ -612,7 +610,7 @@ begin
                         fMaxDeltaCord[2], fMaxDeltaCord[3]]);
                 end;
             end;
-            //  Removes and frees inserted container.
+            { Removes and frees inserted container. }
             FHandlers.Remove(Handler);
             Application.ProcessMessages;
         end;
@@ -625,7 +623,7 @@ var
     i: LongInt;
 begin
     Stop := True;
-    //  Stops all containers.
+    { Stops all handlers. }
     for i := 0 to FHandlers.Count - 1 do
         TDownHillSimplexHandler(FHandlers[i]).Stop;
 end;
@@ -660,7 +658,7 @@ begin
         Memo1.Lines.Add(fResult);
         Application.ProcessMessages;
     end;
-    //  Removes and frees container.
+    { Removes and frees container. }
     FHandlers.Remove(fDownHillSimplexHandler);
 end;
 
@@ -710,26 +708,29 @@ begin
             else
                 fStartAngle := cStartAngle9Runs[i];
 
-            //  Optimization Run to get the minimum volume.
+            { Runs optimization to get the minimum volume. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False);
             Handler.HandlerOutputProcedure := @OuputFindMinBoxByVolume;
-            //  Creates runner.
+            { Creates runner. }
             Runner := TRunner.Create(nil);
+            { Assign runner procedures. }
             Runner.OnComputingProcedure := @Handler.OptimizeBoundingBox;
             Runner.OnOutputProcedure := @Handler.DisplayOutput;
+            { Adds runner to the pool. }
             Runners.Add(Runner);
+            { Starts execution. }
             Runner.Run;
         end;
     end;
-    //  Waits for threads finishing.
+    { Waits until all runners finish computing. }
     for i := 0 to Runners.Count - 1 do
     begin
         Runner := TRunner(Runners[i]);
         Runner.Wait;
     end;
-    Runners.Destroy;
+    Runners.Free;
 
     OptiResultBoxVolume := fBoxVolume;
     OptiResultBoxMaxCoords := iMaxCoords;
@@ -810,7 +811,7 @@ begin
                 S := Uppercase(S);
                 if (S[1] = 'V') and (S[2] = ' ') then
                 begin
-                    // Read Vertex Data
+                    { Reads vertex data. }
                     New(fPoint);
                     fCoord := GetCoords(S);
                     fVector[1] := fCoord.X;
@@ -832,14 +833,14 @@ end;
 procedure TBoundingBoxServerForm.GenerateRandomPointCloud;
 const
     PointCount: LongInt = 10;     //  Number of points in the cloud.
-    //  Dispersion boundaries.
+    { Dispersion boundaries. }
     MaxX: double = 0.5;
     MinX: double = -0.5;
     MaxY: double = 0.5;
     MinY: double = -0.5;
     MaxZ: double = 0.5;
     MinZ: double = -0.5;
-    //  Boundaries along (1,1,1) axis.
+    { Boundaries along (1,1,1) axis. }
     Max111: double = 10.0;
     Min111: double = -10.0;
 var
@@ -864,8 +865,8 @@ begin
     for i := 0 to PointCount - 1 do
     begin
         new(Point);
-        //  Coordinates are located mainly along (1,1,1) axis
-        //  with relatively small dispersion.
+        { Coordinates are located mainly along (1,1,1) axis
+          with relatively small dispersion. }
         Translation111 := Min111 + Random * (Max111 - Min111);
         Point^.FVector[1] := Translation111 + MinX + Random * (MaxX - MinX);
         Point^.FVector[2] := Translation111 + MinY + Random * (MaxY - MinY);

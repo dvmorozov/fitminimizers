@@ -27,12 +27,14 @@ type
     TRunningThread = class(TThread)
     { If process was terminated by means of object destruction then termination procedure is not called. }
     public
+        { Main computing procedure, it is not synchronized with VCL thread. }
         ComputingProcedure: TComputingProcedure;
+        { Procedure displaying results, it is synchronized with VCL thread. }
         OutputProcedure: TOutputProcedure;
         procedure Execute; override;
     end;
 
-    { Class-container for TRunningThread. }
+    { Visual component, container for TRunningThread. }
     TRunner = class(TComponent)
     protected
         FComputingProcedure: TComputingProcedure;
@@ -40,16 +42,20 @@ type
         RunningThread: TRunningThread;
 
     public
+        { Thread is created in suspended state. Run should be called to start execution. }
         constructor Create(AOwner: TComponent); override;
+        { Waits for finishing execution and terminates the thread. }
         destructor Destroy; override;
+        { Starts execution. }
         procedure Run;
+        { Waits for finishing execution. }
         procedure Wait;
 
     published
-        { Computation method running in separate thread. }
+        { Main computing procedure, it is not synchronized with VCL thread. }
         property OnComputingProcedure: TComputingProcedure
             read FComputingProcedure write FComputingProcedure;
-        { Method for printing results, it is synchronized with VCL thread. }
+        { Procedure displaying results, it is synchronized with VCL thread. }
         property OnOutputProcedure: TOutputProcedure
             read FOutputProcedure write FOutputProcedure;
     end;
@@ -83,6 +89,7 @@ end;
 
 destructor TRunner.Destroy;
 begin
+    Wait;
     UtilizeObject(RunningThread);
     inherited Destroy;
 end;
@@ -97,7 +104,8 @@ end;
 
 procedure TRunner.Wait;
 begin
-    RunningThread.WaitFor;
+    if not RunningThread.Finished then
+        RunningThread.WaitFor;
 end;
 {$warnings on}
 
