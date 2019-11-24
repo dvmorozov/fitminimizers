@@ -96,21 +96,21 @@ type
         property ComputationTime: Single read FComputationTime;
     end;
 
+function DegToRad(iDeg: Double): Double;
 
 implementation
 
 uses bounding_box_server_form;
 
+function DegToRad(iDeg: Double): Double;
+begin
+    Result := iDeg * PI / 180.0;
+end;
+
 function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
     var iMinCoords, iMaxCoords: T3Vector): Double;
 
     function GetRotationMatrix(iAlpha, iBeta, iGamma: Single): TMatrix;
-
-        function DegToRad(iDeg: Double): Double;
-        begin
-            Result := iDeg * PI / 180.0;
-        end;
-
     var
         fRotX, fRotY, fRotZ, fMatr: TMatrix;
     begin
