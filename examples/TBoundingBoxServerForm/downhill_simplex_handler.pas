@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
 {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls,
+    StdCtrls, Windows,
 {$ENDIF}
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
@@ -36,6 +36,8 @@ type
         { Vectors containing triplets of maximum and minimum coordinates of
           model points. They are used to compute bounding box volume. }
         gBoxMinCoords, gBoxMaxCoords: TDoubleVector3;
+        { Computation time. }
+        FComputationTime: Single;
 
         function Get_DHS_CycleCount: Integer;
         function Get_DHS_EvaluationCount: Integer;
@@ -60,6 +62,7 @@ type
         { Public declarations }
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
+        { Initializes performance counters and starts optimization. }
         procedure OptimizeBoundingBox(iAlpha, iBeta, iGamma,
             iAlgoInitialStepsAngles: Double);
         procedure SetExitParameters(iFinalTolerance, iExitDerivative: Double);
@@ -81,6 +84,7 @@ type
         //  otherwise from the best point found during last optimization cycle.
         property RecreateSimplexFromOriginal: Boolean
             read FRecreateSimplexFromOriginal write FRecreateSimplexFromOriginal;
+        property ComputationTime: Single read FComputationTime;
     end;
 
 
@@ -192,7 +196,14 @@ procedure TDownHillSimplexHandler.OptimizeBoundingBox(iAlpha, iBeta,
     iGamma, iAlgoInitialStepsAngles: Double);
 var
     fString: string;
+    fPerformanceFrequency, fStartTime, fEndTime: Int64;
 begin
+    // this supresses useless hints in Lazarus
+    fPerformanceFrequency := 0;
+    fStartTime := 0;
+    fEndTime := 0;
+    FComputationTime := 0;
+
     FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
     { Initializing algorithm - Start Parameter }
     gAlpha := iAlpha;
@@ -204,8 +215,15 @@ begin
     gOriginalGamma := iGamma;
 
     gDHS_InitParamLength := iAlgoInitialStepsAngles;
+    { Initializing performance counters. }
+    QueryPerformanceFrequency(fPerformanceFrequency);
+    QueryPerformanceCounter(fStartTime);
     { Optimizing. }
     FDownhillSimplexAlgorithm.AlgorithmRealization;
+    { Calculating computation time. }
+    QueryPerformanceCounter(fEndTime);
+    if fPerformanceFrequency <> 0 then
+        FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
 
     { Gets parameters of best solution. }
     if gShowAlgoDetails then
