@@ -94,6 +94,8 @@ constructor TRunner.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
     RunningThread := TRunningThread.Create(True);
+    if Assigned(OnCreate) then
+        OnCreate(Self);
 end;
 
 destructor TRunner.Destroy;
@@ -113,6 +115,8 @@ end;
 
 procedure TRunner.Wait;
 begin
+    if RunningThread.Suspended then
+        RunningThread.Resume;
     if not RunningThread.Finished then
         RunningThread.WaitFor;
 end;
