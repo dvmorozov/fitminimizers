@@ -18,7 +18,12 @@ unit RunningThread;
 
 interface
 
-uses Classes, Tools;
+uses Classes, Tools,
+    {$IFNDEF Lazarus}
+      DesignIntf;
+    {$ELSE}
+      PropEdits;
+    {$ENDIF}
 
 type
     TComputingProcedure = procedure of object;
@@ -67,10 +72,8 @@ implementation
 procedure Register;
 begin
     RegisterComponents('FitMinimizers', [TRunner]);
-    (*???
-    RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnRunningProcedure',TMethodProperty);
-    RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnEndRunningProcedure',TMethodProperty);
-    *)
+    RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnComputingProcedure',TMethodProperty);
+    RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutputProcedure',TMethodProperty);
 end;
 
 procedure TRunningThread.Execute;
