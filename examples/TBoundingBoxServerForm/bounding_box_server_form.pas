@@ -720,8 +720,8 @@ begin
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign runner procedures. }
-            Runner.OnComputingProcedure := @Handler.OptimizeBoundingBox;
-            Runner.OnOutputProcedure := @Handler.DisplayOutput;
+            Runner.OnCompute := @Handler.OptimizeBoundingBox;
+            Runner.OnOutput := @Handler.DisplayOutput;
             { Adds runner to the pool. }
             Runners.Add(Runner);
             { Starts execution. }
