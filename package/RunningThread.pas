@@ -28,6 +28,8 @@ uses Classes, Tools,
 type
     TComputingProcedure = procedure of object;
     TOutputProcedure = procedure of object;
+    TRunner = class;
+    TCreatingProcedure = procedure(Runner: TRunner) of object;
 
     TRunningThread = class(TThread)
     { If process was terminated by means of object destruction then termination procedure is not called. }
@@ -42,8 +44,9 @@ type
     { Visual component, container for TRunningThread. }
     TRunner = class(TComponent)
     protected
-        FComputingProcedure: TComputingProcedure;
-        FOutputProcedure: TOutputProcedure;
+        FCompute: TComputingProcedure;
+        FOutput: TOutputProcedure;
+        FCreate: TCreatingProcedure;
         RunningThread: TRunningThread;
 
     public
@@ -58,11 +61,13 @@ type
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
-        property OnComputingProcedure: TComputingProcedure
-            read FComputingProcedure write FComputingProcedure;
+        property OnCompute: TComputingProcedure
+            read FCompute write FCompute;
         { Procedure displaying results, it is synchronized with VCL thread. }
-        property OnOutputProcedure: TOutputProcedure
-            read FOutputProcedure write FOutputProcedure;
+        property OnOutput: TOutputProcedure
+            read FOutput write FOutput;
+        property OnCreate: TCreatingProcedure
+            read FCreate write FCreate;
     end;
 
 procedure Register;
@@ -72,8 +77,9 @@ implementation
 procedure Register;
 begin
     RegisterComponents('FitMinimizers', [TRunner]);
-    RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnComputingProcedure',TMethodProperty);
-    RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutputProcedure',TMethodProperty);
+    RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnCompute',TMethodProperty);
+    RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutput',TMethodProperty);
+    RegisterPropertyEditor(TypeInfo(TCreatingProcedure),TRunner,'OnCreate',TMethodProperty);
 end;
 
 procedure TRunningThread.Execute;
@@ -100,8 +106,8 @@ end;
 {$warnings off}
 procedure TRunner.Run;
 begin
-    RunningThread.ComputingProcedure := OnComputingProcedure;
-    RunningThread.OutputProcedure := OnOutputProcedure;
+    RunningThread.ComputingProcedure := OnCompute;
+    RunningThread.OutputProcedure := OnOutput;
     RunningThread.Resume;
 end;
 
