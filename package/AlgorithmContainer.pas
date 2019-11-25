@@ -53,8 +53,6 @@ type
     public
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
-        procedure Suspend; virtual;
-        procedure Resume; virtual;
 
         procedure Run; override;
     end;
@@ -74,8 +72,8 @@ constructor TRunningAlgorithmContainer.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
     Runner := TRunner.Create(nil);
-    Runner.OnRunningProcedure := Running;
-    Runner.OnEndRunningProcedure := RunningFinished;
+    Runner.OnComputingProcedure := Running;
+    Runner.OnOutputProcedure := RunningFinished;
 end;
 
 destructor TRunningAlgorithmContainer.Destroy;
@@ -87,16 +85,6 @@ end;
 procedure TRunningAlgorithmContainer.Run;
 begin
     Runner.Run;
-end;
-
-procedure TRunningAlgorithmContainer.Suspend;
-begin
-    Runner.Suspend;
-end;
-
-procedure TRunningAlgorithmContainer.Resume;
-begin
-    Runner.Resume;
 end;
 
 procedure TAlgorithmContainer.Run;
