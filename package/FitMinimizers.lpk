@@ -64,6 +64,7 @@
       </Item11>
       <Item12>
         <Filename Value="RunningThread.pas"/>
+        <HasRegisterProc Value="True"/>
         <UnitName Value="RunningThread"/>
       </Item12>
       <Item13>
