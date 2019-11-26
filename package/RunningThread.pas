@@ -120,9 +120,9 @@ end;
 
 procedure TRunner.Wait;
 begin
-    if RunningThread.Suspended then
-        RunningThread.Resume;
-    RunningThread.WaitFor;
+    if FRunningThread.Suspended then
+        FRunningThread.Resume;
+    FRunningThread.WaitFor;
 end;
 {$warnings on}
 
