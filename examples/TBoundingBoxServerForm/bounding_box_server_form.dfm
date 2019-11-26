@@ -174,4 +174,11 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 10
     Text = '0.5'
   end
+  object RunnerMinimumOutputBox: TRunner
+    OnCompute = RunnerMinimumBoundingBoxCompute
+    OnOutput = RunnerMinimumBoundingBoxOutput
+    OnCreate = RunnerMinimumBoundingBoxCreate
+    left = 624
+    top = 96
+  end
 end

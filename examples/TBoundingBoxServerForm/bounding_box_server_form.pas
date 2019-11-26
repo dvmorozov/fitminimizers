@@ -43,6 +43,7 @@ type
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
+        RunnerMinimumBoundingBox: TRunner;
         procedure FormDestroy(Sender: TObject);
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
@@ -50,6 +51,9 @@ type
         procedure ButtonBruteForceClick(Sender: TObject);
         procedure ButtonStopClick(Sender: TObject);
         procedure ButtonRandomTestClick(Sender: TObject);
+        procedure RunnerMinimumBoundingBoxCompute;
+        procedure RunnerMinimumBoundingBoxCreate(Runner: TRunner);
+        procedure RunnerMinimumBoundingBoxOutput;
 
     private
         FFilePath: String;
@@ -61,6 +65,9 @@ type
         FShowAlgoDetails: Boolean;
         FShowPassed: Boolean;
         FStop: Boolean;
+        { This "handler" instance is used to demonstrate execution of algorithm
+          in separate thread by visual component TRunner attached to the form. }
+        HandlerMinimumBoundingBox: TDownHillSimplexHandler;
         { Keeps all instances of "handler" class for asynchronous operations. }
         FHandlers: TComponentList;
         { Best values obtained for a few optimization runs. }
@@ -85,7 +92,8 @@ type
         procedure GenerateRandomPointCloud;
 
     public
-        { Public declarations }
+        { Creates FHanlders before other operations. }
+        constructor Create(AOwner: TComponent); override;
     end;
 
 var
@@ -162,7 +170,14 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
+end;
+
+constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
+begin
+    { Must be created before inherited constructor which causes initializing
+      other components. }
     FHandlers := TComponentList.Create(True);
+    inherited Create(AOwner);
 end;
 
 function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
@@ -230,7 +245,6 @@ end;
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
     FileName: string;
-    Handler: TDownHillSimplexHandler;
 begin
     FShowAlgoDetails := True;
     FStop := False;
@@ -247,11 +261,8 @@ begin
         FileName := FFilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
-    Handler.OptimizeBoundingBox;
-    { Removes and frees inserted container. }
-    FHandlers.Remove(Handler);
-    OutputResults;
+    { Executes optimization algorithms in separate thread. }
+    RunnerMinimumBoundingBox.Run;
 end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
@@ -620,6 +631,24 @@ begin
         end;
     end;
     PostProcessStatistics;
+end;
+
+procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCompute;
+begin
+    HandlerMinimumBoundingBox.OptimizeBoundingBox;
+end;
+
+{$hints off}
+procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCreate(Runner: TRunner
+    );
+begin
+    HandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
+end;
+{$hints on}
+
+procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxOutput;
+begin
+    OutputResults;
 end;
 
 procedure TBoundingBoxServerForm.StopComputing;
