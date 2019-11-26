@@ -14,8 +14,6 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 }
 unit RunningThread;
 
-{$MODE Delphi}
-
 interface
 
 uses Classes, Tools;
