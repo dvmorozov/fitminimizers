@@ -14,8 +14,6 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 }
 unit DownhillSimplexContainer;
 
-{$MODE Delphi}
-
 interface
 
 uses
