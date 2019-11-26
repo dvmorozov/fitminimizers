@@ -67,7 +67,7 @@ type
         FStop: Boolean;
         { This "handler" instance is used to demonstrate execution of algorithm
           in separate thread by visual component TRunner attached to the form. }
-        HandlerMinimumBoundingBox: TDownHillSimplexHandler;
+        FHandlerMinimumBoundingBox: TDownHillSimplexHandler;
         { Keeps all instances of "handler" class for asynchronous operations. }
         FHandlers: TComponentList;
         { Best values obtained for a few optimization runs. }
@@ -170,6 +170,7 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
+    FHandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
 end;
 
 constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
@@ -635,14 +636,14 @@ end;
 
 procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCompute;
 begin
-    HandlerMinimumBoundingBox.OptimizeBoundingBox;
+    FHandlerMinimumBoundingBox.OptimizeBoundingBox;
 end;
 
 {$hints off}
 procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCreate(Runner: TRunner
     );
 begin
-    HandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
+
 end;
 {$hints on}
 
