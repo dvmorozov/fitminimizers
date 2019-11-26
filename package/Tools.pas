@@ -8,10 +8,6 @@
 ------------------------------------------------------------------------------------------------------------------------}
 unit Tools;
 
-{$IFDEF Lazarus}
-{$MODE Delphi}
-{$ENDIF}
-
 interface
 
 uses SysUtils, Classes, CBRCComponent
