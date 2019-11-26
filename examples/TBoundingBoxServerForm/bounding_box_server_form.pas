@@ -7,7 +7,7 @@ uses
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-    Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
+    Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
@@ -716,12 +716,12 @@ begin
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False, i + 1);
-            Handler.HandlerOutputProcedure := @OuputFindMinBoxByVolume;
+            Handler.HandlerOutputProcedure := OuputFindMinBoxByVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign runner procedures. }
-            Runner.OnComputingProcedure := @Handler.OptimizeBoundingBox;
-            Runner.OnOutputProcedure := @Handler.DisplayOutput;
+            Runner.OnComputingProcedure := Handler.OptimizeBoundingBox;
+            Runner.OnOutputProcedure := Handler.DisplayOutput;
             { Adds runner to the pool. }
             Runners.Add(Runner);
             { Starts execution. }
