@@ -102,8 +102,9 @@ end;
 
 procedure TRunner.Wait;
 begin
-    if not RunningThread.Finished then
-        RunningThread.WaitFor;
+    if RunningThread.Suspended then
+        RunningThread.Resume;
+    RunningThread.WaitFor;
 end;
 {$warnings on}
 
