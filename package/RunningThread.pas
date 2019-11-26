@@ -47,7 +47,7 @@ type
         FCompute: TComputingProcedure;
         FOutput: TOutputProcedure;
         FCreate: TCreatingProcedure;
-        RunningThread: TRunningThread;
+        FRunningThread: TRunningThread;
 
     public
         { Thread is created in suspended state. Run should be called to start execution. }
@@ -58,6 +58,8 @@ type
         procedure Run;
         { Waits for finishing execution. }
         procedure Wait;
+        { Calls OnCreate if assigned. }
+        procedure Loaded; override;
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
@@ -93,7 +95,12 @@ end;
 constructor TRunner.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
-    RunningThread := TRunningThread.Create(True);
+    FRunningThread := TRunningThread.Create(True);
+end;
+
+procedure TRunner.Loaded;
+begin
+    { Should be called after component construction. }
     if Assigned(OnCreate) then
         OnCreate(Self);
 end;
@@ -101,24 +108,24 @@ end;
 destructor TRunner.Destroy;
 begin
     Wait;
-    UtilizeObject(RunningThread);
+    UtilizeObject(FRunningThread);
     inherited Destroy;
 end;
 
 {$warnings off}
 procedure TRunner.Run;
 begin
-    RunningThread.ComputingProcedure := OnCompute;
-    RunningThread.OutputProcedure := OnOutput;
-    RunningThread.Resume;
+    FRunningThread.ComputingProcedure := OnCompute;
+    FRunningThread.OutputProcedure := OnOutput;
+    FRunningThread.Resume;
 end;
 
 procedure TRunner.Wait;
 begin
-    if RunningThread.Suspended then
-        RunningThread.Resume;
-    if not RunningThread.Finished then
-        RunningThread.WaitFor;
+    if FRunningThread.Suspended then
+        FRunningThread.Resume;
+    if not FRunningThread.Finished then
+        FRunningThread.WaitFor;
 end;
 {$warnings on}
 
