@@ -8,10 +8,6 @@
 ------------------------------------------------------------------------------------------------------------------------}
 unit Decisions;
 
-{$IFDEF Lazarus}
-{$MODE Delphi}
-{$ENDIF}
-
 interface
 
 uses SysUtils, Classes, SelfCheckedComponentList;
