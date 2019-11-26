@@ -15,8 +15,6 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 
 unit AlgorithmContainer;
 
-{$MODE Delphi}
-
 interface
 
 uses

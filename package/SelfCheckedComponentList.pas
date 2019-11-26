@@ -8,10 +8,6 @@
 ------------------------------------------------------------------------------------------------------------------------}
 unit SelfCheckedComponentList;
 
-{$IFDEF Lazarus}
-{$MODE Delphi}
-{$ENDIF}
-
 interface
 
 uses

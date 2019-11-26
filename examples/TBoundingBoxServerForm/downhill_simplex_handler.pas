@@ -255,7 +255,7 @@ end;
 
 procedure TDownHillSimplexHandler.DisplayOutput;
 begin
-    if FHandlerOutputProcedure <> nil then
+    if Assigned(FHandlerOutputProcedure) then
         FHandlerOutputProcedure(Self);
 end;
 

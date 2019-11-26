@@ -14,8 +14,6 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 }
 unit RunningThread;
 
-{$MODE Delphi}
-
 interface
 
 uses Classes, Tools,
@@ -122,10 +120,9 @@ end;
 
 procedure TRunner.Wait;
 begin
-    if FRunningThread.Suspended then
-        FRunningThread.Resume;
-    if not FRunningThread.Finished then
-        FRunningThread.WaitFor;
+    if RunningThread.Suspended then
+        RunningThread.Resume;
+    RunningThread.WaitFor;
 end;
 {$warnings on}
 
