@@ -73,8 +73,9 @@ type
         procedure StopComputing;
         { Computes minimum box volume starting from a few initial points. }
         procedure FindMinBoxByVolume;
-        { Displays computation results and removes container. Should be
-          member of form because works with form controls. }
+        { Displays computation results and removes container.
+          Should be member of form because works with form controls.
+          Removes handler from FHandlers list. }
         procedure OuputFindMinBoxByVolume(fDownHillSimplexHandler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(iAlpha, iBeta, iGamma: Double;
@@ -712,10 +713,12 @@ begin
             else
                 fStartAngle := cStartAngle9Runs[i];
 
-            { Runs optimization to get the minimum volume. }
+            { Runs optimization to get the minimum volume.
+              CreateHandler adds hanlder to FHandlers list. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False, i + 1);
+            { OuputFindMinBoxByVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := OuputFindMinBoxByVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
