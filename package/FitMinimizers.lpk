@@ -8,11 +8,16 @@
       <PathDelim Value="\"/>
       <SearchPaths>
         <Libraries Value="lib\i386-win32\"/>
-        <OtherUnitFiles Value=".\"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <DelphiCompat Value="True"/>
+        </SyntaxOptions>
+      </Parsing>
       <Other>
-        <CustomOptions Value="-dLazarus"/>
+        <CustomOptions Value="-dLazarus
+"/>
         <CompilerPath Value="$(CompPath)"/>
       </Other>
     </CompilerOptions>
@@ -70,13 +75,13 @@
     <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="FCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item1>
       <Item2>
         <PackageName Value="LCL"/>
       </Item2>
       <Item3>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="FCL"/>
       </Item3>
     </RequiredPkgs>
     <UsageOptions>

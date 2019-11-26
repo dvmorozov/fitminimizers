@@ -14,10 +14,6 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 }
 unit CombEnumerator;
 
-{$IFDEF Lazarus}
-{$MODE Delphi}
-{$ENDIF}
-
 interface
 
 uses SysUtils;
