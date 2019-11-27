@@ -48,8 +48,6 @@ type
         FRunningThread: TRunningThread;
 
     public
-        { Thread is created in suspended state. Run should be called to start execution. }
-        constructor Create(AOwner: TComponent); override;
         { Waits for finishing execution and terminates the thread. }
         destructor Destroy; override;
         { Starts execution. }
@@ -90,12 +88,6 @@ begin
         Synchronize(OutputProcedure);
 end;
 
-constructor TRunner.Create(AOwner: TComponent);
-begin
-    inherited Create(AOwner);
-    FRunningThread := TRunningThread.Create(True);
-end;
-
 procedure TRunner.Loaded;
 begin
     { Should be called after component construction. }
@@ -106,13 +98,15 @@ end;
 destructor TRunner.Destroy;
 begin
     Wait;
-    UtilizeObject(FRunningThread);
     inherited Destroy;
 end;
 
 {$warnings off}
 procedure TRunner.Run;
 begin
+    Wait;
+    { Thread is created in suspended state. }
+    FRunningThread := TRunningThread.Create(True);
     FRunningThread.ComputingProcedure := OnCompute;
     FRunningThread.OutputProcedure := OnOutput;
     FRunningThread.Resume;
@@ -120,9 +114,14 @@ end;
 
 procedure TRunner.Wait;
 begin
-    if FRunningThread.Suspended then
-        FRunningThread.Resume;
-    FRunningThread.WaitFor;
+    if Assigned(FRunningThread) then
+    begin
+        if FRunningThread.Suspended then
+            FRunningThread.Resume;
+        FRunningThread.WaitFor;
+        UtilizeObject(FRunningThread);
+        FRunningThread := nil;
+    end;
 end;
 {$warnings on}
 

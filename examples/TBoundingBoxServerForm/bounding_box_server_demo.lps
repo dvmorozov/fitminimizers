@@ -19,9 +19,8 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="225"/>
-        <CursorPos X="5" Y="244"/>
+        <TopLine Value="232"/>
+        <CursorPos X="35" Y="239"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -110,9 +109,10 @@
       </Unit11>
       <Unit12>
         <Filename Value="..\..\package\RunningThread.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="86"/>
-        <CursorPos Y="119"/>
+        <TopLine Value="95"/>
+        <CursorPos Y="115"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
