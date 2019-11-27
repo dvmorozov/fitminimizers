@@ -11,8 +11,6 @@ Classical implementation of downhill simplex algorithm.
 ## TDownhillSimplexSAAlgorithm
 Downhill simplex algorithm with simulated annealing.
 
-{% include google_ads.html %}
-
 ## Class diagram
 ![Class diagram](assets/classes.png)
 
@@ -30,3 +28,5 @@ and for latest version of Lazarus (from branch [master](https://github.com/dvmor
 *Notes for Lazarus 0.9.24 build*
 
 If you see message like that *C:\lazarus-0.9.24\fpc\2.2.0\bin\i386-win32\windres.exe: can't open file 'TForm1': No such file or directory* make sure that *{$R *.dfm}* are excluded by compiler condition.
+
+{% include counter.html %}
