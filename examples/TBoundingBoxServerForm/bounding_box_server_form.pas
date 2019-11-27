@@ -43,6 +43,7 @@ type
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
+        { An example of using component for optimizing by separate thread. }
         RunnerMinimumBoundingBox: TRunner;
         procedure FormDestroy(Sender: TObject);
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
@@ -171,7 +172,6 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
-    FHandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
 end;
 
 constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
@@ -637,6 +637,8 @@ end;
 
 procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCompute;
 begin
+    { Executes optimization method in separated thread. This method
+      should not modify any data except members of container instance. }
     FHandlerMinimumBoundingBox.OptimizeBoundingBox;
 end;
 
@@ -644,12 +646,15 @@ end;
 procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCreate(Runner: TRunner
     );
 begin
-
+    { Creates optimization container, which will be executed by separated thread. }
+    FHandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
 end;
 {$hints on}
 
 procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxOutput;
 begin
+    { Displays optimization results, this method is synchronized with
+      main VCL thread. This method can modify any data of the form. }
     OutputResults;
 end;
 
