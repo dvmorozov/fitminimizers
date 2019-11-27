@@ -43,6 +43,8 @@ type
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
+        { An instance of component used for optimization in separate thread. }
+        RunnerMinimumBoundingBox: TRunner;
         procedure FormDestroy(Sender: TObject);
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
@@ -50,27 +52,32 @@ type
         procedure ButtonBruteForceClick(Sender: TObject);
         procedure ButtonStopClick(Sender: TObject);
         procedure ButtonRandomTestClick(Sender: TObject);
+        procedure RunnerMinimumBoundingBoxCompute;
+        procedure RunnerMinimumBoundingBoxCreate(Runner: TRunner);
+        procedure RunnerMinimumBoundingBoxOutput;
 
     private
         FFilePath: String;
 
-        { Optimization results of several algorithm runs. }
-        FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
-        FOptiResultBoxVolume: Double;
-
         FShowAlgoDetails: Boolean;
         FShowPassed: Boolean;
         FStop: Boolean;
+        { This "handler" instance is used to demonstrate execution of algorithm
+          in separate thread by visual component TRunner attached to the form. }
+        FHandlerMinimumBoundingBox: TDownHillSimplexHandler;
         { Keeps all instances of "handler" class for asynchronous operations. }
         FHandlers: TComponentList;
         { Best values obtained for a few optimization runs. }
         FBoxVolume: Double;
         FMinCoords, FMaxCoords: TDoubleVector3;
+        { Optimization results of several algorithm runs. }
+        FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
+        FOptiResultBoxVolume: Double;
 
         function GetIniParamLenght: Double;
+        procedure StopComputing;
         { Prints final results among a few runs. }
         procedure OutputResults;
-        procedure StopComputing;
         { Computes minimum box volume starting from a few initial points. }
         procedure FindMinBoxByVolume;
         { Displays computation results and removes container.
@@ -86,7 +93,8 @@ type
         procedure GenerateRandomPointCloud;
 
     public
-        { Public declarations }
+        { Creates FHanlders before other operations. }
+        constructor Create(AOwner: TComponent); override;
     end;
 
 var
@@ -163,7 +171,14 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
+end;
+
+constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
+begin
+    { Must be created before inherited constructor which causes initializing
+      other components. Keeps ownership and destroys all collection items. }
     FHandlers := TComponentList.Create(True);
+    inherited Create(AOwner);
 end;
 
 function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
@@ -207,31 +222,9 @@ begin
     FHandlers.Free;
 end;
 
-procedure TBoundingBoxServerForm.OutputResults;
-var
-    fDelta: TDoubleVector3;
-begin
-    Memo1.Lines.Add('');
-    if CheckBoxRandomData.Checked then
-        Memo1.Lines.Add('Random Points')
-    else
-        Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
-    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
-    Memo1.Lines.Add('');
-    Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [FOptiResultBoxVolume]));
-    fDelta[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
-    fDelta[2] := FOptiResultBoxMaxCoords[2] - FOptiResultBoxMinCoords[2];
-    fDelta[3] := FOptiResultBoxMaxCoords[3] - FOptiResultBoxMinCoords[3];
-    SortUp(fDelta[1], fDelta[2], fDelta[3]);
-    Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
-        [fDelta[1], fDelta[2], fDelta[3]]));
-    Application.ProcessMessages;
-end;
-
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
     FileName: string;
-    Handler: TDownHillSimplexHandler;
 begin
     FShowAlgoDetails := True;
     FStop := False;
@@ -248,11 +241,8 @@ begin
         FileName := FFilePath + ComboBoxFiles.Text;
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
-    Handler.OptimizeBoundingBox;
-    { Removes and frees inserted container. }
-    FHandlers.Remove(Handler);
-    OutputResults;
+    { Executes optimization algorithms in separate thread. }
+    RunnerMinimumBoundingBox.Run;
 end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
@@ -623,6 +613,33 @@ begin
     PostProcessStatistics;
 end;
 
+procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCompute;
+begin
+    { Executes optimization method in separated thread. This method
+      should not modify any data except members of container instance. }
+    FHandlerMinimumBoundingBox.OptimizeBoundingBox;
+end;
+
+{$hints off}
+procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxCreate(Runner: TRunner
+    );
+begin
+    { Creates optimization container, which will be executed by separated thread. }
+    FHandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
+end;
+{$hints on}
+
+procedure TBoundingBoxServerForm.RunnerMinimumBoundingBoxOutput;
+begin
+    { Displays optimization results, this method is synchronized with
+      main VCL thread. This method can modify any data of the form.
+      Should not remove handler to allow subsequent runs. }
+    FOptiResultBoxVolume := FHandlerMinimumBoundingBox.BoxVolume;
+    FOptiResultBoxMaxCoords := FHandlerMinimumBoundingBox.BoxMaxCoords;
+    FOptiResultBoxMinCoords := FHandlerMinimumBoundingBox.BoxMinCoords;
+    OutputResults;
+end;
+
 procedure TBoundingBoxServerForm.StopComputing;
 var
     i: LongInt;
@@ -665,6 +682,27 @@ begin
     end;
     { Removes and frees container. }
     FHandlers.Remove(fDownHillSimplexHandler);
+end;
+
+procedure TBoundingBoxServerForm.OutputResults;
+var
+    fDelta: TDoubleVector3;
+begin
+    Memo1.Lines.Add('');
+    if CheckBoxRandomData.Checked then
+        Memo1.Lines.Add('Random Points')
+    else
+        Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
+    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
+    Memo1.Lines.Add('');
+    Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [FOptiResultBoxVolume]));
+    fDelta[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
+    fDelta[2] := FOptiResultBoxMaxCoords[2] - FOptiResultBoxMinCoords[2];
+    fDelta[3] := FOptiResultBoxMaxCoords[3] - FOptiResultBoxMinCoords[3];
+    SortUp(fDelta[1], fDelta[2], fDelta[3]);
+    Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
+        [fDelta[1], fDelta[2], fDelta[3]]));
+    Application.ProcessMessages;
 end;
 
 procedure TBoundingBoxServerForm.FindMinBoxByVolume;
@@ -723,8 +761,8 @@ begin
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign runner procedures. }
-            Runner.OnComputingProcedure := Handler.OptimizeBoundingBox;
-            Runner.OnOutputProcedure := Handler.DisplayOutput;
+            Runner.OnCompute := Handler.OptimizeBoundingBox;
+            Runner.OnOutput := Handler.DisplayOutput;
             { Adds runner to the pool. }
             Runners.Add(Runner);
             { Starts execution. }
