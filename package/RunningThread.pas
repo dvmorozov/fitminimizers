@@ -16,11 +16,18 @@ unit RunningThread;
 
 interface
 
-uses Classes, Tools;
+uses Classes, Tools,
+    {$IFNDEF Lazarus}
+      DesignIntf;
+    {$ELSE}
+      PropEdits;
+    {$ENDIF}
 
 type
     TComputingProcedure = procedure of object;
     TOutputProcedure = procedure of object;
+    TRunner = class;
+    TCreatingProcedure = procedure(Runner: TRunner) of object;
 
     TRunningThread = class(TThread)
     { If process was terminated by means of object destruction then termination procedure is not called. }
@@ -35,27 +42,30 @@ type
     { Visual component, container for TRunningThread. }
     TRunner = class(TComponent)
     protected
-        FComputingProcedure: TComputingProcedure;
-        FOutputProcedure: TOutputProcedure;
-        RunningThread: TRunningThread;
+        FCompute: TComputingProcedure;
+        FOutput: TOutputProcedure;
+        FCreate: TCreatingProcedure;
+        FRunningThread: TRunningThread;
 
     public
-        { Thread is created in suspended state. Run should be called to start execution. }
-        constructor Create(AOwner: TComponent); override;
         { Waits for finishing execution and terminates the thread. }
         destructor Destroy; override;
         { Starts execution. }
         procedure Run;
         { Waits for finishing execution. }
         procedure Wait;
+        { Calls OnCreate if assigned. }
+        procedure Loaded; override;
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
-        property OnComputingProcedure: TComputingProcedure
-            read FComputingProcedure write FComputingProcedure;
+        property OnCompute: TComputingProcedure
+            read FCompute write FCompute;
         { Procedure displaying results, it is synchronized with VCL thread. }
-        property OnOutputProcedure: TOutputProcedure
-            read FOutputProcedure write FOutputProcedure;
+        property OnOutput: TOutputProcedure
+            read FOutput write FOutput;
+        property OnCreate: TCreatingProcedure
+            read FCreate write FCreate;
     end;
 
 procedure Register;
@@ -65,10 +75,9 @@ implementation
 procedure Register;
 begin
     RegisterComponents('FitMinimizers', [TRunner]);
-    (*???
-    RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnRunningProcedure',TMethodProperty);
-    RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnEndRunningProcedure',TMethodProperty);
-    *)
+    RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnCompute',TMethodProperty);
+    RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutput',TMethodProperty);
+    RegisterPropertyEditor(TypeInfo(TCreatingProcedure),TRunner,'OnCreate',TMethodProperty);
 end;
 
 procedure TRunningThread.Execute;
@@ -79,32 +88,40 @@ begin
         Synchronize(OutputProcedure);
 end;
 
-constructor TRunner.Create(AOwner: TComponent);
+procedure TRunner.Loaded;
 begin
-    inherited Create(AOwner);
-    RunningThread := TRunningThread.Create(True);
+    { Should be called after component construction. }
+    if Assigned(OnCreate) then
+        OnCreate(Self);
 end;
 
 destructor TRunner.Destroy;
 begin
     Wait;
-    UtilizeObject(RunningThread);
     inherited Destroy;
 end;
 
 {$warnings off}
 procedure TRunner.Run;
 begin
-    RunningThread.ComputingProcedure := OnComputingProcedure;
-    RunningThread.OutputProcedure := OnOutputProcedure;
-    RunningThread.Resume;
+    Wait;
+    { Thread is created in suspended state. }
+    FRunningThread := TRunningThread.Create(True);
+    FRunningThread.ComputingProcedure := OnCompute;
+    FRunningThread.OutputProcedure := OnOutput;
+    FRunningThread.Resume;
 end;
 
 procedure TRunner.Wait;
 begin
-    if RunningThread.Suspended then
-        RunningThread.Resume;
-    RunningThread.WaitFor;
+    if Assigned(FRunningThread) then
+    begin
+        if FRunningThread.Suspended then
+            FRunningThread.Resume;
+        FRunningThread.WaitFor;
+        UtilizeObject(FRunningThread);
+        FRunningThread := nil;
+    end;
 end;
 {$warnings on}
 
