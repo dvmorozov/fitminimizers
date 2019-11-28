@@ -1,10 +1,10 @@
-object BoundingBoxServerForm: TBoundingBoxServerForm
+object BoundingBoxComponentForm: TBoundingBoxComponentForm
   Left = 355
   Height = 590
   Top = 171
   Width = 1098
   BorderStyle = bsSingle
-  Caption = 'TBoundingBoxServerForm Demo'
+  Caption = 'Component Demo'
   ClientHeight = 590
   ClientWidth = 1098
   Color = clBtnFace
@@ -173,5 +173,12 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Width = 121
     TabOrder = 10
     Text = '0.5'
+  end
+  object RunnerMinimumBoundingBox: TRunner
+    OnCompute = RunnerMinimumBoundingBoxCompute
+    OnOutput = RunnerMinimumBoundingBoxOutput
+    OnCreate = RunnerMinimumBoundingBoxCreate
+    left = 624
+    top = 88
   end
 end

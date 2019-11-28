@@ -1,4 +1,4 @@
-unit bounding_box_server_form;
+unit bounding_box_component_form;
 
 interface
 
@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls, StrUtils, Windows,
+    StdCtrls, StrUtils,
   {$ENDIF}
     Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
@@ -23,9 +23,9 @@ type
         FVector: TDoubleVector3;
     end;
 
-    { TBoundingBoxServerForm }
+    { TBoundingBoxComponentForm }
     { Demonstrates the simplest way of integration of algorithm into application. }
-    TBoundingBoxServerForm = class(TForm)
+    TBoundingBoxComponentForm = class(TForm)
         ComboBoxFiles: TComboBox;
         CheckBoxRandomData: TCheckBox;
         Label1: TLabel;
@@ -43,6 +43,8 @@ type
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
+        { An instance of component used for optimization in separate thread. }
+        RunnerMinimumBoundingBox: TRunner;
         procedure FormDestroy(Sender: TObject);
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
@@ -50,6 +52,9 @@ type
         procedure ButtonBruteForceClick(Sender: TObject);
         procedure ButtonStopClick(Sender: TObject);
         procedure ButtonRandomTestClick(Sender: TObject);
+        procedure RunnerMinimumBoundingBoxCompute;
+        procedure RunnerMinimumBoundingBoxCreate(Runner: TRunner);
+        procedure RunnerMinimumBoundingBoxOutput;
 
     private
         FFilePath: String;
@@ -57,6 +62,9 @@ type
         FShowAlgoDetails: Boolean;
         FShowPassed: Boolean;
         FStop: Boolean;
+        { This "handler" instance is used to demonstrate execution of algorithm
+          in separate thread by visual component TRunner attached to the form. }
+        FHandlerMinimumBoundingBox: TDownHillSimplexHandler;
         { Keeps all instances of "handler" class for asynchronous operations. }
         FHandlers: TComponentList;
         { Best values obtained for a few optimization runs. }
@@ -71,15 +79,11 @@ type
         { Prints final results among a few runs. }
         procedure OutputResults;
         { Computes minimum box volume starting from a few initial points. }
-        procedure FindGlobalMinVolume;
+        procedure FindMinBoxByVolume;
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure OuputGlobalMinVolume(Handler: TDownHillSimplexHandler);
-        { Displays computation results of single run.
-          Should be member of form because works with form controls.
-          Removes handler from FHandlers list. }
-        procedure OuputMinVolume(Handler: TDownHillSimplexHandler);
+        procedure OuputFindMinBoxByVolume(fDownHillSimplexHandler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(iAlpha, iBeta, iGamma: Double;
             iDHS_InitParamLength: Double;
@@ -94,7 +98,7 @@ type
     end;
 
 var
-    BoundingBoxServerForm: TBoundingBoxServerForm;
+    BoundingBoxComponentForm: TBoundingBoxComponentForm;
     { Data can be accessed from different threads.
       That's ok until data aren't changed. }
     PointCloud: TList;
@@ -144,9 +148,9 @@ begin
     end;
 end;
 
-{ TBoundingBoxServerForm }
+{ TBoundingBoxComponentForm }
 
-procedure TBoundingBoxServerForm.FormCreate(Sender: TObject);
+procedure TBoundingBoxComponentForm.FormCreate(Sender: TObject);
 var
     fSearchResult: TSearchRec;
     fExt: string;
@@ -169,7 +173,7 @@ begin
     ComboBoxFiles.ItemIndex := 0;
 end;
 
-constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
+constructor TBoundingBoxComponentForm.Create(AOwner: TComponent);
 begin
     { Must be created before inherited constructor which causes initializing
       other components. Keeps ownership and destroys all collection items. }
@@ -177,7 +181,7 @@ begin
     inherited Create(AOwner);
 end;
 
-function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
+function TBoundingBoxComponentForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
     iDHS_InitParamLength: Double; iShowDetails: Boolean;
     RunId: Integer): TDownHillSimplexHandler;
 var
@@ -202,7 +206,7 @@ begin
     FHandlers.Add(Result);
 end;
 
-function TBoundingBoxServerForm.GetIniParamLenght: Double;
+function TBoundingBoxComponentForm.GetIniParamLenght: Double;
 begin
     { This suppresses useless hints in Lazarus. }
     Result := 37;
@@ -212,29 +216,15 @@ begin
     end;
 end;
 
-procedure TBoundingBoxServerForm.FormDestroy(Sender: TObject);
+procedure TBoundingBoxComponentForm.FormDestroy(Sender: TObject);
 begin
     StopComputing;
     FHandlers.Free;
 end;
 
-procedure TBoundingBoxServerForm.OuputMinVolume(Handler: TDownHillSimplexHandler);
-begin
-    FOptiResultBoxVolume := Handler.BoxVolume;
-    FOptiResultBoxMaxCoords := Handler.BoxMaxCoords;
-    FOptiResultBoxMinCoords := Handler.BoxMinCoords;
-    OutputResults;
-    { Removes and frees container. }
-    FHandlers.Remove(Handler);
-end;
-
-procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
+procedure TBoundingBoxComponentForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
     FileName: string;
-    Runner: TRunner;
-    { This "handler" instance is used to demonstrate execution of algorithm
-      in separate thread by visual component TRunner attached to the form. }
-    Handler: TDownHillSimplexHandler;
 begin
     FShowAlgoDetails := True;
     FStop := False;
@@ -252,27 +242,10 @@ begin
         LoadObjPointCloud(FileName, 0, 45, 45);
     end;
     { Executes optimization algorithms in separate thread. }
-    Runner := TRunner.Create(nil);
-
-    { Creates optimization container, which will be executed by separated thread. }
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
-
-    { OuputMinVolume removes hanlder from FHandlers list. }
-    Handler.HandlerOutputProcedure := OuputMinVolume;
-
-    { Assign runner procedures. }
-    { Executes optimization method in separated thread. This method
-      should not modify any data except members of container instance. }
-    Runner.OnCompute := Handler.OptimizeBoundingBox;
-    { Displays optimization results, this method is synchronized with
-      main VCL thread. This method can modify any data of the form.
-      Should not remove handler to allow subsequent runs. }
-    Runner.OnOutput := Handler.DisplayOutput;
-
-    Runner.Run;
+    RunnerMinimumBoundingBox.Run;
 end;
 
-procedure TBoundingBoxServerForm.PostProcessStatistics;
+procedure TBoundingBoxComponentForm.PostProcessStatistics;
 const
     cCriterion01 = 0.001; // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
     cCriterion1 = 0.01;   // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
@@ -452,7 +425,7 @@ begin
     end;
 end;
 
-procedure TBoundingBoxServerForm.ButtonBruteForceClick(Sender: TObject);
+procedure TBoundingBoxComponentForm.ButtonBruteForceClick(Sender: TObject);
 const
     cSteps = 2;
 var
@@ -478,7 +451,7 @@ begin
     { Loads model data in original orientation. }
     LoadObjPointCloud(FileName, 0, 0, 0);
     { Computes optimized volume and box sizes. }
-    FindGlobalMinVolume;
+    FindMinBoxByVolume;
 
     RunId := 1;
     { Does the test for brute force orientation. }
@@ -553,7 +526,7 @@ begin
     PostProcessStatistics;
 end;
 
-procedure TBoundingBoxServerForm.ButtonRandomTestClick(Sender: TObject);
+procedure TBoundingBoxComponentForm.ButtonRandomTestClick(Sender: TObject);
 var
     x: Integer;
     FileName, fResult: string;
@@ -575,7 +548,7 @@ begin
     { Loads model data in original orientation. }
     LoadObjPointCloud(FileName, 0, 0, 0);
     { Computes optimized volume and box sizes. }
-    FindGlobalMinVolume;
+    FindMinBoxByVolume;
 
     { Does the test for random orientation. }
     Randomize;
@@ -640,7 +613,34 @@ begin
     PostProcessStatistics;
 end;
 
-procedure TBoundingBoxServerForm.StopComputing;
+procedure TBoundingBoxComponentForm.RunnerMinimumBoundingBoxCompute;
+begin
+    { Executes optimization method in separated thread. This method
+      should not modify any data except members of container instance. }
+    FHandlerMinimumBoundingBox.OptimizeBoundingBox;
+end;
+
+{$hints off}
+procedure TBoundingBoxComponentForm.RunnerMinimumBoundingBoxCreate(Runner: TRunner
+    );
+begin
+    { Creates optimization container, which will be executed by separated thread. }
+    FHandlerMinimumBoundingBox := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
+end;
+{$hints on}
+
+procedure TBoundingBoxComponentForm.RunnerMinimumBoundingBoxOutput;
+begin
+    { Displays optimization results, this method is synchronized with
+      main VCL thread. This method can modify any data of the form.
+      Should not remove handler to allow subsequent runs. }
+    FOptiResultBoxVolume := FHandlerMinimumBoundingBox.BoxVolume;
+    FOptiResultBoxMaxCoords := FHandlerMinimumBoundingBox.BoxMaxCoords;
+    FOptiResultBoxMinCoords := FHandlerMinimumBoundingBox.BoxMinCoords;
+    OutputResults;
+end;
+
+procedure TBoundingBoxComponentForm.StopComputing;
 var
     i: LongInt;
 begin
@@ -650,17 +650,17 @@ begin
         TDownHillSimplexHandler(FHandlers[i]).Stop;
 end;
 
-procedure TBoundingBoxServerForm.ButtonStopClick(Sender: TObject);
+procedure TBoundingBoxComponentForm.ButtonStopClick(Sender: TObject);
 begin
     StopComputing;
 end;
 
-procedure TBoundingBoxServerForm.OuputGlobalMinVolume(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxComponentForm.OuputFindMinBoxByVolume(fDownHillSimplexHandler: TDownHillSimplexHandler);
 var
     fResult: string;
     fBoxSize: TDoubleVector3;
 begin
-    with Handler do
+    with fDownHillSimplexHandler do
     begin
         if BoxVolume < FBoxVolume then
         begin
@@ -681,10 +681,10 @@ begin
         Application.ProcessMessages;
     end;
     { Removes and frees container. }
-    FHandlers.Remove(Handler);
+    FHandlers.Remove(fDownHillSimplexHandler);
 end;
 
-procedure TBoundingBoxServerForm.OutputResults;
+procedure TBoundingBoxComponentForm.OutputResults;
 var
     fDelta: TDoubleVector3;
 begin
@@ -705,7 +705,7 @@ begin
     Application.ProcessMessages;
 end;
 
-procedure TBoundingBoxServerForm.FindGlobalMinVolume;
+procedure TBoundingBoxComponentForm.FindMinBoxByVolume;
 const
     cStartAngle5Runs: array[0..4] of TDoubleVector3 = (
         (0, 0, 0),
@@ -733,8 +733,6 @@ var
     Handler: TDownHillSimplexHandler;
     Runners: TComponentList;
     Runner: TRunner;
-    fPerformanceFrequency, fStartTime, fEndTime: Int64;
-    FComputationTime: single;
 begin
     fRuns := 3;
     if PointCloud.Count < 100000 then
@@ -743,12 +741,6 @@ begin
         fRuns := 9;
     FBoxVolume := 1e30;
 
-    { Initializing performance counters. }
-    fPerformanceFrequency := 0;
-    fStartTime := 0;
-    fEndTime := 0;
-    QueryPerformanceFrequency(fPerformanceFrequency);
-    QueryPerformanceCounter(fStartTime);
     Runners := TComponentList.Create(True);
     for i := 0 to fRuns - 1 do
     begin
@@ -764,8 +756,8 @@ begin
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False, i + 1);
-            { OuputGlobalMinVolume removes hanlder from FHandlers list. }
-            Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
+            { OuputFindMinBoxByVolume removes hanlder from FHandlers list. }
+            Handler.HandlerOutputProcedure := OuputFindMinBoxByVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign runner procedures. }
@@ -785,18 +777,13 @@ begin
     end;
     Runners.Free;
 
-    QueryPerformanceCounter(fEndTime);
-    FComputationTime:= 0;
-    if fPerformanceFrequency <> 0 then
-      FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
     FOptiResultBoxVolume := FBoxVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
     OutputResults;
-    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
 end;
 
-procedure TBoundingBoxServerForm.LoadObjPointCloud(iFileName: string;
+procedure TBoundingBoxComponentForm.LoadObjPointCloud(iFileName: string;
     iAlpha, iBeta, iGamma: Single);
 type
     TOBJCoord = record // Stores X, Y, Z coordinates
@@ -888,7 +875,7 @@ end;
 
 {$warnings off}
 {$hints off}
-procedure TBoundingBoxServerForm.GenerateRandomPointCloud;
+procedure TBoundingBoxComponentForm.GenerateRandomPointCloud;
 const
     PointCount: LongInt = 10;     //  Number of points in the cloud.
     { Dispersion boundaries. }
