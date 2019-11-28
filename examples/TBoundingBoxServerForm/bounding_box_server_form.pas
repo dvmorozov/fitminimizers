@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls, StrUtils,
+    StdCtrls, StrUtils, Windows,
   {$ENDIF}
     Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
@@ -733,6 +733,8 @@ var
     Handler: TDownHillSimplexHandler;
     Runners: TComponentList;
     Runner: TRunner;
+    fPerformanceFrequency, fStartTime, fEndTime: Int64;
+    FComputationTime: single;
 begin
     fRuns := 3;
     if PointCloud.Count < 100000 then
@@ -741,6 +743,12 @@ begin
         fRuns := 9;
     FBoxVolume := 1e30;
 
+    { Initializing performance counters. }
+    fPerformanceFrequency := 0;
+    fStartTime := 0;
+    fEndTime := 0;
+    QueryPerformanceFrequency(fPerformanceFrequency);
+    QueryPerformanceCounter(fStartTime);
     Runners := TComponentList.Create(True);
     for i := 0 to fRuns - 1 do
     begin
@@ -777,10 +785,15 @@ begin
     end;
     Runners.Free;
 
+    QueryPerformanceCounter(fEndTime);
+    FComputationTime:= 0;
+    if fPerformanceFrequency <> 0 then
+      FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
     FOptiResultBoxVolume := FBoxVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
     OutputResults;
+    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
 end;
 
 procedure TBoundingBoxServerForm.LoadObjPointCloud(iFileName: string;
