@@ -18,7 +18,8 @@ interface
 
 uses Classes, Tools,
     {$IFNDEF Lazarus}
-      DesignIntf;
+      //TODO: set up proper module name for Delhpi build.
+      //DesignIntf;
     {$ELSE}
       PropEdits;
     {$ENDIF}
@@ -74,10 +75,12 @@ implementation
 
 procedure Register;
 begin
+{$IFDEF Lazarus}
     RegisterComponents('FitMinimizers', [TRunner]);
     RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnCompute',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutput',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TCreatingProcedure),TRunner,'OnCreate',TMethodProperty);
+{$ENDIF}
 end;
 
 procedure TRunningThread.Execute;
