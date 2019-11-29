@@ -16,6 +16,7 @@ The goal is to find 3d box of minimum volume completely enclosing given set of p
 
 See
 [Minimum bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box)
+
 [Bounding volume](https://en.wikipedia.org/wiki/Bounding_volume)
 
 Initially model data containing set of points are loaded into the program.
