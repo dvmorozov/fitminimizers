@@ -82,8 +82,8 @@ type
         procedure OuputMinVolume(Handler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(iAlpha, iBeta, iGamma: Double;
-            iDHS_InitParamLength: Double;
-            iShowDetails: Boolean; RunId: Integer): TDownHillSimplexHandler;
+            iDHS_InitParamLength: Double; iShowDetails: Boolean;
+            RunId: Integer): TDownHillSimplexHandler;
 
         procedure LoadObjPointCloud(iFileName: String; iAlpha, iBeta, iGamma: single);
         procedure GenerateRandomPointCloud;
@@ -195,9 +195,9 @@ begin
     begin
         fExitDerivate := 0.5;       // default value
     end;
-    Result := TDownHillSimplexHandler.Create(self,
-        iAlpha, iBeta, iGamma, iDHS_InitParamLength,
-        fFinalTolerance, fExitDerivate, iShowDetails, RunId);
+    Result := TDownHillSimplexHandler.Create(self, iAlpha,
+        iBeta, iGamma, iDHS_InitParamLength, fFinalTolerance,
+        fExitDerivate, iShowDetails, RunId);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
@@ -274,7 +274,8 @@ end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
 const
-    cCriterion01 = 0.001; // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
+    cCriterion01 = 0.001;
+    // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
     cCriterion1 = 0.01;   // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
 
 var
@@ -511,12 +512,7 @@ begin
                             SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
                             fResult :=
                                 Format(
-                                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                                [fDeltaVolume, BoxVolume, fDeltaCord[1],
-                                fDeltaCord[2], fDeltaCord[3], Alpha,
-                                Beta, Gamma, fAlpha, fBeta, fGamma,
-                                ComputationTime, CycleCount, EvaluationCount,
-                                RestartCount]);
+                                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d', [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, ComputationTime, CycleCount, EvaluationCount, RestartCount]);
                             if fDeltaVolume > fMaxDeltaVolume then
                             begin
                                 fMaxDeltaVolume := fDeltaVolume;
@@ -539,9 +535,10 @@ begin
                             Label2.Caption :=
                                 Format(
                                 'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                                [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
-                                fMinDeltaCord[3], fMaxDeltaVolume,
-                                fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]]);
+                                [fMinDeltaVolume, fMinDeltaCord[1],
+                                fMinDeltaCord[2], fMinDeltaCord[3],
+                                fMaxDeltaVolume, fMaxDeltaCord[1],
+                                fMaxDeltaCord[2], fMaxDeltaCord[3]]);
                         end;
                     end;
                     { Removes and frees inserted container. }
@@ -727,7 +724,7 @@ const
         (45, 45, -45)
         );
 var
-    i: integer;
+    i, j: integer;
     fRuns: integer;
     fStartAngle: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
@@ -735,6 +732,11 @@ var
     Runner: TRunner;
     fPerformanceFrequency, fStartTime, fEndTime: Int64;
     FComputationTime: single;
+    fMustContinue: Boolean;
+    fWaitResult: DWord;
+    fHandle: THandle;
+    fKeyState: Byte;
+    fMsg: TMsg;
 begin
     fRuns := 3;
     if PointCloud.Count < 100000 then
@@ -780,15 +782,45 @@ begin
     { Waits until all runners finish computing. }
     for i := 0 to Runners.Count - 1 do
     begin
-        Runner := TRunner(Runners[i]);
-        Runner.Wait;
+        fHandle := Runner.Handle;
+        fMustContinue := True;
+        while fMustContinue do
+        begin
+            { Waits for thread finishing or any input event. }
+            fWaitResult := MsgWaitForMultipleObjects(1, fHandle, False,
+                INFINITE, QS_ALLINPUT);
+            if (fWaitResult = WAIT_OBJECT_0) then
+                { Thread was finished, break the loop and wait for next. }
+                fMustContinue := False;
+            if fWaitResult = WAIT_OBJECT_0 + 1 then
+            begin
+                { Reads the ESC key's status. }
+                fKeyState := GetAsyncKeyState(27);
+                Application.ProcessMessages;
+                if (fKeyState > 0) then
+                begin
+                    { ESC was pressed. }
+                    Application.Restore;
+                    while PeekMessage(fMsg, 0, WM_KEYFIRST, WM_KEYLAST,
+                            PM_REMOVE or PM_NOYIELD) do ;
+                    GetAsyncKeyState(27);
+                    { Stops calculation of other threads. }
+                    for j := 0 to FHandlers.Count - 1 do
+                        TDownHillSimplexHandler(FHandlers[j]).Stop;
+                end;
+            end;
+            if fWaitResult = WAIT_FAILED then
+                fMustContinue := False;
+        end;
     end;
+    { It is not necessarily to free separately all runners,
+      because the list owns them and removes them itself. }
     Runners.Free;
 
     QueryPerformanceCounter(fEndTime);
-    FComputationTime:= 0;
+    FComputationTime := 0;
     if fPerformanceFrequency <> 0 then
-      FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
+        FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
     FOptiResultBoxVolume := FBoxVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
