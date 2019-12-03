@@ -783,6 +783,7 @@ begin
     { Waits until all runners finish computing. }
     for i := 0 to Runners.Count - 1 do
     begin
+        Runner:= TRunner(Runners[i]);
         fHandle := Runner.Handle;
         fMustContinue := True;
         while fMustContinue do
@@ -819,7 +820,6 @@ begin
     { It is not necessarily to free separately all runners,
       because the list owns them and removes them itself. }
     Runners.Free;
-
     Assert(FHandlers.Count = 0, 'All handlers should be freed by the output method.');
 
     QueryPerformanceCounter(fEndTime);
