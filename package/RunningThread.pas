@@ -16,11 +16,12 @@ unit RunningThread;
 
 interface
 
-uses Classes, Tools,
     {$IFNDEF Lazarus}
+uses Classes, Tools;
       //TODO: set up proper module name for Delhpi build.
       //DesignIntf;
     {$ELSE}
+uses Classes, Tools,
       PropEdits;
     {$ENDIF}
 
@@ -47,6 +48,7 @@ type
         FOutput: TOutputProcedure;
         FCreate: TCreatingProcedure;
         FRunningThread: TRunningThread;
+        function GetHandle: THandle;
 
     public
         { Waits for finishing execution and terminates the thread. }
@@ -67,6 +69,7 @@ type
             read FOutput write FOutput;
         property OnCreate: TCreatingProcedure
             read FCreate write FCreate;
+        property Handle: THandle read GetHandle;
     end;
 
 procedure Register;
@@ -126,6 +129,12 @@ begin
         FRunningThread := nil;
     end;
 end;
+
+function TRunner.GetHandle: THandle;
+begin
+  Result:= FRunningThread.Handle;
+end;
+
 {$warnings on}
 
 end.
