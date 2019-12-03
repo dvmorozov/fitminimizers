@@ -770,8 +770,9 @@ begin
             Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
-            { Assign runner procedures. }
+            { Assign computing method. }
             Runner.OnCompute := Handler.OptimizeBoundingBox;
+            { Assign output method. It is synchronized with main VCL thread. }
             Runner.OnOutput := Handler.DisplayOutput;
             { Adds runner to the pool. }
             Runners.Add(Runner);
@@ -801,8 +802,10 @@ begin
                 begin
                     { ESC was pressed. }
                     Application.Restore;
+{$hints off}
                     while PeekMessage(fMsg, 0, WM_KEYFIRST, WM_KEYLAST,
                             PM_REMOVE or PM_NOYIELD) do ;
+{$hints on}
                     GetAsyncKeyState(27);
                     { Stops calculation of other threads. }
                     for j := 0 to FHandlers.Count - 1 do
@@ -816,6 +819,8 @@ begin
     { It is not necessarily to free separately all runners,
       because the list owns them and removes them itself. }
     Runners.Free;
+
+    Assert(FHandlers.Count = 0, 'All handlers should be freed by the output method.');
 
     QueryPerformanceCounter(fEndTime);
     FComputationTime := 0;
