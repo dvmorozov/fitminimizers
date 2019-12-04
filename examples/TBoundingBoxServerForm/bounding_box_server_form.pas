@@ -84,7 +84,7 @@ type
             RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 
         procedure FreePointCloud(PointCloud: TList);
-        function LoadPointCloud(FileName: String; Alpha, Beta, Gamma: single): TList;
+        function LoadPointCloud(Alpha, Beta, Gamma: single): TList;
         procedure GenerateRandomPointCloud;
 
     public
@@ -226,7 +226,6 @@ end;
 
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
-    FileName: string;
     Runner: TRunner;
     { This "handler" instance is used to demonstrate execution of algorithm
       in separate thread by visual component TRunner attached to the form. }
@@ -244,9 +243,8 @@ begin
     else
     begin
         { Uses model data. }
-        FileName := FFilePath + ComboBoxFiles.Text;
         FreePointCloud(FPointCloud);
-        FPointCloud := LoadPointCloud(FileName, 0, 45, 45);
+        FPointCloud := LoadPointCloud(0, 45, 45);
     end;
     { Executes optimization algorithms in separate thread. }
     Runner := TRunner.Create(nil);
@@ -456,15 +454,13 @@ const
     cSteps = 2;
 var
     x, y, z: Integer;
-    FileName, fResult: string;
+    fResult: string;
     fAlpha, fBeta, fGamma: Single;
     fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
     RunId: Integer;
 begin
-    FileName := FFilePath + ComboBoxFiles.Text;
-
     FShowAlgoDetails := False;
     FShowPassed := True;
     FStop := False;
@@ -474,9 +470,6 @@ begin
     Memo2.Lines.Clear;
     Application.ProcessMessages;
 
-    FreePointCloud(FPointCloud);
-    { Loads model data in original orientation. }
-    FPointCloud := LoadPointCloud(FileName, 0, 0, 0);
     { Computes optimized volume and box sizes. }
     FindGlobalMinVolume;
 
@@ -493,7 +486,7 @@ begin
                     fGamma := z * cSteps;
 
                     FreePointCloud(FPointCloud);
-                    FPointCloud := LoadPointCloud(FileName, fAlpha, fBeta, fGamma);
+                    FPointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
                     Handler :=
                         CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, FPointCloud, False);
                     Handler.OptimizeBoundingBox;
@@ -553,14 +546,12 @@ end;
 procedure TBoundingBoxServerForm.ButtonRandomTestClick(Sender: TObject);
 var
     x: Integer;
-    FileName, fResult: string;
+    fResult: string;
     fAlpha, fBeta, fGamma: Single;
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
 begin
-    FileName := FFilePath + ComboBoxFiles.Text;
-
     FShowAlgoDetails := False;
     FStop := False;
     fMaxDeltaVolume := -1.0e20;
@@ -569,9 +560,6 @@ begin
     Memo2.Lines.Clear;
     Application.ProcessMessages;
 
-    FreePointCloud(FPointCloud);
-    { Loads model data in original orientation. }
-    FPointCloud := LoadPointCloud(FileName, 0, 0, 0);
     { Computes optimized volume and box sizes. }
     FindGlobalMinVolume;
 
@@ -586,7 +574,7 @@ begin
             fGamma := Random * 180;
 
             FreePointCloud(FPointCloud);
-            FPointCloud := LoadPointCloud(FileName, fAlpha, fBeta, fGamma);
+            FPointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
 
             Handler :=
                 CreateHandler(0, 0, 0, GetIniParamLenght, False, x, FPointCloud, False);
@@ -740,6 +728,7 @@ var
     fHandle: THandle;
     fKeyState: Byte;
     fMsg: TMsg;
+    PointCloud: TList;
 begin
     fRuns := 3;
     if FPointCloud.Count < 100000 then
@@ -747,6 +736,9 @@ begin
     if FPointCloud.Count < 25000 then
         fRuns := 9;
     FBoxVolume := 1e30;
+
+    { Loads model data in original orientation. }
+    PointCloud := LoadPointCloud(0, 0, 0);
 
     { Initializing performance counters. }
     fPerformanceFrequency := 0;
@@ -768,7 +760,7 @@ begin
               CreateHandler adds hanlder to FHandlers list. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
-                fStartAngle[3], GetIniParamLenght, False, i + 1, FPointCloud, False);
+                fStartAngle[3], GetIniParamLenght, False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
             { Creates runner. }
@@ -832,8 +824,10 @@ begin
     FOptiResultBoxVolume := FBoxVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
-    OutputResults(FPointCloud);
+    OutputResults(PointCloud);
     Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
+    { Releases model data. }
+    FreePointCloud(PointCloud);
 end;
 
 procedure TBoundingBoxServerForm.FreePointCloud(PointCloud: TList);
@@ -852,8 +846,7 @@ begin
     end;
 end;
 
-function TBoundingBoxServerForm.LoadPointCloud(FileName: string;
-    Alpha, Beta, Gamma: Single): TList;
+function TBoundingBoxServerForm.LoadPointCloud(Alpha, Beta, Gamma: Single): TList;
 type
     TOBJCoord = record // Stores X, Y, Z coordinates
         X, Y, Z: Single;
@@ -880,12 +873,13 @@ type
 
 var
     F: TextFile;
-    S: string;
+    S, FileName: string;
     fCoord: TOBJCoord;
     fPoint: p3DVector;
     RotX, RotY, RotZ, Matr: TMatrix;
     fVector: T3Vector;
 begin
+    FileName := FFilePath + ComboBoxFiles.Text;
     Result := TList.Create;
     if FileExists(FileName) then
     begin
