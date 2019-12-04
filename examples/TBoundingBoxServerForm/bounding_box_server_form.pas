@@ -85,7 +85,7 @@ type
 
         procedure FreePointCloud(PointCloud: TList);
         function LoadPointCloud(Alpha, Beta, Gamma: single): TList;
-        procedure GenerateRandomPointCloud;
+        function GenerateRandomPointCloud: TList;
 
     public
         { Creates FHanlders before other operations. }
@@ -230,6 +230,7 @@ var
     { This "handler" instance is used to demonstrate execution of algorithm
       in separate thread by visual component TRunner attached to the form. }
     Handler: TDownHillSimplexHandler;
+    PointCloud: TList;
 begin
     FShowAlgoDetails := True;
     FStop := False;
@@ -238,19 +239,19 @@ begin
 
     if CheckBoxRandomData.Checked then
     begin
-        GenerateRandomPointCloud;
+        PointCloud := GenerateRandomPointCloud;
     end
     else
     begin
         { Uses model data. }
-        FreePointCloud(FPointCloud);
-        FPointCloud := LoadPointCloud(0, 45, 45);
+        PointCloud := LoadPointCloud(0, 45, 45);
     end;
     { Executes optimization algorithms in separate thread. }
     Runner := TRunner.Create(nil);
 
-    { Creates optimization container, which will be executed by separated thread. }
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1, FPointCloud, False);
+    { Creates optimization container, which will be executed by separated thread.
+      Handler owns point cloud, don't release it! }
+    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1, PointCloud, True);
 
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := OuputMinVolume;
@@ -263,7 +264,7 @@ begin
       main VCL thread. This method can modify any data of the form.
       Should not remove handler to allow subsequent runs. }
     Runner.OnOutput := Handler.DisplayOutput;
-
+    { Starts computation in separate thread. }
     Runner.Run;
 end;
 
@@ -927,7 +928,7 @@ end;
 
 {$warnings off}
 {$hints off}
-procedure TBoundingBoxServerForm.GenerateRandomPointCloud;
+function TBoundingBoxServerForm.GenerateRandomPointCloud: TList;
 const
     PointCount: LongInt = 10;     //  Number of points in the cloud.
     { Dispersion boundaries. }
@@ -946,12 +947,11 @@ var
     Translation111: double;
 begin
     Randomize;
-    FreePointCloud(FPointCloud);
-    FPointCloud := TList.Create;
+    Result := TList.Create;
 
     for i := 0 to PointCount - 1 do
     begin
-        new(Point);
+        New(Point);
         { Coordinates are located mainly along (1,1,1) axis
           with relatively small dispersion. }
         Translation111 := Min111 + Random * (Max111 - Min111);
@@ -959,7 +959,7 @@ begin
         Point^.FVector[2] := Translation111 + MinY + Random * (MaxY - MinY);
         Point^.FVector[3] := Translation111 + MinZ + Random * (MaxZ - MinZ);
 
-        FPointCloud.Add(Point);
+        Result.Add(Point);
     end;
 end;
 
