@@ -15,26 +15,36 @@ uses
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 type
+    p3DVector = ^T3DVector;
+
+    T3DVector = record
+        FVector: TDoubleVector3;
+    end;
+
     TDownHillSimplexHandler = class;
     { External method displaying attributes of container instance. }
     THandlerOutputProcedure = procedure(Handler: TDownHillSimplexHandler) of object;
 
     TDownHillSimplexHandler = class(TComponent, IDownhillSimplexServer)
     private
+        FPointCloud: TList;
+        { FPointCloud can be shared between a few instances of "handler".
+          In that case it should be released by caller. }
+        FOwnsPointCloud: Boolean;
+
         { Minimum bounding box problem. }
         FDownhillSimplexAlgorithm: TDownhillSimplexAlgorithm;
         FHandlerOutputProcedure: THandlerOutputProcedure;
 
         FStop: Boolean;
         FShowAlgoDetails: Boolean;
+        FInitParamLength: Double;
+        FRecreateSimplexFromOriginal: Boolean;
 
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
         FAlpha, FBeta, FGamma: Double;
         { Original values of angles describing rotation of coordinate system (in degrees). }
         FOriginalAlpha, FOriginalBeta, FOriginalGamma: Double;
-        FRecreateSimplexFromOriginal: Boolean;
-
-        FInitParamLength: Double;
 
         { Box infomations: volume and coordinates}
         FBoxVolume: Double;
@@ -49,6 +59,11 @@ type
         function GetCycleCount: Integer;
         function GetEvaluationCount: Integer;
         function GetRestartCount: Integer;
+
+        procedure ClearPointCloud;
+
+        function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
+            var iMinCoords, iMaxCoords: T3Vector): Double;
 
         { IDownhillSimplexServer implementation. }
 
@@ -70,10 +85,11 @@ type
     public
         { If set simplex is recreated from original point on restarting,
           otherwise from the best point found during last optimization cycle. }
-        constructor Create(AOwner: TComponent; iAlpha, iBeta, iGamma,
-            iAlgoInitialStepsAngles: Double;
-            iFinalTolerance, iExitDerivative: Double;
-            iShowDetails: Boolean; RunId: Integer); reintroduce;
+        constructor Create(AOwner: TComponent; AAlpha, ABeta, AGamma,
+            AAlgoInitialStepsAngles: Double;
+            AFinalTolerance, AExitDerivative: Double;
+            AShowAlgoDetails: Boolean; ARunId: Integer;
+            APointCloud: TList; AOwnsPointCloud: Boolean); reintroduce;
         destructor Destroy; override;
         { Initializes performance counters and starts optimization.
           The procedure should not have parameters because it is called
@@ -114,7 +130,7 @@ begin
     Result := iDeg * PI / 180.0;
 end;
 
-function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
+function TDownHillSimplexHandler.ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
     var iMinCoords, iMaxCoords: T3Vector): Double;
 
     function GetRotationMatrix(iAlpha, iBeta, iGamma: Single): TMatrix;
@@ -143,14 +159,14 @@ var
 begin
     { Computes volume of bounding box. }
     fMatr := GetRotationMatrix(iAlpha, iBeta, iGamma);
-    fPoint := PointCloud[0];
+    fPoint := FPointCloud[0];
     fVector := fPoint^.fVector;
     MulVectMatr(fMatr, fVector);
     iMaxCoords := fVector;
     iMinCoords := fVector;
-    for i := 1 to PointCloud.Count - 1 do
+    for i := 1 to FPointCloud.Count - 1 do
     begin
-        fPoint := PointCloud[i];
+        fPoint := FPointCloud[i];
         fVector := fPoint^.fVector;
         MulVectMatr(fMatr, fVector);
         if fVector[1] > iMaxCoords[1] then
@@ -182,38 +198,43 @@ end;
 //-----------------------------------------------------------------------------
 
 constructor TDownHillSimplexHandler.Create(
-    AOwner: TComponent; iAlpha, iBeta, iGamma,
-    iAlgoInitialStepsAngles: Double;
-    iFinalTolerance, iExitDerivative: Double;
-    iShowDetails: Boolean; RunId: Integer);
+    AOwner: TComponent; AAlpha, ABeta, AGamma,
+    AAlgoInitialStepsAngles: Double;
+    AFinalTolerance, AExitDerivative: Double;
+    AShowAlgoDetails: Boolean; ARunId: Integer;
+    APointCloud: TList; AOwnsPointCloud: Boolean);
 begin
     inherited Create(AOwner);
+    FPointCloud := APointCloud;
+    FOwnsPointCloud := AOwnsPointCloud;
+
     FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
     { Initializing algorithm exit parameters. }
     FDownhillSimplexAlgorithm.FinalTolerance := 0.00001;
     FDownhillSimplexAlgorithm.ExitDerivative := 0.5;
     FDownhillSimplexAlgorithm.RestartDisabled := False;
     { FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled := True; }
-    FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
-    FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
+    FDownhillSimplexAlgorithm.FinalTolerance := AFinalTolerance;
+    FDownhillSimplexAlgorithm.ExitDerivative := AExitDerivative;
     FRecreateSimplexFromOriginal := False;
     { Initializing algorithm initial parameters. }
-    FAlpha := iAlpha;
-    FBeta := iBeta;
-    FGamma := iGamma;
+    FAlpha := AAlpha;
+    FBeta := ABeta;
+    FGamma := AGamma;
     { Saves original point. }
-    FOriginalAlpha := iAlpha;
-    FOriginalBeta := iBeta;
-    FOriginalGamma := iGamma;
+    FOriginalAlpha := AAlpha;
+    FOriginalBeta := ABeta;
+    FOriginalGamma := AGamma;
     { Initializes auxiliary attributes. }
-    FShowAlgoDetails := iShowDetails;
-    FInitParamLength := iAlgoInitialStepsAngles;
+    FShowAlgoDetails := AShowAlgoDetails;
+    FInitParamLength := AAlgoInitialStepsAngles;
     FStop := False;
-    FRunId := RunId;
+    FRunId := ARunId;
 end;
 
 destructor TDownHillSimplexHandler.Destroy;
 begin
+    ClearPointCloud;
     FDownhillSimplexAlgorithm.Free;
     inherited Destroy;
 end;
@@ -262,6 +283,26 @@ end;
 procedure TDownHillSimplexHandler.Stop;
 begin
     FStop := True;
+end;
+
+procedure TDownHillSimplexHandler.ClearPointCloud;
+var
+    fPoint: p3DVector;
+    x: Integer;
+begin
+    if FOwnsPointCloud then
+    begin
+        if FPointCloud <> nil then
+        begin
+            for x := 0 to FPointCloud.Count - 1 do
+            begin
+                fPoint := FPointCloud[x];
+                Dispose(fPoint);
+            end;
+            FPointCloud.Free;
+            FPointCloud := nil;
+        end;
+    end;
 end;
 
 function TDownHillSimplexHandler.GetCycleCount: Integer;

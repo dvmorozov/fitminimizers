@@ -17,12 +17,6 @@ uses
 {$ASSERTIONS ON}
 
 type
-    p3DVector = ^T3DVector;
-
-    T3DVector = record
-        FVector: TDoubleVector3;
-    end;
-
     { TBoundingBoxServerForm }
     { Demonstrates the simplest way of integration of algorithm into application. }
     TBoundingBoxServerForm = class(TForm)
@@ -66,6 +60,10 @@ type
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
         FOptiResultBoxVolume: Double;
 
+        { Data can be accessed from different threads.
+          That's ok until data aren't changed. }
+        FPointCloud: TList;
+
         function GetIniParamLenght: Double;
         procedure StopComputing;
         { Prints final results among a few runs. }
@@ -95,9 +93,6 @@ type
 
 var
     BoundingBoxServerForm: TBoundingBoxServerForm;
-    { Data can be accessed from different threads.
-      That's ok until data aren't changed. }
-    PointCloud: TList;
 
 implementation
 
@@ -197,7 +192,7 @@ begin
     end;
     Result := TDownHillSimplexHandler.Create(self, iAlpha,
         iBeta, iGamma, iDHS_InitParamLength, fFinalTolerance,
-        fExitDerivate, iShowDetails, RunId);
+        fExitDerivate, iShowDetails, RunId, FPointCloud, False);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
@@ -276,7 +271,8 @@ procedure TBoundingBoxServerForm.PostProcessStatistics;
 const
     cCriterion01 = 0.001;
     // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
-    cCriterion1 = 0.01;   // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
+    cCriterion1 = 0.01;
+    // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
 
 var
     x: Integer;
@@ -690,7 +686,7 @@ begin
         Memo1.Lines.Add('Random Points')
     else
         Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
-    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
+    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [FPointCloud.Count]));
     Memo1.Lines.Add('');
     Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [FOptiResultBoxVolume]));
     fDelta[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
@@ -739,9 +735,9 @@ var
     fMsg: TMsg;
 begin
     fRuns := 3;
-    if PointCloud.Count < 100000 then
+    if FPointCloud.Count < 100000 then
         fRuns := 5;
-    if PointCloud.Count < 25000 then
+    if FPointCloud.Count < 25000 then
         fRuns := 9;
     FBoxVolume := 1e30;
 
@@ -868,17 +864,17 @@ var
     RotX, RotY, RotZ, Matr: TMatrix;
     fVector: T3Vector;
 begin
-    if PointCloud <> nil then
+    if FPointCloud <> nil then
     begin
-        for x := 0 to PointCloud.Count - 1 do
+        for x := 0 to FPointCloud.Count - 1 do
         begin
-            fPoint := PointCloud[x];
+            fPoint := FPointCloud[x];
             Dispose(fPoint);
         end;
-        PointCloud.Free;
-        PointCloud := nil;
+        FPointCloud.Free;
+        FPointCloud := nil;
     end;
-    PointCloud := TList.Create;
+    FPointCloud := TList.Create;
     if FileExists(iFileName) then
     begin
         RotX := MatrixRotX(DegToRad(iAlpha));
@@ -915,7 +911,7 @@ begin
                     MulVectMatr(Matr, fVector);
 
                     fPoint^.FVector := fVector;
-                    PointCloud.Add(fPoint);
+                    FPointCloud.Add(fPoint);
                 end;
             end;
         end;
@@ -944,18 +940,18 @@ var
     Translation111: double;
 begin
     Randomize;
-    if PointCloud <> nil then
+    if FPointCloud <> nil then
     begin
-        for x := 0 to PointCloud.Count - 1 do
+        for x := 0 to FPointCloud.Count - 1 do
         begin
-            Point := PointCloud[x];
+            Point := FPointCloud[x];
             Dispose(Point);
         end;
-        PointCloud.Free;
-        PointCloud := nil;
+        FPointCloud.Free;
+        FPointCloud := nil;
     end;
 
-    PointCloud := TList.Create;
+    FPointCloud := TList.Create;
 
     for i := 0 to PointCount - 1 do
     begin
@@ -967,7 +963,7 @@ begin
         Point^.FVector[2] := Translation111 + MinY + Random * (MaxY - MinY);
         Point^.FVector[3] := Translation111 + MinZ + Random * (MaxZ - MinZ);
 
-        PointCloud.Add(Point);
+        FPointCloud.Add(Point);
     end;
 end;
 
