@@ -60,10 +60,6 @@ type
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
         FOptiResultBoxVolume: Double;
 
-        { Data can be accessed from different threads.
-          That's ok until data aren't changed. }
-        FPointCloud: TList;
-
         function GetIniParamLenght: Double;
         procedure StopComputing;
         { Prints final results among a few runs. }
@@ -461,6 +457,7 @@ var
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
     RunId: Integer;
+    PointCloud: TList;
 begin
     FShowAlgoDetails := False;
     FShowPassed := True;
@@ -486,10 +483,8 @@ begin
                     fBeta := y * cSteps;
                     fGamma := z * cSteps;
 
-                    FreePointCloud(FPointCloud);
-                    FPointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
-                    Handler :=
-                        CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, FPointCloud, False);
+                    PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
+                    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, False);
                     Handler.OptimizeBoundingBox;
                     if not FStop then
                     begin
@@ -539,6 +534,7 @@ begin
                     FHandlers.Remove(Handler);
                     Inc(RunId);
                     Application.ProcessMessages;
+                    FreePointCloud(PointCloud);
                 end;
             end;
     PostProcessStatistics;
@@ -552,6 +548,7 @@ var
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
+    PointCloud: TList;
 begin
     FShowAlgoDetails := False;
     FStop := False;
@@ -574,11 +571,8 @@ begin
             fBeta := Random * 180;
             fGamma := Random * 180;
 
-            FreePointCloud(FPointCloud);
-            FPointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
-
-            Handler :=
-                CreateHandler(0, 0, 0, GetIniParamLenght, False, x, FPointCloud, False);
+            PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
+            Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, x, PointCloud, False);
             Handler.OptimizeBoundingBox;
             if not FStop then
             begin
@@ -624,6 +618,7 @@ begin
             { Removes and frees inserted container. }
             FHandlers.Remove(Handler);
             Application.ProcessMessages;
+            FreePointCloud(PointCloud);
         end;
     end;
     PostProcessStatistics;
@@ -731,15 +726,17 @@ var
     fMsg: TMsg;
     PointCloud: TList;
 begin
+    { Loads model data in original orientation. }
+    { Data are accessed from different threads.
+      That's ok until data aren't changed. }
+    PointCloud := LoadPointCloud(0, 0, 0);
+
     fRuns := 3;
-    if FPointCloud.Count < 100000 then
+    if PointCloud.Count < 100000 then
         fRuns := 5;
-    if FPointCloud.Count < 25000 then
+    if PointCloud.Count < 25000 then
         fRuns := 9;
     FBoxVolume := 1e30;
-
-    { Loads model data in original orientation. }
-    PointCloud := LoadPointCloud(0, 0, 0);
 
     { Initializing performance counters. }
     fPerformanceFrequency := 0;
