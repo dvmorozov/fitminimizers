@@ -81,7 +81,7 @@ type
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(iAlpha, iBeta, iGamma: Double;
             iDHS_InitParamLength: Double; iShowDetails: Boolean;
-            RunId: Integer): TDownHillSimplexHandler;
+            RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 
         procedure LoadObjPointCloud(iFileName: String; iAlpha, iBeta, iGamma: single);
         procedure GenerateRandomPointCloud;
@@ -174,7 +174,7 @@ end;
 
 function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
     iDHS_InitParamLength: Double; iShowDetails: Boolean;
-    RunId: Integer): TDownHillSimplexHandler;
+    RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
@@ -192,7 +192,7 @@ begin
     end;
     Result := TDownHillSimplexHandler.Create(self, iAlpha,
         iBeta, iGamma, iDHS_InitParamLength, fFinalTolerance,
-        fExitDerivate, iShowDetails, RunId, FPointCloud, False);
+        fExitDerivate, iShowDetails, RunId, PointCloud, OwnsPointCloud);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
@@ -250,7 +250,7 @@ begin
     Runner := TRunner.Create(nil);
 
     { Creates optimization container, which will be executed by separated thread. }
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1);
+    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1, FPointCloud, False);
 
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := OuputMinVolume;
@@ -491,7 +491,7 @@ begin
 
                     LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
                     Handler :=
-                        CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId);
+                        CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, FPointCloud, False);
                     Handler.OptimizeBoundingBox;
                     if not FStop then
                     begin
@@ -582,7 +582,7 @@ begin
             LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
 
             Handler :=
-                CreateHandler(0, 0, 0, GetIniParamLenght, False, x);
+                CreateHandler(0, 0, 0, GetIniParamLenght, False, x, FPointCloud, False);
             Handler.OptimizeBoundingBox;
             if not FStop then
             begin
@@ -761,7 +761,7 @@ begin
               CreateHandler adds hanlder to FHandlers list. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
-                fStartAngle[3], GetIniParamLenght, False, i + 1);
+                fStartAngle[3], GetIniParamLenght, False, i + 1, FPointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
             { Creates runner. }

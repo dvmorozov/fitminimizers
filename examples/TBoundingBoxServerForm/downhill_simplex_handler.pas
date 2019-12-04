@@ -84,7 +84,9 @@ type
 
     public
         { If set simplex is recreated from original point on restarting,
-          otherwise from the best point found during last optimization cycle. }
+          otherwise from the best point found during last optimization cycle.
+          Handler doesn't copy point cloud, it either owns it or just keep
+          reference to external object. }
         constructor Create(AOwner: TComponent; AAlpha, ABeta, AGamma,
             AAlgoInitialStepsAngles: Double;
             AFinalTolerance, AExitDerivative: Double;
