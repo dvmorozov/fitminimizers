@@ -67,7 +67,7 @@ type
         function GetIniParamLenght: Double;
         procedure StopComputing;
         { Prints final results among a few runs. }
-        procedure OutputResults;
+        procedure OutputResults(PointCloud: TList);
         { Computes minimum box volume starting from a few initial points. }
         procedure FindGlobalMinVolume;
         { Displays computation results and removes container.
@@ -219,7 +219,7 @@ begin
     FOptiResultBoxVolume := Handler.BoxVolume;
     FOptiResultBoxMaxCoords := Handler.BoxMaxCoords;
     FOptiResultBoxMinCoords := Handler.BoxMinCoords;
-    OutputResults;
+    OutputResults(Handler.PointCloud);
     { Removes and frees container. }
     FHandlers.Remove(Handler);
 end;
@@ -684,7 +684,7 @@ begin
     FHandlers.Remove(Handler);
 end;
 
-procedure TBoundingBoxServerForm.OutputResults;
+procedure TBoundingBoxServerForm.OutputResults(PointCloud: TList);
 var
     fDelta: TDoubleVector3;
 begin
@@ -693,7 +693,7 @@ begin
         Memo1.Lines.Add('Random Points')
     else
         Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
-    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [FPointCloud.Count]));
+    Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
     Memo1.Lines.Add('');
     Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [FOptiResultBoxVolume]));
     fDelta[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
@@ -832,7 +832,7 @@ begin
     FOptiResultBoxVolume := FBoxVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
-    OutputResults;
+    OutputResults(FPointCloud);
     Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
 end;
 
