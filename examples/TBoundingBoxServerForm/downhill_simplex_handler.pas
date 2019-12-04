@@ -119,6 +119,7 @@ type
             write FHandlerOutputProcedure;
         property ComputationTime: Single read FComputationTime;
         property RunId: Integer read FRunId;
+        property PointCloud: TList read FPointCloud;
     end;
 
 function DegToRad(iDeg: Double): Double;
