@@ -244,14 +244,11 @@ begin
     end;
     { Executes optimization algorithms in separate thread. }
     Runner := TRunner.Create(nil);
-
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
     Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1, PointCloud, True);
-
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := OuputMinVolume;
-
     { Assign runner procedures. }
     { Executes optimization method in separated thread. This method
       should not modify any data except members of container instance. }
@@ -484,7 +481,7 @@ begin
                     fGamma := z * cSteps;
 
                     PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
-                    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, False);
+                    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, True);
                     Handler.OptimizeBoundingBox;
                     if not FStop then
                     begin
@@ -534,7 +531,6 @@ begin
                     FHandlers.Remove(Handler);
                     Inc(RunId);
                     Application.ProcessMessages;
-                    FreePointCloud(PointCloud);
                 end;
             end;
     PostProcessStatistics;
@@ -572,7 +568,7 @@ begin
             fGamma := Random * 180;
 
             PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
-            Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, x, PointCloud, False);
+            Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, x, PointCloud, True);
             Handler.OptimizeBoundingBox;
             if not FStop then
             begin
@@ -618,7 +614,6 @@ begin
             { Removes and frees inserted container. }
             FHandlers.Remove(Handler);
             Application.ProcessMessages;
-            FreePointCloud(PointCloud);
         end;
     end;
     PostProcessStatistics;
@@ -755,7 +750,10 @@ begin
                 fStartAngle := cStartAngle9Runs[i];
 
             { Runs optimization to get the minimum volume.
-              CreateHandler adds hanlder to FHandlers list. }
+              CreateHandler adds hanlder to FHandlers list.
+              Handler should not own data because they are
+              shared between handler instances. It is up to
+              this method to release them. See below. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
                 fStartAngle[3], GetIniParamLenght, False, i + 1, PointCloud, False);
