@@ -79,11 +79,12 @@ type
           Removes handler from FHandlers list. }
         procedure OuputMinVolume(Handler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
-        function CreateHandler(iAlpha, iBeta, iGamma: Double;
-            iDHS_InitParamLength: Double; iShowDetails: Boolean;
+        function CreateHandler(Alpha, Beta, Gamma: Double;
+            InitParamLength: Double; ShowDetails: Boolean;
             RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 
-        procedure LoadObjPointCloud(iFileName: String; iAlpha, iBeta, iGamma: single);
+        procedure FreePointCloud(PointCloud: TList);
+        function LoadPointCloud(FileName: String; Alpha, Beta, Gamma: single): TList;
         procedure GenerateRandomPointCloud;
 
     public
@@ -172,8 +173,8 @@ begin
     inherited Create(AOwner);
 end;
 
-function TBoundingBoxServerForm.CreateHandler(iAlpha, iBeta, iGamma: Double;
-    iDHS_InitParamLength: Double; iShowDetails: Boolean;
+function TBoundingBoxServerForm.CreateHandler(Alpha, Beta, Gamma: Double;
+    InitParamLength: Double; ShowDetails: Boolean;
     RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
@@ -190,9 +191,9 @@ begin
     begin
         fExitDerivate := 0.5;       // default value
     end;
-    Result := TDownHillSimplexHandler.Create(self, iAlpha,
-        iBeta, iGamma, iDHS_InitParamLength, fFinalTolerance,
-        fExitDerivate, iShowDetails, RunId, PointCloud, OwnsPointCloud);
+    Result := TDownHillSimplexHandler.Create(self, Alpha,
+        Beta, Gamma, InitParamLength, fFinalTolerance,
+        fExitDerivate, ShowDetails, RunId, PointCloud, OwnsPointCloud);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
@@ -244,7 +245,8 @@ begin
     begin
         { Uses model data. }
         FileName := FFilePath + ComboBoxFiles.Text;
-        LoadObjPointCloud(FileName, 0, 45, 45);
+        FreePointCloud(FPointCloud);
+        FPointCloud := LoadPointCloud(FileName, 0, 45, 45);
     end;
     { Executes optimization algorithms in separate thread. }
     Runner := TRunner.Create(nil);
@@ -472,8 +474,9 @@ begin
     Memo2.Lines.Clear;
     Application.ProcessMessages;
 
+    FreePointCloud(FPointCloud);
     { Loads model data in original orientation. }
-    LoadObjPointCloud(FileName, 0, 0, 0);
+    FPointCloud := LoadPointCloud(FileName, 0, 0, 0);
     { Computes optimized volume and box sizes. }
     FindGlobalMinVolume;
 
@@ -489,7 +492,8 @@ begin
                     fBeta := y * cSteps;
                     fGamma := z * cSteps;
 
-                    LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
+                    FreePointCloud(FPointCloud);
+                    FPointCloud := LoadPointCloud(FileName, fAlpha, fBeta, fGamma);
                     Handler :=
                         CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, FPointCloud, False);
                     Handler.OptimizeBoundingBox;
@@ -565,8 +569,9 @@ begin
     Memo2.Lines.Clear;
     Application.ProcessMessages;
 
+    FreePointCloud(FPointCloud);
     { Loads model data in original orientation. }
-    LoadObjPointCloud(FileName, 0, 0, 0);
+    FPointCloud := LoadPointCloud(FileName, 0, 0, 0);
     { Computes optimized volume and box sizes. }
     FindGlobalMinVolume;
 
@@ -579,7 +584,9 @@ begin
             fAlpha := Random * 180;
             fBeta := Random * 180;
             fGamma := Random * 180;
-            LoadObjPointCloud(FileName, fAlpha, fBeta, fGamma);
+
+            FreePointCloud(FPointCloud);
+            FPointCloud := LoadPointCloud(FileName, fAlpha, fBeta, fGamma);
 
             Handler :=
                 CreateHandler(0, 0, 0, GetIniParamLenght, False, x, FPointCloud, False);
@@ -829,8 +836,24 @@ begin
     Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
 end;
 
-procedure TBoundingBoxServerForm.LoadObjPointCloud(iFileName: string;
-    iAlpha, iBeta, iGamma: Single);
+procedure TBoundingBoxServerForm.FreePointCloud(PointCloud: TList);
+var
+    x: Integer;
+    fPoint: p3DVector;
+begin
+    if PointCloud <> nil then
+    begin
+        for x := 0 to PointCloud.Count - 1 do
+        begin
+            fPoint := PointCloud[x];
+            Dispose(fPoint);
+        end;
+        PointCloud.Free;
+    end;
+end;
+
+function TBoundingBoxServerForm.LoadPointCloud(FileName: string;
+    Alpha, Beta, Gamma: Single): TList;
 type
     TOBJCoord = record // Stores X, Y, Z coordinates
         X, Y, Z: Single;
@@ -856,7 +879,6 @@ type
     end;
 
 var
-    x: Integer;
     F: TextFile;
     S: string;
     fCoord: TOBJCoord;
@@ -864,22 +886,12 @@ var
     RotX, RotY, RotZ, Matr: TMatrix;
     fVector: T3Vector;
 begin
-    if FPointCloud <> nil then
+    Result := TList.Create;
+    if FileExists(FileName) then
     begin
-        for x := 0 to FPointCloud.Count - 1 do
-        begin
-            fPoint := FPointCloud[x];
-            Dispose(fPoint);
-        end;
-        FPointCloud.Free;
-        FPointCloud := nil;
-    end;
-    FPointCloud := TList.Create;
-    if FileExists(iFileName) then
-    begin
-        RotX := MatrixRotX(DegToRad(iAlpha));
-        RotY := MatrixRotY(DegToRad(iBeta));
-        RotZ := MatrixRotZ(DegToRad(iGamma));
+        RotX := MatrixRotX(DegToRad(Alpha));
+        RotY := MatrixRotY(DegToRad(Beta));
+        RotZ := MatrixRotZ(DegToRad(Gamma));
         { Computes rotation matrix. }
         Matr := UnitMatrix;
         Mul3DMatrix(RotZ, Matr, Matr);
@@ -891,7 +903,7 @@ begin
         fVector[3] := 0;
         MulVectMatr(Matr, fVector);
 
-        AssignFile(F, iFileName);
+        AssignFile(F, FileName);
         Reset(F);
         while not (EOF(F)) do
         begin
@@ -911,7 +923,7 @@ begin
                     MulVectMatr(Matr, fVector);
 
                     fPoint^.FVector := fVector;
-                    FPointCloud.Add(fPoint);
+                    Result.Add(fPoint);
                 end;
             end;
         end;
@@ -935,22 +947,12 @@ const
     Max111: double = 10.0;
     Min111: double = -10.0;
 var
-    i, x: LongInt;
+    i: LongInt;
     Point: p3DVector;
     Translation111: double;
 begin
     Randomize;
-    if FPointCloud <> nil then
-    begin
-        for x := 0 to FPointCloud.Count - 1 do
-        begin
-            Point := FPointCloud[x];
-            Dispose(Point);
-        end;
-        FPointCloud.Free;
-        FPointCloud := nil;
-    end;
-
+    FreePointCloud(FPointCloud);
     FPointCloud := TList.Create;
 
     for i := 0 to PointCount - 1 do
