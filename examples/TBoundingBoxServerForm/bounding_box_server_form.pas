@@ -53,8 +53,10 @@ type
         FStop: Boolean;
         { Keeps all instances of "handler" class for asynchronous operations. }
         FHandlers: TComponentList;
-        { Best values obtained for a few optimization runs. }
-        FBoxVolume: Double;
+        { Minimum volume obtained for a few optimization runs.
+          It is used as etalon value. }
+        FGlobalMinVolume: Double;
+        FMaxDeltaVolume, FMinDeltaVolume: Single;
         FMinCoords, FMaxCoords: TDoubleVector3;
         { Optimization results of several algorithm runs. }
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
@@ -74,6 +76,8 @@ type
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
         procedure OuputMinVolume(Handler: TDownHillSimplexHandler);
+        { Displays computation results of single run of brute force search. }
+        procedure OuputBruteForce(Handler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(Alpha, Beta, Gamma: Double;
             InitParamLength: Double; ShowDetails: Boolean;
@@ -443,24 +447,80 @@ begin
     end;
 end;
 
+procedure TBoundingBoxServerForm.OuputBruteForce(Handler: TDownHillSimplexHandler);
+var
+    fResult: string;
+    fDeltaVolume: Single;
+    fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
+    fAlpha, fBeta, fGamma: Single;
+begin
+    fAlpha := 0; fBeta := 0; fGamma := 0;
+    if not FStop then
+    begin
+        { Computes difference in volumes calculated
+          for original and rotated orientation. }
+        with Handler do
+        begin
+            fDeltaVolume := (BoxVolume - FGlobalMinVolume);
+            { Computes lengths of edges of bounding box. }
+            fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+            fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+            fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+            { Sorts edges. }
+            SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
+            fResult :=
+                Format(
+                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d', [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, ComputationTime, CycleCount, EvaluationCount, RestartCount]);
+            if fDeltaVolume > fMaxDeltaVolume then
+            begin
+                fMaxDeltaVolume := fDeltaVolume;
+                fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2],
+                    fMaxDeltaCord[3]);
+            end;
+            if fDeltaVolume < fMinDeltaVolume then
+            begin
+                fMinDeltaVolume := fDeltaVolume;
+                fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                SortUp(fMinDeltaCord[1], fMinDeltaCord[2],
+                    fMinDeltaCord[3]);
+            end;
+            Memo2.Lines.Add(fResult);
+            Label2.Caption :=
+                Format(
+                'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
+                [fMinDeltaVolume, fMinDeltaCord[1],
+                fMinDeltaCord[2], fMinDeltaCord[3],
+                fMaxDeltaVolume, fMaxDeltaCord[1],
+                fMaxDeltaCord[2], fMaxDeltaCord[3]]);
+        end;
+    end;
+    { Removes and frees inserted container. }
+    FHandlers.Remove(Handler);
+end;
+
 procedure TBoundingBoxServerForm.ButtonBruteForceClick(Sender: TObject);
 const
     cSteps = 2;
 var
     x, y, z: Integer;
-    fResult: string;
     fAlpha, fBeta, fGamma: Single;
-    fMaxDeltaVolume, fMinDeltaVolume, fDeltaVolume: Single;
-    fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
     RunId: Integer;
     PointCloud: TList;
+    Runner: TRunner;
 begin
     FShowAlgoDetails := False;
     FShowPassed := True;
     FStop := False;
-    fMaxDeltaVolume := -1.0e20;
-    fMinDeltaVolume := 1.0e20;
+    { Initializes global minimum parameters. }
+    FMaxDeltaVolume := -1.0e20;
+    FMinDeltaVolume := 1.0e20;
+    { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
     Application.ProcessMessages;
@@ -481,54 +541,27 @@ begin
                     fGamma := z * cSteps;
 
                     PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
+                    { Creates optimization container, which will be executed by separated thread.
+                      Handler owns point cloud, don't release it! }
                     Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, True);
-                    Handler.OptimizeBoundingBox;
-                    if not FStop then
-                    begin
-                        { Computes difference in volumes calculated
-                          for original and rotated orientation. }
-                        with Handler do
-                        begin
-                            fDeltaVolume := (BoxVolume - FBoxVolume);
-                            { Computes lengths of edges of bounding box. }
-                            fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                            fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                            fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                            { Sorts edges. }
-                            SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
-                            fResult :=
-                                Format(
-                                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d', [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, ComputationTime, CycleCount, EvaluationCount, RestartCount]);
-                            if fDeltaVolume > fMaxDeltaVolume then
-                            begin
-                                fMaxDeltaVolume := fDeltaVolume;
-                                fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                                fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                                fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                                SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2],
-                                    fMaxDeltaCord[3]);
-                            end;
-                            if fDeltaVolume < fMinDeltaVolume then
-                            begin
-                                fMinDeltaVolume := fDeltaVolume;
-                                fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                                fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                                fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                                SortUp(fMinDeltaCord[1], fMinDeltaCord[2],
-                                    fMinDeltaCord[3]);
-                            end;
-                            Memo2.Lines.Add(fResult);
-                            Label2.Caption :=
-                                Format(
-                                'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                                [fMinDeltaVolume, fMinDeltaCord[1],
-                                fMinDeltaCord[2], fMinDeltaCord[3],
-                                fMaxDeltaVolume, fMaxDeltaCord[1],
-                                fMaxDeltaCord[2], fMaxDeltaCord[3]]);
-                        end;
-                    end;
-                    { Removes and frees inserted container. }
-                    FHandlers.Remove(Handler);
+
+                    { Executes optimization algorithms in separate thread. }
+                    Runner := TRunner.Create(nil);
+
+                    { OuputMinVolume removes hanlder from FHandlers list. }
+                    Handler.HandlerOutputProcedure := OuputBruteForce;
+                    { Assign runner procedures. }
+                    { Executes optimization method in separated thread. This method
+                      should not modify any data except members of container instance. }
+                    Runner.OnCompute := Handler.OptimizeBoundingBox;
+                    { Displays optimization results, this method is synchronized with
+                      main VCL thread. This method can modify any data of the form.
+                      Should not remove handler to allow subsequent runs. }
+                    Runner.OnOutput := Handler.DisplayOutput;
+                    { Starts computation in separate thread. }
+                    Runner.Run;
+                    { Waits for finishing computation. }
+                    Runner.Wait;
                     Inc(RunId);
                     Application.ProcessMessages;
                 end;
@@ -548,8 +581,10 @@ var
 begin
     FShowAlgoDetails := False;
     FStop := False;
-    fMaxDeltaVolume := -1.0e20;
-    fMinDeltaVolume := 1.0e20;
+    { Initializes global minimum parameters. }
+    FMaxDeltaVolume := -1.0e20;
+    FMinDeltaVolume := 1.0e20;
+    { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
     Application.ProcessMessages;
@@ -574,7 +609,7 @@ begin
             begin
                 with Handler do
                 begin
-                    fDeltaVolume := (BoxVolume - FBoxVolume);
+                    fDeltaVolume := (BoxVolume - FGlobalMinVolume);
                     fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
                     fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
                     fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
@@ -641,9 +676,9 @@ var
 begin
     with Handler do
     begin
-        if BoxVolume < FBoxVolume then
+        if BoxVolume < FGlobalMinVolume then
         begin
-            FBoxVolume := BoxVolume;
+            FGlobalMinVolume := BoxVolume;
             FMaxCoords := BoxMaxCoords;
             FMinCoords := BoxMinCoords;
         end;
@@ -731,7 +766,7 @@ begin
         fRuns := 5;
     if PointCloud.Count < 25000 then
         fRuns := 9;
-    FBoxVolume := 1e30;
+    FGlobalMinVolume := 1e30;
 
     { Initializing performance counters. }
     fPerformanceFrequency := 0;
@@ -817,7 +852,7 @@ begin
     FComputationTime := 0;
     if fPerformanceFrequency <> 0 then
         FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
-    FOptiResultBoxVolume := FBoxVolume;
+    FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
     OutputResults(PointCloud);
