@@ -57,6 +57,7 @@ type
           It is used as etalon value. }
         FGlobalMinVolume: Double;
         FMaxDeltaVolume, FMinDeltaVolume: Single;
+        FMinDeltaCord, FMaxDeltaCord: TDoubleVector3;
         FMinCoords, FMaxCoords: TDoubleVector3;
         { Optimization results of several algorithm runs. }
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
@@ -81,11 +82,11 @@ type
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(Alpha, Beta, Gamma: Double;
             InitParamLength: Double; ShowDetails: Boolean;
-            RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
+            RunId: Integer; PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 
-        procedure FreePointCloud(PointCloud: TList);
-        function LoadPointCloud(Alpha, Beta, Gamma: single): TList;
-        function GenerateRandomPointCloud: TList;
+        procedure FreePointCloud(PointCloud: TPointCloud);
+        function LoadPointCloud(Alpha, Beta, Gamma: single): TPointCloud;
+        function GenerateRandomPointCloud: TPointCloud;
 
     public
         { Creates FHanlders before other operations. }
@@ -175,7 +176,7 @@ end;
 
 function TBoundingBoxServerForm.CreateHandler(Alpha, Beta, Gamma: Double;
     InitParamLength: Double; ShowDetails: Boolean;
-    RunId: Integer; PointCloud: TList; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
+    RunId: Integer; PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
@@ -230,7 +231,7 @@ var
     { This "handler" instance is used to demonstrate execution of algorithm
       in separate thread by visual component TRunner attached to the form. }
     Handler: TDownHillSimplexHandler;
-    PointCloud: TList;
+    PointCloud: TPointCloud;
 begin
     FShowAlgoDetails := True;
     FStop := False;
@@ -451,10 +452,8 @@ procedure TBoundingBoxServerForm.OuputBruteForce(Handler: TDownHillSimplexHandle
 var
     fResult: string;
     fDeltaVolume: Single;
-    fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
-    fAlpha, fBeta, fGamma: Single;
+    fDeltaCord: TDoubleVector3;
 begin
-    fAlpha := 0; fBeta := 0; fGamma := 0;
     if not FStop then
     begin
         { Computes difference in volumes calculated
@@ -470,24 +469,29 @@ begin
             SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
             fResult :=
                 Format(
-                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d', [fDeltaVolume, BoxVolume, fDeltaCord[1], fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma, fAlpha, fBeta, fGamma, ComputationTime, CycleCount, EvaluationCount, RestartCount]);
+                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
+                [fDeltaVolume, BoxVolume,
+                 fDeltaCord[1], fDeltaCord[2], fDeltaCord[3],
+                 Alpha, Beta, Gamma,
+                 PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
+                 ComputationTime, CycleCount, EvaluationCount, RestartCount]);
             if fDeltaVolume > fMaxDeltaVolume then
             begin
                 fMaxDeltaVolume := fDeltaVolume;
-                fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2],
-                    fMaxDeltaCord[3]);
+                FMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                FMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                FMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                SortUp(FMaxDeltaCord[1], FMaxDeltaCord[2],
+                    FMaxDeltaCord[3]);
             end;
             if fDeltaVolume < fMinDeltaVolume then
             begin
                 fMinDeltaVolume := fDeltaVolume;
-                fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                SortUp(fMinDeltaCord[1], fMinDeltaCord[2],
-                    fMinDeltaCord[3]);
+                FMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                FMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                FMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                SortUp(FMinDeltaCord[1], FMinDeltaCord[2],
+                    FMinDeltaCord[3]);
             end;
             Memo2.Lines.Add(fResult);
             Label2.Caption :=
@@ -511,7 +515,7 @@ var
     fAlpha, fBeta, fGamma: Single;
     Handler: TDownHillSimplexHandler;
     RunId: Integer;
-    PointCloud: TList;
+    PointCloud: TPointCloud;
     Runner: TRunner;
 begin
     FShowAlgoDetails := False;
@@ -577,7 +581,7 @@ var
     fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume: Single;
     fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
-    PointCloud: TList;
+    PointCloud: TPointCloud;
 begin
     FShowAlgoDetails := False;
     FStop := False;
@@ -754,7 +758,7 @@ var
     fHandle: THandle;
     fKeyState: Byte;
     fMsg: TMsg;
-    PointCloud: TList;
+    PointCloud: TPointCloud;
 begin
     { Loads model data in original orientation. }
     { Data are accessed from different threads.
@@ -861,7 +865,7 @@ begin
     FreePointCloud(PointCloud);
 end;
 
-procedure TBoundingBoxServerForm.FreePointCloud(PointCloud: TList);
+procedure TBoundingBoxServerForm.FreePointCloud(PointCloud: TPointCloud);
 var
     x: Integer;
     fPoint: p3DVector;
@@ -877,7 +881,7 @@ begin
     end;
 end;
 
-function TBoundingBoxServerForm.LoadPointCloud(Alpha, Beta, Gamma: Single): TList;
+function TBoundingBoxServerForm.LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
 type
     TOBJCoord = record // Stores X, Y, Z coordinates
         X, Y, Z: Single;
@@ -911,7 +915,7 @@ var
     fVector: T3Vector;
 begin
     FileName := FFilePath + ComboBoxFiles.Text;
-    Result := TList.Create;
+    Result := TPointCloud.Create(Alpha, Beta, Gamma);
     if FileExists(FileName) then
     begin
         RotX := MatrixRotX(DegToRad(Alpha));
@@ -958,7 +962,7 @@ end;
 
 {$warnings off}
 {$hints off}
-function TBoundingBoxServerForm.GenerateRandomPointCloud: TList;
+function TBoundingBoxServerForm.GenerateRandomPointCloud: TPointCloud;
 const
     PointCount: LongInt = 10;     //  Number of points in the cloud.
     { Dispersion boundaries. }
@@ -977,7 +981,7 @@ var
     Translation111: double;
 begin
     Randomize;
-    Result := TList.Create;
+    Result := TPointCloud.Create(0, 0, 0);
 
     for i := 0 to PointCount - 1 do
     begin

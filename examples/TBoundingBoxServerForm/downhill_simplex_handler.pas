@@ -21,13 +21,25 @@ type
         FVector: TDoubleVector3;
     end;
 
+    TPointCloud = class(TList)
+    private
+        { Data rotation angles relative to original position. }
+        FAlpha, FBeta, FGamma: Single;
+    public
+        constructor Create(AAlpha, ABeta, AGamma: Single); reintroduce;
+
+        property Alpha: Single read FAlpha;
+        property Beta: Single read FBeta;
+        property Gamma: Single read FGamma;
+    end;
+
     TDownHillSimplexHandler = class;
     { External method displaying attributes of container instance. }
     THandlerOutputProcedure = procedure(Handler: TDownHillSimplexHandler) of object;
 
     TDownHillSimplexHandler = class(TComponent, IDownhillSimplexServer)
     private
-        FPointCloud: TList;
+        FPointCloud: TPointCloud;
         { FPointCloud can be shared between a few instances of "handler".
           In that case it should be released by caller. }
         FOwnsPointCloud: Boolean;
@@ -91,7 +103,7 @@ type
             AAlgoInitialStepsAngles: Double;
             AFinalTolerance, AExitDerivative: Double;
             AShowAlgoDetails: Boolean; ARunId: Integer;
-            APointCloud: TList; AOwnsPointCloud: Boolean); reintroduce;
+            APointCloud: TPointCloud; AOwnsPointCloud: Boolean); reintroduce;
         destructor Destroy; override;
         { Initializes performance counters and starts optimization.
           The procedure should not have parameters because it is called
@@ -119,7 +131,7 @@ type
             write FHandlerOutputProcedure;
         property ComputationTime: Single read FComputationTime;
         property RunId: Integer read FRunId;
-        property PointCloud: TList read FPointCloud;
+        property PointCloud: TPointCloud read FPointCloud;
     end;
 
 function DegToRad(iDeg: Double): Double;
@@ -131,6 +143,14 @@ uses bounding_box_server_form;
 function DegToRad(iDeg: Double): Double;
 begin
     Result := iDeg * PI / 180.0;
+end;
+
+constructor TPointCloud.Create(AAlpha, ABeta, AGamma: Single);
+begin
+    inherited Create;
+    FAlpha := AAlpha;
+    FBeta := ABeta;
+    FGamma := AGamma;
 end;
 
 function TDownHillSimplexHandler.ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
@@ -205,7 +225,7 @@ constructor TDownHillSimplexHandler.Create(
     AAlgoInitialStepsAngles: Double;
     AFinalTolerance, AExitDerivative: Double;
     AShowAlgoDetails: Boolean; ARunId: Integer;
-    APointCloud: TList; AOwnsPointCloud: Boolean);
+    APointCloud: TPointCloud; AOwnsPointCloud: Boolean);
 begin
     inherited Create(AOwner);
     FPointCloud := APointCloud;
