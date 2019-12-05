@@ -15,15 +15,14 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 unit RunningThread;
 
 interface
-
+uses Classes, Tools,
     {$IFNDEF Lazarus}
-uses Classes, Tools;
       //TODO: set up proper module name for Delhpi build.
       //DesignIntf;
     {$ELSE}
-uses Classes, Tools,
-      PropEdits;
+      PropEdits,
     {$ENDIF}
+    Contnrs;
 
 type
     TComputingProcedure = procedure of object;
@@ -70,6 +69,15 @@ type
         property OnCreate: TCreatingProcedure
             read FCreate write FCreate;
         property Handle: THandle read GetHandle;
+    end;
+
+    TRunnerPool = class(TObject)
+    private
+        FRunners: TComponentList;
+
+    public
+        constructor Create; reintroduce;
+        destructor Destroy; override;
     end;
 
 procedure Register;
@@ -134,7 +142,29 @@ function TRunner.GetHandle: THandle;
 begin
   Result:= FRunningThread.Handle;
 end;
-
 {$warnings on}
+
+constructor TRunnerPool.Create;
+var i: Integer;
+begin
+    inherited;
+    { Owns runner instances. }
+    FRunners := TComponentList.Create(True);
+    for i := 0 to TThread.ProcessorCount - 1 do
+    begin
+        FRunners.Add(TRunner.Create(nil));
+    end;
+end;
+
+destructor TRunnerPool.Destroy;
+var i: Integer;
+begin
+    { Waits for finishing. }
+    for i := 0 to FRunners.Count - 1 do
+        TRunner(FRunners[i]).Wait;
+    { Destroys all runner instances. }
+    FRunners.Free;
+    inherited;
+end;
 
 end.
