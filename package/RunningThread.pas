@@ -58,6 +58,7 @@ type
         procedure Wait;
         { Calls OnCreate if assigned. }
         procedure Loaded; override;
+        function Finished: Boolean;
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
@@ -78,6 +79,11 @@ type
     public
         constructor Create; reintroduce;
         destructor Destroy; override;
+        { Returns instance of runner ready to start new task.
+          Waits internally if necessary. }
+        function GetFreeRunner: TRunner;
+        { Waits for all runners finishing. }
+        procedure WaitAll;
     end;
 
 procedure Register;
@@ -112,7 +118,7 @@ end;
 destructor TRunner.Destroy;
 begin
     Wait;
-    inherited Destroy;
+    inherited;
 end;
 
 {$warnings off}
@@ -140,8 +146,16 @@ end;
 
 function TRunner.GetHandle: THandle;
 begin
-  Result:= FRunningThread.Handle;
+    Result:= FRunningThread.Handle;
 end;
+
+function TRunner.Finished: Boolean;
+begin
+    Result := True;
+    if FRunningThread <> nil then
+        Result := FRunningThread.Finished;
+end;
+
 {$warnings on}
 
 constructor TRunnerPool.Create;
@@ -150,6 +164,7 @@ begin
     inherited;
     { Owns runner instances. }
     FRunners := TComponentList.Create(True);
+    { Creates number of runners equal to number of CPU cores. }
     for i := 0 to TThread.ProcessorCount - 1 do
     begin
         FRunners.Add(TRunner.Create(nil));
@@ -160,11 +175,42 @@ destructor TRunnerPool.Destroy;
 var i: Integer;
 begin
     { Waits for finishing. }
-    for i := 0 to FRunners.Count - 1 do
-        TRunner(FRunners[i]).Wait;
+    WaitAll;
     { Destroys all runner instances. }
     FRunners.Free;
     inherited;
+end;
+
+function TRunnerPool.GetFreeRunner: TRunner;
+var
+    i: LongInt;
+    Runner: TRunner;
+begin
+    { Returns the first free runner if any exsits. }
+    for i := 0 to FRunners.Count - 1 do
+    begin
+        Runner := TRunner(FRunners[i]);
+        if Runner.Finished then
+        begin
+            Result := Runner;
+            Exit;
+        end;
+    end;
+    { Waits for finishing of any of runners. }
+
+end;
+
+procedure TRunnerPool.WaitAll;
+var
+    i: LongInt;
+    Runner: TRunner;
+begin
+    for i := 0 to FRunners.Count - 1 do
+        begin
+            Runner := TRunner(FRunners[i]);
+            if not Runner.Finished then
+                Runner.Wait;
+        end;
 end;
 
 end.
