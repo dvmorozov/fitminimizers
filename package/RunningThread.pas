@@ -22,7 +22,7 @@ uses Classes, Tools,
     {$ELSE}
       PropEdits,
     {$ENDIF}
-    Contnrs;
+    Contnrs, Windows;
 
 type
     TComputingProcedure = procedure of object;
@@ -185,19 +185,40 @@ function TRunnerPool.GetFreeRunner: TRunner;
 var
     i: LongInt;
     Runner: TRunner;
+    ThreadHandles: array of THandle;
+    FreeThreadIndex, LastError: DWord;
 begin
-    { Returns the first free runner if any exsits. }
-    for i := 0 to FRunners.Count - 1 do
+    Result := nil;
+    if FRunners.Count > 0 then
     begin
-        Runner := TRunner(FRunners[i]);
-        if Runner.Finished then
+        { Returns the first free runner if any exsits. }
+        for i := 0 to FRunners.Count - 1 do
         begin
-            Result := Runner;
-            Exit;
+            Runner := TRunner(FRunners[i]);
+            if Runner.Finished then
+            begin
+                Result := Runner;
+                Exit;
+            end;
+        end;
+        { Waits for finishing of any of runners. }
+        SetLength(ThreadHandles, FRunners.Count);
+        for i := 0 to FRunners.Count - 1 do
+        begin
+            Runner := TRunner(FRunners[i]);
+            ThreadHandles[i] := Runner.Handle;
+        end;
+        { Gets free thread index. }
+        FreeThreadIndex := WaitForMultipleObjects(
+            FRunners.Count, PWOHandleArray(ThreadHandles), False, INFINITE) - WAIT_OBJECT_0;
+        { Checks errors. }
+        if FreeThreadIndex <> $FFFFFFFF then
+            Result := TRunner(FRunners[FreeThreadIndex])
+        else
+        begin
+            LastError := GetLastError;
         end;
     end;
-    { Waits for finishing of any of runners. }
-
 end;
 
 procedure TRunnerPool.WaitAll;

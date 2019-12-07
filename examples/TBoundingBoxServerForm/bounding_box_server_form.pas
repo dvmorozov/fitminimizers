@@ -517,6 +517,7 @@ var
     RunId: Integer;
     PointCloud: TPointCloud;
     Runner: TRunner;
+    ThreadPool: TRunnerPool;
 begin
     FShowAlgoDetails := False;
     FShowPassed := True;
@@ -532,6 +533,7 @@ begin
     { Computes optimized volume and box sizes. }
     FindGlobalMinVolume;
 
+    ThreadPool := TRunnerPool.Create;
     RunId := 1;
     { Does the test for brute force orientation. }
     for x := 0 to (179 div cSteps) do
@@ -550,7 +552,7 @@ begin
                     Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, True);
 
                     { Executes optimization algorithms in separate thread. }
-                    Runner := TRunner.Create(nil);
+                    Runner := ThreadPool.GetFreeRunner;
 
                     { OuputMinVolume removes hanlder from FHandlers list. }
                     Handler.HandlerOutputProcedure := OuputBruteForce;
@@ -564,13 +566,12 @@ begin
                     Runner.OnOutput := Handler.DisplayOutput;
                     { Starts computation in separate thread. }
                     Runner.Run;
-                    { Waits for finishing computation. }
-                    Runner.Wait;
                     Inc(RunId);
                     Application.ProcessMessages;
                 end;
             end;
     PostProcessStatistics;
+    ThreadPool.Free;
 end;
 
 procedure TBoundingBoxServerForm.ButtonRandomTestClick(Sender: TObject);
