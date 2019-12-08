@@ -186,6 +186,7 @@ var
     i: LongInt;
     Runner: TRunner;
     ThreadHandles: array of THandle;
+    PHandle: ^THandle;
     FreeThreadIndex, LastError: DWord;
 begin
     Result := nil;
@@ -209,8 +210,8 @@ begin
             ThreadHandles[i] := Runner.Handle;
         end;
         { Gets free thread index. }
-        FreeThreadIndex := WaitForMultipleObjects(
-            FRunners.Count, PWOHandleArray(ThreadHandles), False, INFINITE) - WAIT_OBJECT_0;
+        FreeThreadIndex := MsgWaitForMultipleObjects(
+            {FRunners.Count}1, {PWOHandleArray(ThreadHandles)}ThreadHandles[0], False, INFINITE, QS_ALLINPUT) - WAIT_OBJECT_0;
         { Checks errors. }
         if FreeThreadIndex <> $FFFFFFFF then
             Result := TRunner(FRunners[FreeThreadIndex])
