@@ -15,15 +15,14 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 unit RunningThread;
 
 interface
-
+uses Classes, Tools, Forms,
     {$IFNDEF Lazarus}
-uses Classes, Tools;
       //TODO: set up proper module name for Delhpi build.
       //DesignIntf;
     {$ELSE}
-uses Classes, Tools,
-      PropEdits;
+      PropEdits,
     {$ENDIF}
+    Contnrs;
 
 type
     TComputingProcedure = procedure of object;
@@ -59,6 +58,7 @@ type
         procedure Wait;
         { Calls OnCreate if assigned. }
         procedure Loaded; override;
+        function Finished: Boolean;
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
@@ -70,6 +70,20 @@ type
         property OnCreate: TCreatingProcedure
             read FCreate write FCreate;
         property Handle: THandle read GetHandle;
+    end;
+
+    TRunnerPool = class(TObject)
+    private
+        FRunners: TComponentList;
+
+    public
+        constructor Create; reintroduce;
+        destructor Destroy; override;
+        { Returns instance of runner ready to start new task.
+          Waits internally if necessary. }
+        function GetFreeRunner: TRunner;
+        { Waits for all runners finishing. }
+        procedure WaitAll;
     end;
 
 procedure Register;
@@ -104,7 +118,7 @@ end;
 destructor TRunner.Destroy;
 begin
     Wait;
-    inherited Destroy;
+    inherited;
 end;
 
 {$warnings off}
@@ -132,9 +146,80 @@ end;
 
 function TRunner.GetHandle: THandle;
 begin
-  Result:= FRunningThread.Handle;
+    Result:= FRunningThread.Handle;
+end;
+
+function TRunner.Finished: Boolean;
+begin
+    Result := True;
+    if FRunningThread <> nil then
+        Result := FRunningThread.Finished;
 end;
 
 {$warnings on}
+
+constructor TRunnerPool.Create;
+var i, ThreadCount: Integer;
+begin
+    inherited;
+    { Owns runner instances. }
+    FRunners := TComponentList.Create(True);
+    { Creates number of runners equal to number of CPU cores. }
+    ThreadCount := TThread.ProcessorCount;
+    for i := 0 to ThreadCount - 1 do
+    begin
+        FRunners.Add(TRunner.Create(nil));
+    end;
+end;
+
+destructor TRunnerPool.Destroy;
+begin
+    { Waits for finishing. }
+    WaitAll;
+    { Destroys all runner instances. }
+    FRunners.Free;
+    inherited;
+end;
+
+function TRunnerPool.GetFreeRunner: TRunner;
+var
+    i: LongInt;
+    Runner: TRunner;
+begin
+    Result := nil;
+    if FRunners.Count > 0 then
+    begin
+        { Returns the first free runner if any exsits. }
+        while True do
+        begin
+            for i := 0 to FRunners.Count - 1 do
+            begin
+                Runner := TRunner(FRunners[i]);
+                if Runner.Finished then
+                begin
+                    Result := Runner;
+                    Exit;
+                end;
+            end;
+            { This must be called to process synchronous calls of output methods,
+              using any waiting method here can cause deadlock because waiting
+              will never finish because synchronous call will be never processed. }
+            Application.ProcessMessages;
+        end;
+    end;
+end;
+
+procedure TRunnerPool.WaitAll;
+var
+    i: LongInt;
+    Runner: TRunner;
+begin
+    for i := 0 to FRunners.Count - 1 do
+        begin
+            Runner := TRunner(FRunners[i]);
+            if not Runner.Finished then
+                Runner.Wait;
+        end;
+end;
 
 end.

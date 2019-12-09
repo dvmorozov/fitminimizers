@@ -148,6 +148,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Top = 30
     Width = 193
     ItemHeight = 13
+    OnChange = ComboBoxFilesChange
     TabOrder = 7
   end
   object Ed_IniParamLenght: TEdit
