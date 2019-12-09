@@ -15,7 +15,7 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 unit RunningThread;
 
 interface
-uses Classes, Tools,
+uses Classes, Tools, Forms,
     {$IFNDEF Lazarus}
       //TODO: set up proper module name for Delhpi build.
       //DesignIntf;
@@ -159,13 +159,14 @@ end;
 {$warnings on}
 
 constructor TRunnerPool.Create;
-var i: Integer;
+var i, ThreadCount: Integer;
 begin
     inherited;
     { Owns runner instances. }
     FRunners := TComponentList.Create(True);
     { Creates number of runners equal to number of CPU cores. }
-    for i := 0 to TThread.ProcessorCount - 1 do
+    ThreadCount := TThread.ProcessorCount;
+    for i := 0 to ThreadCount - 1 do
     begin
         FRunners.Add(TRunner.Create(nil));
     end;
@@ -184,50 +185,27 @@ function TRunnerPool.GetFreeRunner: TRunner;
 var
     i: LongInt;
     Runner: TRunner;
-    ThreadHandles: array of THandle;
-    PHandle, PCurHandle: ^THandle;
-    FreeThreadIndex, LastError: DWord;
-    RunnerCount: DWord;
 begin
     Result := nil;
     if FRunners.Count > 0 then
     begin
         { Returns the first free runner if any exsits. }
-        for i := 0 to FRunners.Count - 1 do
+        while True do
         begin
-            Runner := TRunner(FRunners[i]);
-            if Runner.Finished then
+            for i := 0 to FRunners.Count - 1 do
             begin
-                Result := Runner;
-                Exit;
+                Runner := TRunner(FRunners[i]);
+                if Runner.Finished then
+                begin
+                    Result := Runner;
+                    Exit;
+                end;
             end;
+            { This must be called to process synchronous calls of output methods,
+              using any waiting method here can cause deadlock because waiting
+              will never finish because synchronous call will be never processed. }
+            Application.ProcessMessages;
         end;
-        { All runners are busy, waits for finishing of any. }
-        SetLength(ThreadHandles, FRunners.Count);
-        RunnerCount := FRunners.Count;
-        GetMem(PHandle, RunnerCount * SizeOf(THandle));
-        PCurHandle := PHandle;
-
-        for i := 0 to FRunners.Count - 1 do
-        begin
-            Runner := TRunner(FRunners[i]);
-            ThreadHandles[i] := Runner.Handle;
-            PCurHandle^ := Runner.Handle;
-            Inc(PCurHandle);
-        end;
-        { Gets free thread index. }
-        FreeThreadIndex := WaitForMultipleObjects(
-            RunnerCount, PWOHandleArray(PHandle), False, INFINITE) - WAIT_OBJECT_0;
-        Assert(FreeThreadIndex < RunnerCount);
-        { Checks errors. }
-        if FreeThreadIndex <> $FFFFFFFF then
-            Result := TRunner(FRunners[FreeThreadIndex])
-        else
-        begin
-            LastError := GetLastError;
-        end;
-
-        FreeMem(PHandle);
     end;
 end;
 
