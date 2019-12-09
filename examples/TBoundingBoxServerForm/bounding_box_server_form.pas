@@ -37,6 +37,7 @@ type
         ButtonRandomTest: TButton;
         ButtonBruteForce: TButton;
         ButtonStop: TButton;
+        procedure ComboBoxFilesChange(Sender: TObject);
         procedure FormDestroy(Sender: TObject);
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
         procedure FormCreate(Sender: TObject);
@@ -47,6 +48,10 @@ type
 
     private
         FFilePath: String;
+        { Notifies that selected file has been changed. }
+        FReloadPointCloud: Boolean;
+        { Contains cached data to avoid redundand file reading. }
+        PointCloudCache: TPointCloud;
 
         FShowAlgoDetails: Boolean;
         FShowPassed: Boolean;
@@ -164,6 +169,8 @@ begin
         until FindNext(fSearchResult) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
+    { For first load. }
+    FReloadPointCloud := True;
 end;
 
 constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
@@ -213,6 +220,11 @@ procedure TBoundingBoxServerForm.FormDestroy(Sender: TObject);
 begin
     StopComputing;
     FHandlers.Free;
+end;
+
+procedure TBoundingBoxServerForm.ComboBoxFilesChange(Sender: TObject);
+begin
+    FReloadPointCloud := True;
 end;
 
 procedure TBoundingBoxServerForm.OuputMinVolume(Handler: TDownHillSimplexHandler);
@@ -554,6 +566,8 @@ begin
                     { Executes optimization algorithms in separate thread. }
                     Runner := ThreadPool.GetFreeRunner;
 
+                    Memo1.Lines.Add('%d', [PtrInt(Runner)]);
+
                     { OuputMinVolume removes hanlder from FHandlers list. }
                     Handler.HandlerOutputProcedure := OuputBruteForce;
                     { Assign runner procedures. }
@@ -567,7 +581,6 @@ begin
                     { Starts computation in separate thread. }
                     Runner.Run;
                     Inc(RunId);
-                    Application.ProcessMessages;
                 end;
             end;
     PostProcessStatistics;
@@ -907,57 +920,80 @@ type
         Result := fCoord;
     end;
 
-var
-    F: TextFile;
-    S, FileName: string;
-    fCoord: TOBJCoord;
-    fPoint: p3DVector;
-    RotX, RotY, RotZ, Matr: TMatrix;
-    fVector: T3Vector;
-begin
-    FileName := FFilePath + ComboBoxFiles.Text;
-    Result := TPointCloud.Create(Alpha, Beta, Gamma);
-    if FileExists(FileName) then
+    procedure LoadDataFromFile;
+    var
+        F: TextFile;
+        S, FileName: string;
+        OriginalPoint: p3DVector;
+        Coord: TOBJCoord;
+        Vector: T3Vector;
     begin
-        RotX := MatrixRotX(DegToRad(Alpha));
-        RotY := MatrixRotY(DegToRad(Beta));
-        RotZ := MatrixRotZ(DegToRad(Gamma));
-        { Computes rotation matrix. }
-        Matr := UnitMatrix;
-        Mul3DMatrix(RotZ, Matr, Matr);
-        Mul3DMatrix(RotY, Matr, Matr);
-        Mul3DMatrix(RotX, Matr, Matr);
+        FreePointCloud(PointCloudCache);
+        PointCloudCache := TPointCloud.Create(0, 0, 0);
 
-        fVector[1] := 1;
-        fVector[2] := 0;
-        fVector[3] := 0;
-        MulVectMatr(Matr, fVector);
-
-        AssignFile(F, FileName);
-        Reset(F);
-        while not (EOF(F)) do
+        FileName := FFilePath + ComboBoxFiles.Text;
+        if FileExists(FileName) then
         begin
-            Application.ProcessMessages;
-            Readln(F, S);
-            if (Length(S) >= 2) and (S[1] <> '#') then
+            { Data are loaded in original position. }
+            AssignFile(F, FileName);
+            Reset(F);
+            while not (EOF(F)) do
             begin
-                S := Uppercase(S);
-                if (S[1] = 'V') and (S[2] = ' ') then
+                Application.ProcessMessages;
+                Readln(F, S);
+                if (Length(S) >= 2) and (S[1] <> '#') then
                 begin
-                    { Reads vertex data. }
-                    New(fPoint);
-                    fCoord := GetCoords(S);
-                    fVector[1] := fCoord.X;
-                    fVector[2] := fCoord.Y;
-                    fVector[3] := fCoord.Z;
-                    MulVectMatr(Matr, fVector);
+                    S := Uppercase(S);
+                    if (S[1] = 'V') and (S[2] = ' ') then
+                    begin
+                        { Reads vertex data. }
+                        New(OriginalPoint);
+                        Coord := GetCoords(S);
+                        Vector[1] := Coord.X;
+                        Vector[2] := Coord.Y;
+                        Vector[3] := Coord.Z;
 
-                    fPoint^.FVector := fVector;
-                    Result.Add(fPoint);
+                        OriginalPoint^.FVector := Vector;
+                        PointCloudCache.Add(OriginalPoint);
+                    end;
                 end;
             end;
+            CloseFile(F);
         end;
-        CloseFile(F);
+    end;
+
+var
+    OriginalPoint, RotatedPoint: p3DVector;
+    RotX, RotY, RotZ, Matr: TMatrix;
+    Vector: T3Vector;
+    i: LongInt;
+begin
+    if FReloadPointCloud then
+    begin
+        LoadDataFromFile;
+        FReloadPointCloud := False;
+    end;
+
+    Result := TPointCloud.Create(Alpha, Beta, Gamma);
+
+    RotX := MatrixRotX(DegToRad(Alpha));
+    RotY := MatrixRotY(DegToRad(Beta));
+    RotZ := MatrixRotZ(DegToRad(Gamma));
+    { Computes rotation matrix. }
+    Matr := UnitMatrix;
+    Mul3DMatrix(RotZ, Matr, Matr);
+    Mul3DMatrix(RotY, Matr, Matr);
+    Mul3DMatrix(RotX, Matr, Matr);
+
+    { Rotates data point. }
+    for i := 0 to PointCloudCache.Count - 1 do
+    begin
+        New(RotatedPoint);
+        OriginalPoint := p3DVector(PointCloudCache.Items[i]);
+        Vector := OriginalPoint^.FVector;
+        MulVectMatr(Matr, Vector);
+        RotatedPoint^.FVector := Vector;
+        Result.Add(RotatedPoint);
     end;
 end;
 
