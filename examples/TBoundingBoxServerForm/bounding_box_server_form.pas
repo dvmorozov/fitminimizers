@@ -557,7 +557,7 @@ begin
                     fAlpha := x * cSteps;
                     fBeta := y * cSteps;
                     fGamma := z * cSteps;
-
+                    { Loads data and rotates them by given angles. }
                     PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
@@ -618,6 +618,9 @@ begin
 
             PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
             Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, x, PointCloud, True);
+            { Computes minimum volume directly in the calling thread.
+              It could be refactored to use thread pool as it was done
+              for "brute force" search. }
             Handler.OptimizeBoundingBox;
             if not FStop then
             begin
