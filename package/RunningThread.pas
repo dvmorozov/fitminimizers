@@ -172,7 +172,6 @@ begin
 end;
 
 destructor TRunnerPool.Destroy;
-var i: Integer;
 begin
     { Waits for finishing. }
     WaitAll;
@@ -186,8 +185,9 @@ var
     i: LongInt;
     Runner: TRunner;
     ThreadHandles: array of THandle;
-    PHandle: ^THandle;
+    PHandle, PCurHandle: ^THandle;
     FreeThreadIndex, LastError: DWord;
+    RunnerCount: DWord;
 begin
     Result := nil;
     if FRunners.Count > 0 then
@@ -202,16 +202,23 @@ begin
                 Exit;
             end;
         end;
-        { Waits for finishing of any of runners. }
+        { All runners are busy, waits for finishing of any. }
         SetLength(ThreadHandles, FRunners.Count);
+        RunnerCount := FRunners.Count;
+        GetMem(PHandle, RunnerCount * SizeOf(THandle));
+        PCurHandle := PHandle;
+
         for i := 0 to FRunners.Count - 1 do
         begin
             Runner := TRunner(FRunners[i]);
             ThreadHandles[i] := Runner.Handle;
+            PCurHandle^ := Runner.Handle;
+            Inc(PCurHandle);
         end;
         { Gets free thread index. }
-        FreeThreadIndex := MsgWaitForMultipleObjects(
-            {FRunners.Count}1, {PWOHandleArray(ThreadHandles)}ThreadHandles[0], False, INFINITE, QS_ALLINPUT) - WAIT_OBJECT_0;
+        FreeThreadIndex := WaitForMultipleObjects(
+            RunnerCount, PWOHandleArray(PHandle), False, INFINITE) - WAIT_OBJECT_0;
+        Assert(FreeThreadIndex < RunnerCount);
         { Checks errors. }
         if FreeThreadIndex <> $FFFFFFFF then
             Result := TRunner(FRunners[FreeThreadIndex])
@@ -219,6 +226,8 @@ begin
         begin
             LastError := GetLastError;
         end;
+
+        FreeMem(PHandle);
     end;
 end;
 
