@@ -19,8 +19,9 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="969"/>
-        <CursorPos Y="996"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="550"/>
+        <CursorPos X="66" Y="565"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -96,10 +97,9 @@
       </Unit10>
       <Unit11>
         <Filename Value="..\..\package\RunningThread.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="179"/>
-        <CursorPos X="35" Y="130"/>
+        <TopLine Value="2"/>
+        <CursorPos X="27" Y="18"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -190,21 +190,21 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="15" Y="21"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="30"/>
       </Unit23>
       <Unit24>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\func.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="145"/>
         <CursorPos X="187" Y="162"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="30"/>
       </Unit24>
       <Unit25>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\base.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="84"/>
         <CursorPos X="24" Y="101"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="30"/>
       </Unit25>
       <Unit26>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\sysosh.inc"/>
@@ -218,14 +218,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1685"/>
         <CursorPos X="6" Y="1702"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="29"/>
       </Unit27>
       <Unit28>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1572"/>
         <CursorPos X="22" Y="1579"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit28>
       <Unit29>
         <Filename Value="C:\lazarus\lcl\forms.pp"/>
@@ -233,7 +233,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1802"/>
         <CursorPos X="3" Y="1819"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit29>
       <Unit30>
         <Filename Value="C:\lazarus\lcl\interfaces\win32\win32object.inc"/>
@@ -249,120 +249,120 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="169" Column="22" TopLine="147"/>
       </Position1>
       <Position2>
         <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="93" Column="28" TopLine="76"/>
       </Position2>
       <Position3>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="93" Column="28" TopLine="76"/>
+        <Caret Line="173" Column="22" TopLine="161"/>
       </Position3>
       <Position4>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="173" Column="22" TopLine="161"/>
+        <Caret Line="227" Column="22" TopLine="199"/>
       </Position4>
       <Position5>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="227" Column="22" TopLine="199"/>
+        <Caret Line="260" Column="37" TopLine="232"/>
       </Position5>
       <Position6>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="260" Column="37" TopLine="232"/>
+        <Caret Line="561" Column="49" TopLine="533"/>
       </Position6>
       <Position7>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="561" Column="49" TopLine="533"/>
+        <Caret Line="623" Column="41" TopLine="596"/>
       </Position7>
       <Position8>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="623" Column="41" TopLine="596"/>
+        <Caret Line="780" Column="33" TopLine="752"/>
       </Position8>
       <Position9>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="780" Column="33" TopLine="752"/>
+        <Caret Line="904" Column="23" TopLine="891"/>
       </Position9>
       <Position10>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="904" Column="23" TopLine="891"/>
+        <Caret Line="895" Column="32" TopLine="889"/>
       </Position10>
       <Position11>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="895" Column="32" TopLine="889"/>
       </Position11>
       <Position12>
         <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="904" Column="23" TopLine="876"/>
       </Position12>
       <Position13>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="904" Column="23" TopLine="876"/>
+        <Caret Line="954" Column="44" TopLine="927"/>
       </Position13>
       <Position14>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="954" Column="44" TopLine="927"/>
       </Position14>
       <Position15>
         <Filename Value="bounding_box_server_form.pas"/>
+        <Caret Line="52" Column="26" TopLine="25"/>
       </Position15>
       <Position16>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="52" Column="26" TopLine="25"/>
+        <Caret Line="93" Column="32" TopLine="66"/>
       </Position16>
       <Position17>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="93" Column="32" TopLine="66"/>
+        <Caret Line="173" Column="22" TopLine="145"/>
       </Position17>
       <Position18>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="173" Column="22" TopLine="145"/>
+        <Caret Line="227" Column="22" TopLine="199"/>
       </Position18>
       <Position19>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="227" Column="22" TopLine="199"/>
+        <Caret Line="260" Column="37" TopLine="251"/>
       </Position19>
       <Position20>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="260" Column="37" TopLine="251"/>
+        <Caret Line="561" Column="49" TopLine="533"/>
       </Position20>
       <Position21>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="561" Column="49" TopLine="533"/>
+        <Caret Line="623" Column="41" TopLine="596"/>
       </Position21>
       <Position22>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="623" Column="41" TopLine="596"/>
+        <Caret Line="798" Column="16" TopLine="776"/>
       </Position22>
       <Position23>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="798" Column="16" TopLine="776"/>
+        <Caret Line="928" Column="33" TopLine="917"/>
       </Position23>
       <Position24>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="928" Column="33" TopLine="917"/>
+        <Caret Line="986" Column="23" TopLine="961"/>
       </Position24>
       <Position25>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="986" Column="23" TopLine="961"/>
+        <Caret Line="965" Column="10" TopLine="968"/>
       </Position25>
       <Position26>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="965" Column="10" TopLine="968"/>
+        <Caret Line="928" Column="31" TopLine="912"/>
       </Position26>
       <Position27>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="928" Column="31" TopLine="912"/>
+        <Caret Line="929" Column="55" TopLine="912"/>
       </Position27>
       <Position28>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="929" Column="55" TopLine="912"/>
+        <Caret Line="927" Column="15" TopLine="903"/>
       </Position28>
       <Position29>
         <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="927" Column="15" TopLine="903"/>
+        <Caret Line="928" Column="27" TopLine="931"/>
       </Position29>
       <Position30>
-        <Filename Value="bounding_box_server_form.pas"/>
-        <Caret Line="928" Column="27" TopLine="931"/>
+        <Filename Value="..\..\package\RunningThread.pas"/>
+        <Caret Line="18" Column="20" TopLine="5"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

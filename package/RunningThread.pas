@@ -22,7 +22,7 @@ uses Classes, Tools, Forms,
     {$ELSE}
       PropEdits,
     {$ENDIF}
-    Contnrs, Windows;
+    Contnrs;
 
 type
     TComputingProcedure = procedure of object;

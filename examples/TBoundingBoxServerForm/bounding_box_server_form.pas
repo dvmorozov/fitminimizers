@@ -562,12 +562,8 @@ begin
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
                     Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, True);
-
-                    { Executes optimization algorithms in separate thread. }
+                    { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
-
-                    Memo1.Lines.Add('%d', [PtrInt(Runner)]);
-
                     { OuputMinVolume removes hanlder from FHandlers list. }
                     Handler.HandlerOutputProcedure := OuputBruteForce;
                     { Assign runner procedures. }
