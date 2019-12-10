@@ -50,7 +50,7 @@ type
 
         FStop: Boolean;
         FShowDetails: Boolean;
-        FInitialAngleSteps: Double;
+        FInitialAngleStep: Double;
         FRecreateSimplexFromOriginal: Boolean;
 
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
@@ -100,7 +100,7 @@ type
           Handler doesn't copy point cloud, it either owns it or just keep
           reference to external object. }
         constructor Create(AOwner: TComponent; AAlpha, ABeta, AGamma,
-            AInitialAngleSteps: Double;
+            AInitialAngleStep: Double;
             AFinalTolerance, AExitDerivative: Double;
             AShowDetails: Boolean; ARunId: Integer;
             APointCloud: TPointCloud; AOwnsPointCloud: Boolean); reintroduce;
@@ -222,7 +222,7 @@ end;
 
 constructor TDownHillSimplexHandler.Create(
     AOwner: TComponent; AAlpha, ABeta, AGamma,
-    AInitialAngleSteps: Double;
+    AInitialAngleStep: Double;
     AFinalTolerance, AExitDerivative: Double;
     AShowDetails: Boolean; ARunId: Integer;
     APointCloud: TPointCloud; AOwnsPointCloud: Boolean);
@@ -250,7 +250,7 @@ begin
     FOriginalGamma := AGamma;
     { Initializes auxiliary attributes. }
     FShowDetails := AShowDetails;
-    FInitialAngleSteps := AInitialAngleSteps;
+    FInitialAngleStep := AInitialAngleStep;
     FStop := False;
     FRunId := ARunId;
 end;
@@ -379,7 +379,7 @@ end;
 function TDownHillSimplexHandler.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
-    Result := FInitialAngleSteps;
+    Result := FInitialAngleStep;
 end;
 {$hints on}
 
