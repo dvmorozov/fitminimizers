@@ -891,7 +891,7 @@ end;
 procedure TBoundingBoxServerForm.FreePointCloud(PointCloud: TPointCloud);
 var
     x: Integer;
-    Point: p3DVector;
+    Point: P3DVector;
 begin
     if PointCloud <> nil then
     begin
@@ -933,7 +933,7 @@ type
     var
         F: TextFile;
         S, FileName: string;
-        OriginalPoint: p3DVector;
+        OriginalPoint: P3DVector;
         Coord: TOBJCoord;
         Vector: T3Vector;
     begin
@@ -972,7 +972,7 @@ type
     end;
 
 var
-    OriginalPoint, RotatedPoint: p3DVector;
+    OriginalPoint, RotatedPoint: P3DVector;
     RotX, RotY, RotZ, Matr: TMatrix;
     Vector: T3Vector;
     i: LongInt;
@@ -998,7 +998,7 @@ begin
     for i := 0 to PointCloudCache.Count - 1 do
     begin
         New(RotatedPoint);
-        OriginalPoint := p3DVector(PointCloudCache.Items[i]);
+        OriginalPoint := P3DVector(PointCloudCache.Items[i]);
         Vector := OriginalPoint^.FVector;
         MulVectMatr(Matr, Vector);
         RotatedPoint^.FVector := Vector;
@@ -1023,7 +1023,7 @@ const
     Min111: double = -10.0;
 var
     i: LongInt;
-    Point: p3DVector;
+    Point: P3DVector;
     Translation111: double;
 begin
     Randomize;
