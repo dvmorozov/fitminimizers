@@ -151,7 +151,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     OnChange = ComboBoxFilesChange
     TabOrder = 7
   end
-  object Ed_IniParamLenght: TEdit
+  object EditInitialAngleStep: TEdit
     Left = 366
     Height = 21
     Top = 4
@@ -159,7 +159,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 8
     Text = '37'
   end
-  object Ed_FinalTolerance: TEdit
+  object EditFinalTolerance: TEdit
     Left = 366
     Height = 21
     Top = 26
@@ -167,7 +167,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 9
     Text = '0.00001'
   end
-  object Ed_ExitDerivate: TEdit
+  object EditExitDerivate: TEdit
     Left = 366
     Height = 21
     Top = 48
