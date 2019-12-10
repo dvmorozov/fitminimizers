@@ -25,9 +25,9 @@ type
         Label1: TLabel;
         Label2: TLabel;
         Label3: TLabel;
-        Ed_IniParamLenght: TEdit;
-        Ed_FinalTolerance: TEdit;
-        Ed_ExitDerivate: TEdit;
+        EditInitialAngleStep: TEdit;
+        EditFinalTolerance: TEdit;
+        EditExitDerivate: TEdit;
         Label4: TLabel;
         Label5: TLabel;
         Label6: TLabel;
@@ -64,6 +64,9 @@ type
         { Differences between value of volume obtained at the last step
           and etalon value. }
         FMaxDeltaVolume, FMinDeltaVolume: Single;
+        { Mininum and maximum box sizes obtained by different threads
+          of "brute force" search. }
+        FMinBoxSizes, FMaxBoxSizes: TDoubleVector3;
         { Sets of maximum and minimus coordinates corresponding to globally
           minimum volume. }
         FMinCoords, FMaxCoords: TDoubleVector3;
@@ -71,7 +74,7 @@ type
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
         FOptiResultBoxVolume: Double;
 
-        function GetInitialAngleSteps: Double;
+        function GetInitialAngleStep: Double;
         procedure StopComputing;
         { Prints final results among a few runs. }
         procedure OutputResults(PointCloud: TList);
@@ -89,7 +92,7 @@ type
         procedure OuputBruteForce(Handler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(Alpha, Beta, Gamma: Double;
-            InitialAngleSteps: Double; ShowDetails: Boolean;
+            InitialAngleStep: Double; ShowDetails: Boolean;
             RunId: Integer; PointCloud: TPointCloud;
             OwnsPointCloud: Boolean): TDownHillSimplexHandler;
         { Releases point cloud data. }
@@ -111,42 +114,42 @@ implementation
 
 {$R *.dfm}
 
-procedure SortUp(var iS1, iS2, iS3: double);
+procedure SortUp(var S1, S2, S3: Double);
 var
-    fTmp: double;
+    Tmp: Double;
 begin
-    if iS2 < iS1 then
+    if S2 < S1 then
     begin
-        fTmp := iS1;
-        iS1 := iS2;
-        iS2 := fTmp;
+        Tmp := S1;
+        S1 := S2;
+        S2 := Tmp;
     end;
-    if iS3 < iS2 then
+    if S3 < S2 then
     begin
-        fTmp := iS2;
-        iS2 := iS3;
-        iS3 := fTmp;
-        if iS2 < iS1 then
+        Tmp := S2;
+        S2 := S3;
+        S3 := Tmp;
+        if S2 < S1 then
         begin
-            fTmp := iS1;
-            iS1 := iS2;
-            iS2 := fTmp;
+            Tmp := S1;
+            S1 := S2;
+            S2 := Tmp;
         end;
     end;
 end;
 
-function ConvertValue(iConvStr: String; var iValue: double): Boolean;
+function StrToValue(Str: String; var Value: double): Boolean;
 var
-    fCode: Integer;
+    Code: Integer;
 begin
     Result := True;
-    if Pos(',', iConvStr) > 0 then
-        iConvStr[Pos(',', iConvStr)] := '.';
-    if Pos('°', iConvStr) > 0 then
-        iConvStr[Pos('°', iConvStr)] := ' ';
-    iConvStr := Trim(iConvStr);
-    Val(iConvStr, iValue, fCode);
-    if fCode <> 0 then
+    if Pos(',', Str) > 0 then
+        Str[Pos(',', Str)] := '.';
+    if Pos('°', Str) > 0 then
+        Str[Pos('°', Str)] := ' ';
+    Str := Trim(Str);
+    Val(Str, Value, Code);
+    if Code <> 0 then
     begin
         Result := False;
     end;
@@ -156,23 +159,23 @@ end;
 
 procedure TBoundingBoxServerForm.FormCreate(Sender: TObject);
 var
-    fSearchResult: TSearchRec;
-    fExt: string;
+    SearchRec: TSearchRec;
+    Ext: string;
 begin
     { Reads file list from the directory adjacent to the program directory. }
     FFilePath := ExtractFilePath(ParamStr(0));
     FFilePath := IncludeTrailingPathDelimiter(FFilePath) + '..' + PathDelim;
     FFilePath := ExpandFileName(FFilePath) + 'Models' + PathDelim;
     ComboBoxFiles.Items.Clear;
-    if FindFirst(FFilePath + '*.*', faAnyFile, fSearchResult) = 0 then
+    if FindFirst(FFilePath + '*.*', faAnyFile, SearchRec) = 0 then
     begin
         repeat
-            fExt := LowerCase(ExtractFileExt(fSearchResult.Name));
-            if (fExt = '.obj') then
+            Ext := LowerCase(ExtractFileExt(SearchRec.Name));
+            if (Ext = '.obj') then
             begin
-                ComboBoxFiles.Items.Add(fSearchResult.Name);
+                ComboBoxFiles.Items.Add(SearchRec.Name);
             end;
-        until FindNext(fSearchResult) <> 0;
+        until FindNext(SearchRec) <> 0;
     end;
     ComboBoxFiles.ItemIndex := 0;
     { For first load. }
@@ -188,35 +191,35 @@ begin
 end;
 
 function TBoundingBoxServerForm.CreateHandler(Alpha, Beta, Gamma: Double;
-    InitialAngleSteps: Double; ShowDetails: Boolean; RunId: Integer;
+    InitialAngleStep: Double; ShowDetails: Boolean; RunId: Integer;
     PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 var
-    fFinalTolerance, fExitDerivate: double;
+    FinalTolerance, ExitDerivate: double;
 begin
     { This suppresses useless hints in Lazarus. }
-    fFinalTolerance := 0.00001;
-    fExitDerivate := 0.5;
+    FinalTolerance := 0.00001;
+    ExitDerivate := 0.5;
 
-    if not ConvertValue(Ed_FinalTolerance.Text, fFinalTolerance) then
+    if not StrToValue(EditFinalTolerance.Text, FinalTolerance) then
     begin
-        fFinalTolerance := 0.00001; // default value
+        FinalTolerance := 0.00001; // default value
     end;
-    if not ConvertValue(Ed_ExitDerivate.Text, fExitDerivate) then
+    if not StrToValue(EditExitDerivate.Text, ExitDerivate) then
     begin
-        fExitDerivate := 0.5;       // default value
+        ExitDerivate := 0.5;       // default value
     end;
     Result := TDownHillSimplexHandler.Create(self, Alpha, Beta,
-        Gamma, InitialAngleSteps, fFinalTolerance, fExitDerivate,
+        Gamma, InitialAngleStep, FinalTolerance, ExitDerivate,
         ShowDetails, RunId, PointCloud, OwnsPointCloud);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
 
-function TBoundingBoxServerForm.GetInitialAngleSteps: Double;
+function TBoundingBoxServerForm.GetInitialAngleStep: Double;
 begin
     { This suppresses useless hints in Lazarus. }
     Result := 37;
-    if not ConvertValue(Ed_IniParamLenght.Text, Result) then
+    if not StrToValue(EditInitialAngleStep.Text, Result) then
     begin
         Result := 37; //default value
     end;
@@ -269,7 +272,7 @@ begin
     Runner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
-    Handler := CreateHandler(0, 0, 0, GetInitialAngleSteps, True, 1, PointCloud, True);
+    Handler := CreateHandler(0, 0, 0, GetInitialAngleStep, True, 1, PointCloud, True);
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := OuputMinVolume;
     { Assign runner procedures. }
@@ -286,109 +289,109 @@ end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
 const
-    cCriterion01 = 0.001;
+    Criterion01 = 0.001;
     // criterion for relative deviation pass/fail; e.g. 0.0 1 => 0.1%
-    cCriterion1 = 0.01;
+    Criterion1 = 0.01;
     // criterion for relative deviation pass/fail; e.g. 0.01 => 1%
 
 var
-    x: Integer;
-    fP1, fCode: Integer;
-    fString, fString2, fRateing: string;
-    fValue: Single;
-    fMinVolume, fDeviation, fSumTime, fX, fY, fZ: Double;
-    fPassCount01, fFailCount01, fPassCount1, fFailCount1, fSumTimeCount: Integer;
-    fSL: TStringList;
+    i: Integer;
+    Pos, Code: Integer;
+    String1, String2, Rate: string;
+    Value: Single;
+    MinVolume, Deviation, TotalTime, X, Y, Z: Double;
+    PassCount01, FailCount01, PassCount1, FailCount1, TotalTimeCount: Integer;
+    StringList: TStringList;
     Passed: Boolean;
 begin
-    fMinVolume := 1e20;
+    MinVolume := 1e20;
     { Gets optimized MinVolume. }
-    for x := 0 to Memo2.Lines.Count - 1 do
+    for i := 0 to Memo2.Lines.Count - 1 do
     begin
-        fString := Trim(Memo2.Lines[x]);
-        fP1 := PosEx(' ', fString, 1);
-        if fP1 > 0 then
+        String1 := Trim(Memo2.Lines[i]);
+        Pos := PosEx(' ', String1, 1);
+        if Pos > 0 then
         begin
-            fString := Trim(Copy(fString, fP1, 1024));
-            fP1 := PosEx(' ', fString, 1);
-            if fP1 > 0 then
+            String1 := Trim(Copy(String1, Pos, 1024));
+            Pos := PosEx(' ', String1, 1);
+            if Pos > 0 then
             begin
-                fString2 := Trim(Copy(fString, fP1, 1024));
-                fString := Trim(Copy(fString, 1, fP1 - 1));
-                fString := StringReplace(fString, ',', '.', [rfReplaceAll]);
-                Val(fString, fValue, fCode);
-                if fCode = 0 then
+                String2 := Trim(Copy(String1, Pos, 1024));
+                String1 := Trim(Copy(String1, 1, Pos - 1));
+                String1 := StringReplace(String1, ',', '.', [rfReplaceAll]);
+                Val(String1, Value, Code);
+                if Code = 0 then
                 begin
-                    if fValue < fMinVolume then
+                    if Value < MinVolume then
                     begin
-                        fMinVolume := fValue;
-                        fP1 := PosEx('(', fString2, 1);
-                        fString2 := Trim(Copy(fString2, fP1 + 1, 1024));
-                        fP1 := PosEx(')', fString2, 1);
-                        fString2 := Trim(Copy(fString2, 1, fP1 - 1));
-                        fString2 := StringReplace(fString2, ',', '.', [rfReplaceAll]);
-                        fP1 := PosEx(' ', fString2, 1);
-                        fString := Trim(Copy(fString2, 1, fP1 - 1));
-                        Val(fString, fX, fCode);
-                        fString2 := Trim(Copy(fString2, fP1 + 1, 1024));
-                        fP1 := PosEx(' ', fString2, 1);
-                        fString := Trim(Copy(fString2, 1, fP1 - 1));
-                        Val(fString, fY, fCode);
-                        fString := Trim(Copy(fString2, fP1 + 1, 1024));
-                        Val(fString, fZ, fCode);
+                        MinVolume := Value;
+                        Pos := PosEx('(', String2, 1);
+                        String2 := Trim(Copy(String2, Pos + 1, 1024));
+                        Pos := PosEx(')', String2, 1);
+                        String2 := Trim(Copy(String2, 1, Pos - 1));
+                        String2 := StringReplace(String2, ',', '.', [rfReplaceAll]);
+                        Pos := PosEx(' ', String2, 1);
+                        String1 := Trim(Copy(String2, 1, Pos - 1));
+                        Val(String1, X, Code);
+                        String2 := Trim(Copy(String2, Pos + 1, 1024));
+                        Pos := PosEx(' ', String2, 1);
+                        String1 := Trim(Copy(String2, 1, Pos - 1));
+                        Val(String1, Y, Code);
+                        String1 := Trim(Copy(String2, Pos + 1, 1024));
+                        Val(String1, Z, Code);
                     end;
                 end;
             end;
         end;
     end;
     { Get optimized Volume Pass/Fail statistics. }
-    fPassCount01 := 0;
-    fFailCount01 := 0;
-    fPassCount1 := 0;
-    fFailCount1 := 0;
+    PassCount01 := 0;
+    FailCount01 := 0;
+    PassCount1 := 0;
+    FailCount1 := 0;
     Memo2.Lines.BeginUpdate;
-    fSL := TStringList.Create;
-    fSL.Duplicates := dupAccept;
-    if fMinVolume > 0 then
+    StringList := TStringList.Create;
+    StringList.Duplicates := dupAccept;
+    if MinVolume > 0 then
     begin
-        for x := 0 to Memo2.Lines.Count - 1 do
+        for i := 0 to Memo2.Lines.Count - 1 do
         begin
-            fString := Trim(Memo2.Lines[x]);
-            fP1 := PosEx(' ', fString, 1);
-            if fP1 > 0 then
+            String1 := Trim(Memo2.Lines[i]);
+            Pos := PosEx(' ', String1, 1);
+            if Pos > 0 then
             begin
-                fString := Trim(Copy(fString, fP1, 1024));
-                fP1 := PosEx(' ', fString, 1);
-                if fP1 > 0 then
+                String1 := Trim(Copy(String1, Pos, 1024));
+                Pos := PosEx(' ', String1, 1);
+                if Pos > 0 then
                 begin
-                    fString := Trim(Copy(fString, 1, fP1 - 1));
-                    fString := StringReplace(fString, ',', '.', [rfReplaceAll]);
-                    Val(fString, fValue, fCode);
-                    if fCode = 0 then
+                    String1 := Trim(Copy(String1, 1, Pos - 1));
+                    String1 := StringReplace(String1, ',', '.', [rfReplaceAll]);
+                    Val(String1, Value, Code);
+                    if Code = 0 then
                     begin
-                        fDeviation := (fValue - fMinVolume) / fMinVolume;
-                        fRateing := 'Pass';
+                        Deviation := (Value - MinVolume) / MinVolume;
+                        Rate := 'Pass';
                         Passed := True;
-                        if fDeviation < cCriterion1 then
-                            Inc(fPassCount1)
+                        if Deviation < Criterion1 then
+                            Inc(PassCount1)
                         else
                         begin
-                            Inc(fFailCount1);
-                            fRateing := 'F1';
+                            Inc(FailCount1);
+                            Rate := 'F1';
                             Passed := False;
                         end;
-                        if fDeviation < cCriterion01 then
-                            Inc(fPassCount01)
+                        if Deviation < Criterion01 then
+                            Inc(PassCount01)
                         else
                         begin
-                            Inc(fFailCount01);
-                            fRateing := 'F01';
+                            Inc(FailCount01);
+                            Rate := 'F01';
                             Passed := False;
                         end;
                         if not Passed or FShowPassed then
                         begin
                             { Only "failed" tests are added to the resulting list. }
-                            fSL.Add(Memo2.Lines[x] + ' - ' + fRateing);
+                            StringList.Add(Memo2.Lines[i] + ' - ' + Rate);
                         end;
                     end;
                 end;
@@ -396,63 +399,63 @@ begin
         end;
     end;
     Memo2.Clear;
-    Memo2.Text := fSL.Text;
+    Memo2.Text := StringList.Text;
     Memo2.Lines.EndUpdate;
 
     { Get Time to proccess. }
-    fSumTime := 0;
-    fSumTimeCount := 0;
-    for x := 0 to Memo2.Lines.Count - 1 do
+    TotalTime := 0;
+    TotalTimeCount := 0;
+    for i := 0 to Memo2.Lines.Count - 1 do
     begin
-        fString := Trim(Memo2.Lines[x]);
-        fP1 := PosEx('---', fString, 1);
-        if fP1 > 0 then
+        String1 := Trim(Memo2.Lines[i]);
+        Pos := PosEx('---', String1, 1);
+        if Pos > 0 then
         begin
-            fString := Trim(Copy(fString, fP1 + 3, 1024));
-            fP1 := PosEx('--', fString, 1);
-            if fP1 > 0 then
+            String1 := Trim(Copy(String1, Pos + 3, 1024));
+            Pos := PosEx('--', String1, 1);
+            if Pos > 0 then
             begin
-                fString := Trim(Copy(fString, 1, fP1 - 1));
-                fString := StringReplace(fString, ',', '.', [rfReplaceAll]);
-                Val(fString, fValue, fCode);
-                if fCode = 0 then
+                String1 := Trim(Copy(String1, 1, Pos - 1));
+                String1 := StringReplace(String1, ',', '.', [rfReplaceAll]);
+                Val(String1, Value, Code);
+                if Code = 0 then
                 begin
-                    fSumTime := fSumTime + fValue;
-                    Inc(fSumTimeCount);
+                    TotalTime := TotalTime + Value;
+                    Inc(TotalTimeCount);
                 end;
             end;
         end;
     end;
-    if fSumTimeCount > 0 then
-        fSumTime := fSumTime / fSumTimeCount
+    if TotalTimeCount > 0 then
+        TotalTime := TotalTime / TotalTimeCount
     else
-        fSumTime := 0;
+        TotalTime := 0;
 
-    if (fPassCount01 > 0) then
+    if (PassCount01 > 0) then
     begin
-        SortUp(fX, fY, fZ);
+        SortUp(X, Y, Z);
         Memo1.Lines.Add('');
         Memo1.Lines.Add('');
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
         Memo1.Lines.Add('Minimum Volume    : ' +
-            Format('%.4f (%6.3f %6.3f %6.3f)', [fMinVolume, fX, fY, fZ]));
+            Format('%.4f (%6.3f %6.3f %6.3f)', [MinVolume, X, Y, Z]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
-        fDeviation := (FOptiResultBoxVolume - fMinVolume) / fMinVolume * 100;
+        Deviation := (FOptiResultBoxVolume - MinVolume) / MinVolume * 100;
         Memo1.Lines.Add('Calculation Delta : ' +
-            Format('%.4f (%.2f%%)', [(FOptiResultBoxVolume - fMinVolume), fDeviation]));
+            Format('%.4f (%.2f%%)', [(FOptiResultBoxVolume - MinVolume), Deviation]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
         Memo1.Lines.Add('Passrate 0.1%     : ' + Format('%.4f%%',
-            [fPassCount01 / (fPassCount01 + fFailCount01) * 100]));
+            [PassCount01 / (PassCount01 + FailCount01) * 100]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
         Memo1.Lines.Add('Passrate 1%       : ' + Format('%.4f%%',
-            [fPassCount1 / (fPassCount1 + fFailCount1) * 100]));
+            [PassCount1 / (PassCount1 + FailCount1) * 100]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
-        Memo1.Lines.Add('Time Average      : ' + Format('%.4f', [fSumTime]));
+        Memo1.Lines.Add('Time Average      : ' + Format('%.4f', [TotalTime]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
     end
@@ -468,10 +471,9 @@ end;
 
 procedure TBoundingBoxServerForm.OuputBruteForce(Handler: TDownHillSimplexHandler);
 var
-    fResult: string;
-    fDeltaVolume: Single;
-    fDeltaCord: TDoubleVector3;
-    FMinDeltaCord, FMaxDeltaCord: TDoubleVector3;
+    Line: string;
+    DeltaVolume: Single;
+    BoxSizes: TDoubleVector3;
 begin
     if not FStop then
     begin
@@ -479,45 +481,45 @@ begin
           for original and rotated orientation. }
         with Handler do
         begin
-            fDeltaVolume := (BoxVolume - FGlobalMinVolume);
+            DeltaVolume := (BoxVolume - FGlobalMinVolume);
             { Computes lengths of edges of bounding box. }
-            fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-            fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-            fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+            BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+            BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+            BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
             { Sorts edges. }
-            SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
-            fResult :=
+            SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
+            Line :=
                 Format(
                 ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                [fDeltaVolume, BoxVolume, fDeltaCord[1],
-                fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma,
+                [DeltaVolume, BoxVolume, BoxSizes[1],
+                BoxSizes[2], BoxSizes[3], Alpha, Beta, Gamma,
                 PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
                 ComputationTime, CycleCount, EvaluationCount, RestartCount]);
-            if fDeltaVolume > fMaxDeltaVolume then
+            if DeltaVolume > FMaxDeltaVolume then
             begin
-                fMaxDeltaVolume := fDeltaVolume;
-                FMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                FMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                FMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                SortUp(FMaxDeltaCord[1], FMaxDeltaCord[2],
-                    FMaxDeltaCord[3]);
+                FMaxDeltaVolume := DeltaVolume;
+                FMaxBoxSizes[1] := BoxSizes[1];
+                FMaxBoxSizes[2] := BoxSizes[2];
+                FMaxBoxSizes[3] := BoxSizes[3];
+                SortUp(FMaxBoxSizes[1], FMaxBoxSizes[2],
+                    FMaxBoxSizes[3]);
             end;
-            if fDeltaVolume < fMinDeltaVolume then
+            if DeltaVolume < FMinDeltaVolume then
             begin
-                fMinDeltaVolume := fDeltaVolume;
-                FMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                FMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                FMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                SortUp(FMinDeltaCord[1], FMinDeltaCord[2],
-                    FMinDeltaCord[3]);
+                FMinDeltaVolume := DeltaVolume;
+                FMinBoxSizes[1] := BoxSizes[1];
+                FMinBoxSizes[2] := BoxSizes[2];
+                FMinBoxSizes[3] := BoxSizes[3];
+                SortUp(FMinBoxSizes[1], FMinBoxSizes[2],
+                    FMinBoxSizes[3]);
             end;
-            Memo2.Lines.Add(fResult);
+            Memo2.Lines.Add(Line);
             Label2.Caption :=
                 Format(
                 'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
-                fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1],
-                fMaxDeltaCord[2], fMaxDeltaCord[3]]);
+                [FMinDeltaVolume, FMinBoxSizes[1], FMinBoxSizes[2],
+                FMinBoxSizes[3], FMaxDeltaVolume, FMaxBoxSizes[1],
+                FMaxBoxSizes[2], FMaxBoxSizes[3]]);
         end;
     end;
     { Removes and frees inserted container. }
@@ -526,10 +528,10 @@ end;
 
 procedure TBoundingBoxServerForm.ButtonBruteForceClick(Sender: TObject);
 const
-    cSteps = 2;
+    Steps = 2;
 var
     x, y, z: Integer;
-    fAlpha, fBeta, fGamma: Single;
+    Alpha, Beta, Gamma: Single;
     Handler: TDownHillSimplexHandler;
     RunId: Integer;
     PointCloud: TPointCloud;
@@ -553,21 +555,21 @@ begin
     ThreadPool := TRunnerPool.Create;
     RunId := 1;
     { Does the test for brute force orientation. }
-    for x := 0 to (179 div cSteps) do
-        for y := 0 to (179 div cSteps) do
-            for z := 0 to (179 div cSteps) do
+    for x := 0 to (179 div Steps) do
+        for y := 0 to (179 div Steps) do
+            for z := 0 to (179 div Steps) do
             begin
                 if not FStop then
                 begin
-                    fAlpha := x * cSteps;
-                    fBeta := y * cSteps;
-                    fGamma := z * cSteps;
+                    Alpha := x * Steps;
+                    Beta := y * Steps;
+                    Gamma := z * Steps;
                     { Loads data and rotates them by given angles. }
-                    PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
+                    PointCloud := LoadPointCloud(Alpha, Beta, Gamma);
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
                     Handler :=
-                        CreateHandler(0, 0, 0, GetInitialAngleSteps,
+                        CreateHandler(0, 0, 0, GetInitialAngleStep,
                         False, RunId, PointCloud, True);
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
@@ -593,13 +595,12 @@ end;
 procedure TBoundingBoxServerForm.ButtonRandomTestClick(Sender: TObject);
 var
     x: Integer;
-    fResult: string;
-    fAlpha, fBeta, fGamma: Single;
-    fDeltaVolume: Single;
-    fDeltaCord: TDoubleVector3;
+    Line: string;
+    Alpha, Beta, Gamma: Single;
+    DeltaVolume: Single;
+    BoxSizes: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
     PointCloud: TPointCloud;
-    FMinDeltaCord, FMaxDeltaCord: TDoubleVector3;
 begin
     FShowAlgoDetails := False;
     FStop := False;
@@ -620,12 +621,12 @@ begin
     begin
         if not FStop then
         begin
-            fAlpha := Random * 180;
-            fBeta := Random * 180;
-            fGamma := Random * 180;
+            Alpha := Random * 180;
+            Beta := Random * 180;
+            Gamma := Random * 180;
 
-            PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
-            Handler := CreateHandler(0, 0, 0, GetInitialAngleSteps,
+            PointCloud := LoadPointCloud(Alpha, Beta, Gamma);
+            Handler := CreateHandler(0, 0, 0, GetInitialAngleStep,
                 False, x, PointCloud, True);
             { Computes minimum volume directly in the calling thread.
               It could be refactored to use thread pool as it was done
@@ -635,41 +636,41 @@ begin
             begin
                 with Handler do
                 begin
-                    fDeltaVolume := (BoxVolume - FGlobalMinVolume);
-                    fDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                    fDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                    fDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                    SortUp(fDeltaCord[1], fDeltaCord[2], fDeltaCord[3]);
-                    fResult :=
+                    DeltaVolume := (BoxVolume - FGlobalMinVolume);
+                    BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                    BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                    BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                    SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
+                    Line :=
                         Format(
                         ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                        [fDeltaVolume, BoxVolume, fDeltaCord[1],
-                        fDeltaCord[2], fDeltaCord[3], Alpha, Beta,
-                        Gamma, fAlpha, fBeta, fGamma, ComputationTime,
+                        [DeltaVolume, BoxVolume, BoxSizes[1],
+                        BoxSizes[2], BoxSizes[3], Alpha, Beta,
+                        Gamma, Alpha, Beta, Gamma, ComputationTime,
                         CycleCount, EvaluationCount, RestartCount]);
-                    if fDeltaVolume > fMaxDeltaVolume then
+                    if DeltaVolume > FMaxDeltaVolume then
                     begin
-                        fMaxDeltaVolume := fDeltaVolume;
-                        fMaxDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                        fMaxDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                        fMaxDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                        SortUp(fMaxDeltaCord[1], fMaxDeltaCord[2], fMaxDeltaCord[3]);
+                        FMaxDeltaVolume := DeltaVolume;
+                        FMaxBoxSizes[1] := BoxSizes[1];
+                        FMaxBoxSizes[2] := BoxSizes[2];
+                        FMaxBoxSizes[3] := BoxSizes[3];
+                        SortUp(FMaxBoxSizes[1], FMaxBoxSizes[2], FMaxBoxSizes[3]);
                     end;
-                    if fDeltaVolume < fMinDeltaVolume then
+                    if DeltaVolume < FMinDeltaVolume then
                     begin
-                        fMinDeltaVolume := fDeltaVolume;
-                        fMinDeltaCord[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                        fMinDeltaCord[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                        fMinDeltaCord[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                        SortUp(fMinDeltaCord[1], fMinDeltaCord[2], fMinDeltaCord[3]);
+                        FMinDeltaVolume := DeltaVolume;
+                        FMinBoxSizes[1] := BoxSizes[1];
+                        FMinBoxSizes[2] := BoxSizes[2];
+                        FMinBoxSizes[3] := BoxSizes[3];
+                        SortUp(FMinBoxSizes[1], FMinBoxSizes[2], FMinBoxSizes[3]);
                     end;
-                    Memo2.Lines.Add(fResult);
+                    Memo2.Lines.Add(Line);
                     Label2.Caption :=
                         Format(
                         'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                        [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
-                        fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1],
-                        fMaxDeltaCord[2], fMaxDeltaCord[3]]);
+                        [FMinDeltaVolume, FMinBoxSizes[1], FMinBoxSizes[2],
+                        FMinBoxSizes[3], FMaxDeltaVolume, FMaxBoxSizes[1],
+                        FMaxBoxSizes[2], FMaxBoxSizes[3]]);
                 end;
             end;
             { Removes and frees inserted container. }
@@ -697,8 +698,8 @@ end;
 
 procedure TBoundingBoxServerForm.OuputGlobalMinVolume(Handler: TDownHillSimplexHandler);
 var
-    fResult: string;
-    fBoxSize: TDoubleVector3;
+    Line: string;
+    BoxSizes: TDoubleVector3;
 begin
     with Handler do
     begin
@@ -708,16 +709,16 @@ begin
             FMaxCoords := BoxMaxCoords;
             FMinCoords := BoxMinCoords;
         end;
-        fBoxSize[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-        fBoxSize[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-        fBoxSize[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-        SortUp(fBoxSize[1], fBoxSize[2], fBoxSize[3]);
-        fResult := Format(
+        BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+        BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+        BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+        SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
+        Line := Format(
             ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
-            [RunId, BoxVolume, fBoxSize[1], fBoxSize[2], fBoxSize[3],
+            [RunId, BoxVolume, BoxSizes[1], BoxSizes[2], BoxSizes[3],
             Alpha, Beta, Gamma, ComputationTime, CycleCount, EvaluationCount,
             RestartCount]);
-        Memo1.Lines.Add(fResult);
+        Memo1.Lines.Add(Line);
         Application.ProcessMessages;
     end;
     { Removes and frees container. }
@@ -726,7 +727,7 @@ end;
 
 procedure TBoundingBoxServerForm.OutputResults(PointCloud: TList);
 var
-    fDelta: TDoubleVector3;
+    BoxSizes: TDoubleVector3;
 begin
     Memo1.Lines.Add('');
     if CheckBoxRandomData.Checked then
@@ -736,18 +737,18 @@ begin
     Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
     Memo1.Lines.Add('');
     Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [FOptiResultBoxVolume]));
-    fDelta[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
-    fDelta[2] := FOptiResultBoxMaxCoords[2] - FOptiResultBoxMinCoords[2];
-    fDelta[3] := FOptiResultBoxMaxCoords[3] - FOptiResultBoxMinCoords[3];
-    SortUp(fDelta[1], fDelta[2], fDelta[3]);
+    BoxSizes[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
+    BoxSizes[2] := FOptiResultBoxMaxCoords[2] - FOptiResultBoxMinCoords[2];
+    BoxSizes[3] := FOptiResultBoxMaxCoords[3] - FOptiResultBoxMinCoords[3];
+    SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
     Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
-        [fDelta[1], fDelta[2], fDelta[3]]));
+        [BoxSizes[1], BoxSizes[2], BoxSizes[3]]));
     Application.ProcessMessages;
 end;
 
 procedure TBoundingBoxServerForm.FindGlobalMinVolume;
 const
-    cStartAngle5Runs: array[0..4] of TDoubleVector3 = (
+    StartAngle5Runs: array[0..4] of TDoubleVector3 = (
         (0, 0, 0),
         (45, 45, 45),
         (-45, -45, -45),
@@ -755,7 +756,7 @@ const
         (-45, 45, -45)
         );
 const
-    cStartAngle9Runs: array[0..8] of TDoubleVector3 = (
+    StartAngle9Runs: array[0..8] of TDoubleVector3 = (
         (0, 0, 0),
         (45, 45, 45),
         (-45, -45, -45),
@@ -768,18 +769,18 @@ const
         );
 var
     i, j: integer;
-    fRuns: integer;
-    fStartAngle: TDoubleVector3;
+    RunCount: integer;
+    StartAngles: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
     Runners: TComponentList;
     Runner: TRunner;
-    fPerformanceFrequency, fStartTime, fEndTime: Int64;
-    FComputationTime: single;
-    fMustContinue: Boolean;
-    fWaitResult: DWord;
-    fHandle: THandle;
-    fKeyState: Byte;
-    fMsg: TMsg;
+    PerformanceFrequency, StartTime, EndTime: Int64;
+    ComputationTime: single;
+    MustContinue: Boolean;
+    WaitResult: DWord;
+    Handle: THandle;
+    KeyState: Byte;
+    Msg: TMsg;
     PointCloud: TPointCloud;
 begin
     { Loads model data in original orientation. }
@@ -787,28 +788,28 @@ begin
       That's ok until data aren't changed. }
     PointCloud := LoadPointCloud(0, 0, 0);
 
-    fRuns := 3;
+    RunCount := 3;
     if PointCloud.Count < 100000 then
-        fRuns := 5;
+        RunCount := 5;
     if PointCloud.Count < 25000 then
-        fRuns := 9;
+        RunCount := 9;
     FGlobalMinVolume := 1e30;
 
     { Initializing performance counters. }
-    fPerformanceFrequency := 0;
-    fStartTime := 0;
-    fEndTime := 0;
-    QueryPerformanceFrequency(fPerformanceFrequency);
-    QueryPerformanceCounter(fStartTime);
+    PerformanceFrequency := 0;
+    StartTime := 0;
+    EndTime := 0;
+    QueryPerformanceFrequency(PerformanceFrequency);
+    QueryPerformanceCounter(StartTime);
     Runners := TComponentList.Create(True);
-    for i := 0 to fRuns - 1 do
+    for i := 0 to RunCount - 1 do
     begin
         if not FStop then
         begin
-            if fRuns <= 5 then
-                fStartAngle := cStartAngle5Runs[i]
+            if RunCount <= 5 then
+                StartAngles := StartAngle5Runs[i]
             else
-                fStartAngle := cStartAngle9Runs[i];
+                StartAngles := StartAngle9Runs[i];
 
             { Runs optimization to get the minimum volume.
               CreateHandler adds hanlder to FHandlers list.
@@ -816,8 +817,8 @@ begin
               shared between handler instances. It is up to
               this method to release them. See below. }
             Handler :=
-                CreateHandler(fStartAngle[1], fStartAngle[2],
-                fStartAngle[3], GetInitialAngleSteps, False, i + 1, PointCloud, False);
+                CreateHandler(StartAngles[1], StartAngles[2],
+                StartAngles[3], GetInitialAngleStep, False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
             { Creates runner. }
@@ -836,27 +837,27 @@ begin
     for i := 0 to Runners.Count - 1 do
     begin
         Runner := TRunner(Runners[i]);
-        fHandle := Runner.Handle;
-        fMustContinue := True;
-        while fMustContinue do
+        Handle := Runner.Handle;
+        MustContinue := True;
+        while MustContinue do
         begin
             { Waits for thread finishing or any input event. }
-            fWaitResult := MsgWaitForMultipleObjects(1, fHandle,
+            WaitResult := MsgWaitForMultipleObjects(1, Handle,
                 False, INFINITE, QS_ALLINPUT);
-            if (fWaitResult = WAIT_OBJECT_0) then
+            if (WaitResult = WAIT_OBJECT_0) then
                 { Thread was finished, break the loop and wait for next. }
-                fMustContinue := False;
-            if fWaitResult = WAIT_OBJECT_0 + 1 then
+                MustContinue := False;
+            if WaitResult = WAIT_OBJECT_0 + 1 then
             begin
                 { Reads the ESC key's status. }
-                fKeyState := GetAsyncKeyState(27);
+                KeyState := GetAsyncKeyState(27);
                 Application.ProcessMessages;
-                if (fKeyState > 0) then
+                if (KeyState > 0) then
                 begin
                     { ESC was pressed. }
                     Application.Restore;
 {$hints off}
-                    while PeekMessage(fMsg, 0, WM_KEYFIRST, WM_KEYLAST,
+                    while PeekMessage(Msg, 0, WM_KEYFIRST, WM_KEYLAST,
                             PM_REMOVE or PM_NOYIELD) do ;
 {$hints on}
                     GetAsyncKeyState(27);
@@ -865,8 +866,8 @@ begin
                         TDownHillSimplexHandler(FHandlers[j]).Stop;
                 end;
             end;
-            if fWaitResult = WAIT_FAILED then
-                fMustContinue := False;
+            if WaitResult = WAIT_FAILED then
+                MustContinue := False;
         end;
     end;
     { It is not necessarily to free separately all runners,
@@ -874,15 +875,15 @@ begin
     Runners.Free;
     Assert(FHandlers.Count = 0, 'All handlers should be freed by the output method.');
 
-    QueryPerformanceCounter(fEndTime);
-    FComputationTime := 0;
-    if fPerformanceFrequency <> 0 then
-        FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
+    QueryPerformanceCounter(EndTime);
+    ComputationTime := 0;
+    if PerformanceFrequency <> 0 then
+        ComputationTime := (EndTime - StartTime) / PerformanceFrequency;
     FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
     OutputResults(PointCloud);
-    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
+    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [ComputationTime]));
     { Releases model data. }
     FreePointCloud(PointCloud);
 end;
@@ -890,14 +891,14 @@ end;
 procedure TBoundingBoxServerForm.FreePointCloud(PointCloud: TPointCloud);
 var
     x: Integer;
-    fPoint: p3DVector;
+    Point: p3DVector;
 begin
     if PointCloud <> nil then
     begin
         for x := 0 to PointCloud.Count - 1 do
         begin
-            fPoint := PointCloud[x];
-            Dispose(fPoint);
+            Point := PointCloud[x];
+            Dispose(Point);
         end;
         PointCloud.Free;
     end;
@@ -912,7 +913,7 @@ type
     function GetCoords(iString: string): TOBJCoord;
     var
         P, P2, P3: Integer;
-        fCoord: TOBJCoord;
+        Coord: TOBJCoord;
     begin
         iString := Trim(Copy(iString, 3, Length(iString)));
         P := Pos(' ', iString);
@@ -922,10 +923,10 @@ type
             P3 := 1000;
         iString := StringReplace(iString, '.', FormatSettings.DecimalSeparator,
             [rfReplaceAll]);
-        fCoord.X := StrToFloat(Copy(iString, 1, P - 1));
-        fCoord.Y := StrToFloat(Copy(iString, P + 1, P2 - P - 1));
-        fCoord.Z := StrToFloat(Copy(iString, P2 + 1, P3 - P2 - 1));
-        Result := fCoord;
+        Coord.X := StrToFloat(Copy(iString, 1, P - 1));
+        Coord.Y := StrToFloat(Copy(iString, P + 1, P2 - P - 1));
+        Coord.Z := StrToFloat(Copy(iString, P2 + 1, P3 - P2 - 1));
+        Result := Coord;
     end;
 
     procedure LoadDataFromFile;
