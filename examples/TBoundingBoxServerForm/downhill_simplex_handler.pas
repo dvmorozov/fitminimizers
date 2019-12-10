@@ -15,7 +15,7 @@ uses
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
 type
-    p3DVector = ^T3DVector;
+    P3DVector = ^T3DVector;
 
     T3DVector = record
         FVector: TDoubleVector3;
@@ -74,8 +74,8 @@ type
 
         procedure ClearPointCloud;
 
-        function ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
-            var iMinCoords, iMaxCoords: T3Vector): Double;
+        function ComputeRotatedBoxVolume(AAlpha, ABeta, AGamma: Single;
+            var AMinCoords, AMaxCoords: T3Vector): Double;
 
         { IDownhillSimplexServer implementation. }
 
@@ -85,12 +85,12 @@ type
         { Sets inital calculation point in internal representation.
           The number of array element is equal to the number of
           variable parameters of task being solved. }
-        procedure FillStartDecision(Sender: TComponent; iStartDecision: TFloatDecision);
+        procedure FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
         { Calculates evaluation function for the point given in internal
           representation. }
-        procedure EvaluateDecision(Sender: TComponent; iDecision: TFloatDecision);
+        procedure EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
         { Displays current minimum. }
-        procedure UpdateResults(Sender: TComponent; iDecision: TFloatDecision);
+        procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
         { Returns flag of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
 
@@ -134,15 +134,15 @@ type
         property PointCloud: TPointCloud read FPointCloud;
     end;
 
-function DegToRad(iDeg: Double): Double;
+function DegToRad(Deg: Double): Double;
 
 implementation
 
 uses bounding_box_server_form;
 
-function DegToRad(iDeg: Double): Double;
+function DegToRad(Deg: Double): Double;
 begin
-    Result := iDeg * PI / 180.0;
+    Result := Deg * PI / 180.0;
 end;
 
 constructor TPointCloud.Create(AAlpha, ABeta, AGamma: Single);
@@ -153,62 +153,62 @@ begin
     FGamma := AGamma;
 end;
 
-function TDownHillSimplexHandler.ComputeRotatedBoxVolume(iAlpha, iBeta, iGamma: Single;
-    var iMinCoords, iMaxCoords: T3Vector): Double;
+function TDownHillSimplexHandler.ComputeRotatedBoxVolume(AAlpha, ABeta, AGamma: Single;
+    var AMinCoords, AMaxCoords: T3Vector): Double;
 
-    function GetRotationMatrix(iAlpha, iBeta, iGamma: Single): TMatrix;
+    function GetRotationMatrix: TMatrix;
     var
-        fRotX, fRotY, fRotZ, fMatr: TMatrix;
+        RotX, RotY, RotZ, Matr: TMatrix;
     begin
         { Computing rotation matrices.
           Matrices are initalized inside functions. }
-        fRotX := MatrixRotX(DegToRad(iAlpha));
-        fRotY := MatrixRotY(DegToRad(iBeta));
-        fRotZ := MatrixRotZ(DegToRad(iGamma));
+        RotX := MatrixRotX(DegToRad(AAlpha));
+        RotY := MatrixRotY(DegToRad(ABeta));
+        RotZ := MatrixRotZ(DegToRad(AGamma));
         { Computes rotation matrix. }
-        fMatr := UnitMatrix;
-        Mul3DMatrix(fRotZ, fMatr, fMatr);
-        Mul3DMatrix(fRotY, fMatr, fMatr);
-        Mul3DMatrix(fRotX, fMatr, fMatr);
-        Result := fMatr;
+        Matr := UnitMatrix;
+        Mul3DMatrix(RotZ, Matr, Matr);
+        Mul3DMatrix(RotY, Matr, Matr);
+        Mul3DMatrix(RotX, Matr, Matr);
+        Result := Matr;
     end;
 
 var
     i: Integer;
-    fA, fB, fC: Double; //  Sizes of the box.
-    fMatr: TMatrix;
-    fPoint: p3DVector;
-    fVector: T3Vector;
+    A, B, C: Double; //  Sizes of the box.
+    Matr: TMatrix;
+    Point: P3DVector;
+    Vector: T3Vector;
 begin
     { Computes volume of bounding box. }
-    fMatr := GetRotationMatrix(iAlpha, iBeta, iGamma);
-    fPoint := FPointCloud[0];
-    fVector := fPoint^.fVector;
-    MulVectMatr(fMatr, fVector);
-    iMaxCoords := fVector;
-    iMinCoords := fVector;
+    Matr := GetRotationMatrix;
+    Point := FPointCloud[0];
+    Vector := Point^.fVector;
+    MulVectMatr(Matr, Vector);
+    AMaxCoords := Vector;
+    AMinCoords := Vector;
     for i := 1 to FPointCloud.Count - 1 do
     begin
-        fPoint := FPointCloud[i];
-        fVector := fPoint^.fVector;
-        MulVectMatr(fMatr, fVector);
-        if fVector[1] > iMaxCoords[1] then
-            iMaxCoords[1] := fVector[1];
-        if fVector[2] > iMaxCoords[2] then
-            iMaxCoords[2] := fVector[2];
-        if fVector[3] > iMaxCoords[3] then
-            iMaxCoords[3] := fVector[3];
-        if fVector[1] < iMinCoords[1] then
-            iMinCoords[1] := fVector[1];
-        if fVector[2] < iMinCoords[2] then
-            iMinCoords[2] := fVector[2];
-        if fVector[3] < iMinCoords[3] then
-            iMinCoords[3] := fVector[3];
+        Point := FPointCloud[i];
+        Vector := Point^.fVector;
+        MulVectMatr(Matr, Vector);
+        if Vector[1] > AMaxCoords[1] then
+            AMaxCoords[1] := Vector[1];
+        if Vector[2] > AMaxCoords[2] then
+            AMaxCoords[2] := Vector[2];
+        if Vector[3] > AMaxCoords[3] then
+            AMaxCoords[3] := Vector[3];
+        if Vector[1] < AMinCoords[1] then
+            AMinCoords[1] := Vector[1];
+        if Vector[2] < AMinCoords[2] then
+            AMinCoords[2] := Vector[2];
+        if Vector[3] < AMinCoords[3] then
+            AMinCoords[3] := Vector[3];
     end;
-    fA := iMaxCoords[1] - iMinCoords[1];
-    fB := iMaxCoords[2] - iMinCoords[2];
-    fC := iMaxCoords[3] - iMinCoords[3];
-    Result := fA * fB * fC;
+    A := AMaxCoords[1] - AMinCoords[1];
+    B := AMaxCoords[2] - AMinCoords[2];
+    C := AMaxCoords[3] - AMinCoords[3];
+    Result := A * B * C;
 end;
 
 procedure DisplayDetails(iString: string);
@@ -264,36 +264,36 @@ end;
 
 procedure TDownHillSimplexHandler.OptimizeBoundingBox;
 var
-    fString: string;
-    fPerformanceFrequency, fStartTime, fEndTime: Int64;
+    Line: string;
+    PerformanceFrequency, StartTime, EndTime: Int64;
 begin
     { This supresses useless hints in Lazarus. }
-    fPerformanceFrequency := 0;
-    fStartTime := 0;
-    fEndTime := 0;
+    PerformanceFrequency := 0;
+    StartTime := 0;
+    EndTime := 0;
     FComputationTime := 0;
 
     FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
 
     { Initializing performance counters. }
-    QueryPerformanceFrequency(fPerformanceFrequency);
-    QueryPerformanceCounter(fStartTime);
+    QueryPerformanceFrequency(PerformanceFrequency);
+    QueryPerformanceCounter(StartTime);
     { Optimizing. }
     FDownhillSimplexAlgorithm.AlgorithmRealization;
     { Calculating computation time. }
-    QueryPerformanceCounter(fEndTime);
-    if fPerformanceFrequency <> 0 then
-        FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
+    QueryPerformanceCounter(EndTime);
+    if PerformanceFrequency <> 0 then
+        FComputationTime := (EndTime - StartTime) / PerformanceFrequency;
 
     { Gets parameters of best solution. }
     if FShowDetails then
     begin
-        fString := '  Result:' + sLineBreak;
-        fString := fString + '     Modified parameters:' +
+        Line := '  Result:' + sLineBreak;
+        Line := Line + '     Modified parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
-        fString := fString + '     Volume: ' + Format('%.4f', [FBoxVolume]) + sLineBreak;
-        DisplayDetails(fString);
+        Line := Line + '     Volume: ' + Format('%.4f', [FBoxVolume]) + sLineBreak;
+        DisplayDetails(Line);
     end;
 end;
 
@@ -310,7 +310,7 @@ end;
 
 procedure TDownHillSimplexHandler.ClearPointCloud;
 var
-    fPoint: p3DVector;
+    Point: P3DVector;
     x: Integer;
 begin
     if FOwnsPointCloud then
@@ -319,8 +319,8 @@ begin
         begin
             for x := 0 to FPointCloud.Count - 1 do
             begin
-                fPoint := FPointCloud[x];
-                Dispose(fPoint);
+                Point := FPointCloud[x];
+                Dispose(Point);
             end;
             FPointCloud.Free;
             FPointCloud := nil;
@@ -348,12 +348,12 @@ end;
 //-----------------------------------------------------------------------------
 
 procedure TDownHillSimplexHandler.FillStartDecision(Sender: TComponent;
-    iStartDecision: TFloatDecision);
+    StartDecision: TFloatDecision);
 var
-    fString: string;
+    Line: string;
 begin
     { Sets up capacity. }
-    iStartDecision.ParametersNumber := 3;
+    StartDecision.ParametersNumber := 3;
     { Simplex is created from original point. }
     if FRecreateSimplexFromOriginal then
     begin
@@ -361,17 +361,17 @@ begin
         FBeta := FOriginalBeta;
         FGamma := FOriginalGamma;
     end;
-    iStartDecision.Parameters[0] := FAlpha;
-    iStartDecision.Parameters[1] := FBeta;
-    iStartDecision.Parameters[2] := FGamma;
+    StartDecision.Parameters[0] := FAlpha;
+    StartDecision.Parameters[1] := FBeta;
+    StartDecision.Parameters[2] := FGamma;
 
     if FShowDetails then
     begin
-        fString := '  StartDecision:' + sLineBreak;
-        fString := fString + '     Start Parameters:' +
+        Line := '  StartDecision:' + sLineBreak;
+        Line := Line + '     Start Parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
-        DisplayDetails(fString);
+        DisplayDetails(Line);
     end;
 end;
 
@@ -384,49 +384,49 @@ end;
 {$hints on}
 
 procedure TDownHillSimplexHandler.EvaluateDecision(Sender: TComponent;
-    iDecision: TFloatDecision);
+    Decision: TFloatDecision);
 var
-    fString: string;
+    Line: string;
 begin
     { Fills variable parameters from the object. }
-    FAlpha := iDecision.Parameters[0];
-    FBeta := iDecision.Parameters[1];
-    FGamma := iDecision.Parameters[2];
+    FAlpha := Decision.Parameters[0];
+    FBeta := Decision.Parameters[1];
+    FGamma := Decision.Parameters[2];
     { Computes evaluation function. }
     FBoxVolume := ComputeRotatedBoxVolume(FAlpha, FBeta, FGamma,
         FBoxMinCoords, FBoxMaxCoords);
-    iDecision.Evaluation := FBoxVolume;
+    Decision.Evaluation := FBoxVolume;
 
     if FShowDetails then
     begin
-        fString := '  EvaluateDecition:' + sLineBreak;
-        fString := fString + '     Modified parameters:' +
+        Line := '  EvaluateDecition:' + sLineBreak;
+        Line := Line + '     Modified parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
-        fString := fString + '     Volume: ' + Format('%.4f', [iDecision.Evaluation]) +
+        Line := Line + '     Volume: ' + Format('%.4f', [Decision.Evaluation]) +
             sLineBreak;
-        DisplayDetails(fString);
+        DisplayDetails(Line);
     end;
 end;
 
 procedure TDownHillSimplexHandler.UpdateResults(Sender: TComponent;
-    iDecision: TFloatDecision);
+    Decision: TFloatDecision);
 var
-    fString: string;
+    Line: string;
 begin
-    FAlpha := iDecision.Parameters[0];
-    FBeta := iDecision.Parameters[1];
-    FGamma := iDecision.Parameters[2];
+    FAlpha := Decision.Parameters[0];
+    FBeta := Decision.Parameters[1];
+    FGamma := Decision.Parameters[2];
 
     if FShowDetails then
     begin
-        fString := 'UpdateResults:' + sLineBreak;
-        fString := fString + '    Optimized parameters:' +
+        Line := 'UpdateResults:' + sLineBreak;
+        Line := Line + '    Optimized parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
-        fString := fString + '    Optimized Volume: ' +
-            Format('%.4f', [iDecision.Evaluation]) + sLineBreak;
-        DisplayDetails(fString);
+        Line := Line + '    Optimized Volume: ' +
+            Format('%.4f', [Decision.Evaluation]) + sLineBreak;
+        DisplayDetails(Line);
     end;
 end;
 
