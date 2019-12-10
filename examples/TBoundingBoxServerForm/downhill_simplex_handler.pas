@@ -49,8 +49,8 @@ type
         FHandlerOutputProcedure: THandlerOutputProcedure;
 
         FStop: Boolean;
-        FShowAlgoDetails: Boolean;
-        FInitParamLength: Double;
+        FShowDetails: Boolean;
+        FInitialAngleSteps: Double;
         FRecreateSimplexFromOriginal: Boolean;
 
         { Optimized values of angles describing rotation of coordinate system (in degrees). }
@@ -100,9 +100,9 @@ type
           Handler doesn't copy point cloud, it either owns it or just keep
           reference to external object. }
         constructor Create(AOwner: TComponent; AAlpha, ABeta, AGamma,
-            AAlgoInitialStepsAngles: Double;
+            AInitialAngleSteps: Double;
             AFinalTolerance, AExitDerivative: Double;
-            AShowAlgoDetails: Boolean; ARunId: Integer;
+            AShowDetails: Boolean; ARunId: Integer;
             APointCloud: TPointCloud; AOwnsPointCloud: Boolean); reintroduce;
         destructor Destroy; override;
         { Initializes performance counters and starts optimization.
@@ -222,9 +222,9 @@ end;
 
 constructor TDownHillSimplexHandler.Create(
     AOwner: TComponent; AAlpha, ABeta, AGamma,
-    AAlgoInitialStepsAngles: Double;
+    AInitialAngleSteps: Double;
     AFinalTolerance, AExitDerivative: Double;
-    AShowAlgoDetails: Boolean; ARunId: Integer;
+    AShowDetails: Boolean; ARunId: Integer;
     APointCloud: TPointCloud; AOwnsPointCloud: Boolean);
 begin
     inherited Create(AOwner);
@@ -249,8 +249,8 @@ begin
     FOriginalBeta := ABeta;
     FOriginalGamma := AGamma;
     { Initializes auxiliary attributes. }
-    FShowAlgoDetails := AShowAlgoDetails;
-    FInitParamLength := AAlgoInitialStepsAngles;
+    FShowDetails := AShowDetails;
+    FInitialAngleSteps := AInitialAngleSteps;
     FStop := False;
     FRunId := ARunId;
 end;
@@ -286,7 +286,7 @@ begin
         FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
 
     { Gets parameters of best solution. }
-    if FShowAlgoDetails then
+    if FShowDetails then
     begin
         fString := '  Result:' + sLineBreak;
         fString := fString + '     Modified parameters:' +
@@ -365,7 +365,7 @@ begin
     iStartDecision.Parameters[1] := FBeta;
     iStartDecision.Parameters[2] := FGamma;
 
-    if FShowAlgoDetails then
+    if FShowDetails then
     begin
         fString := '  StartDecision:' + sLineBreak;
         fString := fString + '     Start Parameters:' +
@@ -379,7 +379,7 @@ end;
 function TDownHillSimplexHandler.GetInitParamLength(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
-    Result := FInitParamLength;
+    Result := FInitialAngleSteps;
 end;
 {$hints on}
 
@@ -397,7 +397,7 @@ begin
         FBoxMinCoords, FBoxMaxCoords);
     iDecision.Evaluation := FBoxVolume;
 
-    if FShowAlgoDetails then
+    if FShowDetails then
     begin
         fString := '  EvaluateDecition:' + sLineBreak;
         fString := fString + '     Modified parameters:' +
@@ -418,7 +418,7 @@ begin
     FBeta := iDecision.Parameters[1];
     FGamma := iDecision.Parameters[2];
 
-    if FShowAlgoDetails then
+    if FShowDetails then
     begin
         fString := 'UpdateResults:' + sLineBreak;
         fString := fString + '    Optimized parameters:' +

@@ -61,14 +61,17 @@ type
         { Minimum volume obtained for a few optimization runs.
           It is used as etalon value. }
         FGlobalMinVolume: Double;
+        { Differences between value of volume obtained at the last step
+          and etalon value. }
         FMaxDeltaVolume, FMinDeltaVolume: Single;
-        FMinDeltaCord, FMaxDeltaCord: TDoubleVector3;
+        { Sets of maximum and minimus coordinates corresponding to globally
+          minimum volume. }
         FMinCoords, FMaxCoords: TDoubleVector3;
         { Optimization results of several algorithm runs. }
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
         FOptiResultBoxVolume: Double;
 
-        function GetIniParamLenght: Double;
+        function GetInitialAngleSteps: Double;
         procedure StopComputing;
         { Prints final results among a few runs. }
         procedure OutputResults(PointCloud: TList);
@@ -86,11 +89,14 @@ type
         procedure OuputBruteForce(Handler: TDownHillSimplexHandler);
         { Creates and returns container instance which should be destroyed by calling method. }
         function CreateHandler(Alpha, Beta, Gamma: Double;
-            InitParamLength: Double; ShowDetails: Boolean;
-            RunId: Integer; PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
-
+            InitialAngleSteps: Double; ShowDetails: Boolean;
+            RunId: Integer; PointCloud: TPointCloud;
+            OwnsPointCloud: Boolean): TDownHillSimplexHandler;
+        { Releases point cloud data. }
         procedure FreePointCloud(PointCloud: TPointCloud);
+        { Loads point cloud from file selected by drop-down list. }
         function LoadPointCloud(Alpha, Beta, Gamma: single): TPointCloud;
+        { Generates point cloud from random data. }
         function GenerateRandomPointCloud: TPointCloud;
 
     public
@@ -182,8 +188,8 @@ begin
 end;
 
 function TBoundingBoxServerForm.CreateHandler(Alpha, Beta, Gamma: Double;
-    InitParamLength: Double; ShowDetails: Boolean;
-    RunId: Integer; PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
+    InitialAngleSteps: Double; ShowDetails: Boolean; RunId: Integer;
+    PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
 var
     fFinalTolerance, fExitDerivate: double;
 begin
@@ -199,14 +205,14 @@ begin
     begin
         fExitDerivate := 0.5;       // default value
     end;
-    Result := TDownHillSimplexHandler.Create(self, Alpha,
-        Beta, Gamma, InitParamLength, fFinalTolerance,
-        fExitDerivate, ShowDetails, RunId, PointCloud, OwnsPointCloud);
+    Result := TDownHillSimplexHandler.Create(self, Alpha, Beta,
+        Gamma, InitialAngleSteps, fFinalTolerance, fExitDerivate,
+        ShowDetails, RunId, PointCloud, OwnsPointCloud);
     { Adds to the list for asynchronous operations. }
     FHandlers.Add(Result);
 end;
 
-function TBoundingBoxServerForm.GetIniParamLenght: Double;
+function TBoundingBoxServerForm.GetInitialAngleSteps: Double;
 begin
     { This suppresses useless hints in Lazarus. }
     Result := 37;
@@ -263,7 +269,7 @@ begin
     Runner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
-    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, True, 1, PointCloud, True);
+    Handler := CreateHandler(0, 0, 0, GetInitialAngleSteps, True, 1, PointCloud, True);
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := OuputMinVolume;
     { Assign runner procedures. }
@@ -465,6 +471,7 @@ var
     fResult: string;
     fDeltaVolume: Single;
     fDeltaCord: TDoubleVector3;
+    FMinDeltaCord, FMaxDeltaCord: TDoubleVector3;
 begin
     if not FStop then
     begin
@@ -482,11 +489,10 @@ begin
             fResult :=
                 Format(
                 ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                [fDeltaVolume, BoxVolume,
-                 fDeltaCord[1], fDeltaCord[2], fDeltaCord[3],
-                 Alpha, Beta, Gamma,
-                 PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
-                 ComputationTime, CycleCount, EvaluationCount, RestartCount]);
+                [fDeltaVolume, BoxVolume, fDeltaCord[1],
+                fDeltaCord[2], fDeltaCord[3], Alpha, Beta, Gamma,
+                PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
+                ComputationTime, CycleCount, EvaluationCount, RestartCount]);
             if fDeltaVolume > fMaxDeltaVolume then
             begin
                 fMaxDeltaVolume := fDeltaVolume;
@@ -509,9 +515,8 @@ begin
             Label2.Caption :=
                 Format(
                 'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                [fMinDeltaVolume, fMinDeltaCord[1],
-                fMinDeltaCord[2], fMinDeltaCord[3],
-                fMaxDeltaVolume, fMaxDeltaCord[1],
+                [fMinDeltaVolume, fMinDeltaCord[1], fMinDeltaCord[2],
+                fMinDeltaCord[3], fMaxDeltaVolume, fMaxDeltaCord[1],
                 fMaxDeltaCord[2], fMaxDeltaCord[3]]);
         end;
     end;
@@ -561,7 +566,9 @@ begin
                     PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
-                    Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, RunId, PointCloud, True);
+                    Handler :=
+                        CreateHandler(0, 0, 0, GetInitialAngleSteps,
+                        False, RunId, PointCloud, True);
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
                     { OuputMinVolume removes hanlder from FHandlers list. }
@@ -588,10 +595,11 @@ var
     x: Integer;
     fResult: string;
     fAlpha, fBeta, fGamma: Single;
-    fMinDeltaVolume, fMaxDeltaVolume, fDeltaVolume: Single;
-    fMinDeltaCord, fMaxDeltaCord, fDeltaCord: TDoubleVector3;
+    fDeltaVolume: Single;
+    fDeltaCord: TDoubleVector3;
     Handler: TDownHillSimplexHandler;
     PointCloud: TPointCloud;
+    FMinDeltaCord, FMaxDeltaCord: TDoubleVector3;
 begin
     FShowAlgoDetails := False;
     FStop := False;
@@ -617,7 +625,8 @@ begin
             fGamma := Random * 180;
 
             PointCloud := LoadPointCloud(fAlpha, fBeta, fGamma);
-            Handler := CreateHandler(0, 0, 0, GetIniParamLenght, False, x, PointCloud, True);
+            Handler := CreateHandler(0, 0, 0, GetInitialAngleSteps,
+                False, x, PointCloud, True);
             { Computes minimum volume directly in the calling thread.
               It could be refactored to use thread pool as it was done
               for "brute force" search. }
@@ -808,7 +817,7 @@ begin
               this method to release them. See below. }
             Handler :=
                 CreateHandler(fStartAngle[1], fStartAngle[2],
-                fStartAngle[3], GetIniParamLenght, False, i + 1, PointCloud, False);
+                fStartAngle[3], GetInitialAngleSteps, False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
             { Creates runner. }
@@ -826,14 +835,14 @@ begin
     { Waits until all runners finish computing. }
     for i := 0 to Runners.Count - 1 do
     begin
-        Runner:= TRunner(Runners[i]);
+        Runner := TRunner(Runners[i]);
         fHandle := Runner.Handle;
         fMustContinue := True;
         while fMustContinue do
         begin
             { Waits for thread finishing or any input event. }
-            fWaitResult := MsgWaitForMultipleObjects(1, fHandle, False,
-                INFINITE, QS_ALLINPUT);
+            fWaitResult := MsgWaitForMultipleObjects(1, fHandle,
+                False, INFINITE, QS_ALLINPUT);
             if (fWaitResult = WAIT_OBJECT_0) then
                 { Thread was finished, break the loop and wait for next. }
                 fMustContinue := False;
