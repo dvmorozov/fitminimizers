@@ -16,12 +16,12 @@ unit RunningThread;
 
 interface
 uses Classes, Tools, Forms,
-    {$IFNDEF Lazarus}
-      //TODO: set up proper module name for Delhpi build.
-      //DesignIntf;
-    {$ELSE}
-      PropEdits,
-    {$ENDIF}
+{$IFNDEF Lazarus}
+    //TODO: set up proper module name for Delhpi build.
+    //DesignIntf;
+{$ELSE}
+    PropEdits,
+{$ENDIF}
     Contnrs;
 
 type
