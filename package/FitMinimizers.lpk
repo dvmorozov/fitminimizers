@@ -18,7 +18,8 @@
         </SyntaxOptions>
       </Parsing>
       <Other>
-        <CustomOptions Value="-dLazarus"/>
+        <CustomOptions Value="-dLazarus
+-dUseCThreads"/>
       </Other>
     </CompilerOptions>
     <Version Minor="1" Build="1"/>
