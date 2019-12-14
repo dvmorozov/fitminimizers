@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types,
   {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls, StrUtils, Windows,
+    StdCtrls, StrUtils,
   {$ENDIF}
     Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
@@ -73,6 +73,8 @@ type
         { Optimization results of several algorithm runs. }
         FOptiResultBoxMinCoords, FOptiResultBoxMaxCoords: TDoubleVector3;
         FOptiResultBoxVolume: Double;
+        { Measures total computation time of multiple runs. }
+        FComputationTime: TComputationTime;
 
         function GetInitialAngleStep: Double;
         procedure StopComputing;
@@ -80,6 +82,8 @@ type
         procedure OutputResults(PointCloud: TList);
         { Computes minimum box volume starting from a few initial points. }
         procedure FindGlobalMinVolume;
+        { Waits until all runners finish computing. }
+        procedure WaitForRunnerFinishing(Runners: TComponentList);
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
@@ -105,6 +109,7 @@ type
     public
         { Creates FHanlders before other operations. }
         constructor Create(AOwner: TComponent); override;
+        destructor Destroy; override;
     end;
 
 var
@@ -187,7 +192,15 @@ begin
     { Must be created before inherited constructor which causes initializing
       other components. Keeps ownership and destroys all collection items. }
     FHandlers := TComponentList.Create(True);
+    FComputationTime := TComputationTime.Create;
     inherited Create(AOwner);
+end;
+
+destructor TBoundingBoxServerForm.Destroy;
+begin
+    FComputationTime.Free;
+    FHandlers.Free;
+    inherited;
 end;
 
 function TBoundingBoxServerForm.CreateHandler(Alpha, Beta, Gamma: Double;
@@ -746,97 +759,23 @@ begin
     Application.ProcessMessages;
 end;
 
-procedure TBoundingBoxServerForm.FindGlobalMinVolume;
-const
-    StartAngle5Runs: array[0..4] of TDoubleVector3 = (
-        (0, 0, 0),
-        (45, 45, 45),
-        (-45, -45, -45),
-        (45, -45, 45),
-        (-45, 45, -45)
-        );
-const
-    StartAngle9Runs: array[0..8] of TDoubleVector3 = (
-        (0, 0, 0),
-        (45, 45, 45),
-        (-45, -45, -45),
-        (45, -45, 45),
-        (-45, 45, -45),
-        (-45, 45, 45),
-        (-45, -45, 45),
-        (45, -45, -45),
-        (45, 45, -45)
-        );
+procedure TBoundingBoxServerForm.WaitForRunnerFinishing(Runners: TComponentList);
 var
-    i, j: integer;
-    RunCount: integer;
-    StartAngles: TDoubleVector3;
-    Handler: TDownHillSimplexHandler;
-    Runners: TComponentList;
+    i: LongInt;
     Runner: TRunner;
-    PerformanceFrequency, StartTime, EndTime: Int64;
-    ComputationTime: single;
+{$IFNDEF Lazarus}
+    j: LongInt;
     MustContinue: Boolean;
     WaitResult: DWord;
     Handle: THandle;
     KeyState: Byte;
     Msg: TMsg;
-    PointCloud: TPointCloud;
+{$ENDIF}
 begin
-    { Loads model data in original orientation. }
-    { Data are accessed from different threads.
-      That's ok until data aren't changed. }
-    PointCloud := LoadPointCloud(0, 0, 0);
-
-    RunCount := 3;
-    if PointCloud.Count < 100000 then
-        RunCount := 5;
-    if PointCloud.Count < 25000 then
-        RunCount := 9;
-    FGlobalMinVolume := 1e30;
-
-    { Initializing performance counters. }
-    PerformanceFrequency := 0;
-    StartTime := 0;
-    EndTime := 0;
-    QueryPerformanceFrequency(PerformanceFrequency);
-    QueryPerformanceCounter(StartTime);
-    Runners := TComponentList.Create(True);
-    for i := 0 to RunCount - 1 do
-    begin
-        if not FStop then
-        begin
-            if RunCount <= 5 then
-                StartAngles := StartAngle5Runs[i]
-            else
-                StartAngles := StartAngle9Runs[i];
-
-            { Runs optimization to get the minimum volume.
-              CreateHandler adds hanlder to FHandlers list.
-              Handler should not own data because they are
-              shared between handler instances. It is up to
-              this method to release them. See below. }
-            Handler :=
-                CreateHandler(StartAngles[1], StartAngles[2],
-                StartAngles[3], GetInitialAngleStep, False, i + 1, PointCloud, False);
-            { OuputGlobalMinVolume removes hanlder from FHandlers list. }
-            Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
-            { Creates runner. }
-            Runner := TRunner.Create(nil);
-            { Assign computing method. }
-            Runner.OnCompute := Handler.OptimizeBoundingBox;
-            { Assign output method. It is synchronized with main VCL thread. }
-            Runner.OnOutput := Handler.DisplayOutput;
-            { Adds runner to the pool. }
-            Runners.Add(Runner);
-            { Starts execution. }
-            Runner.Run;
-        end;
-    end;
-    { Waits until all runners finish computing. }
     for i := 0 to Runners.Count - 1 do
     begin
         Runner := TRunner(Runners[i]);
+{$IFNDEF Lazarus}
         Handle := Runner.Handle;
         MustContinue := True;
         while MustContinue do
@@ -869,21 +808,101 @@ begin
             if WaitResult = WAIT_FAILED then
                 MustContinue := False;
         end;
+{$ELSE}
+        { Lazarus variant is more limited but portable. }
+        Runner.Wait;
+{$ENDIF}
     end;
+end;
+
+procedure TBoundingBoxServerForm.FindGlobalMinVolume;
+const
+    StartAngle5Runs: array[0..4] of TDoubleVector3 = (
+        (0, 0, 0),
+        (45, 45, 45),
+        (-45, -45, -45),
+        (45, -45, 45),
+        (-45, 45, -45)
+        );
+const
+    StartAngle9Runs: array[0..8] of TDoubleVector3 = (
+        (0, 0, 0),
+        (45, 45, 45),
+        (-45, -45, -45),
+        (45, -45, 45),
+        (-45, 45, -45),
+        (-45, 45, 45),
+        (-45, -45, 45),
+        (45, -45, -45),
+        (45, 45, -45)
+        );
+var
+    i: integer;
+    RunCount: integer;
+    StartAngles: TDoubleVector3;
+    Handler: TDownHillSimplexHandler;
+    Runner: TRunner;
+    Runners: TComponentList;
+    PointCloud: TPointCloud;
+begin
+    { Loads model data in original orientation. }
+    { Data are accessed from different threads.
+      That's ok until data aren't changed. }
+    PointCloud := LoadPointCloud(0, 0, 0);
+
+    RunCount := 3;
+    if PointCloud.Count < 100000 then
+        RunCount := 5;
+    if PointCloud.Count < 25000 then
+        RunCount := 9;
+    FGlobalMinVolume := 1e30;
+
+    FComputationTime.StartMeasurement;
+    Runners := TComponentList.Create(True);
+    for i := 0 to RunCount - 1 do
+    begin
+        if not FStop then
+        begin
+            if RunCount <= 5 then
+                StartAngles := StartAngle5Runs[i]
+            else
+                StartAngles := StartAngle9Runs[i];
+
+            { Runs optimization to get the minimum volume.
+              CreateHandler adds hanlder to FHandlers list.
+              Handler should not own data because they are
+              shared between handler instances. It is up to
+              this method to release them. See below. }
+            Handler :=
+                CreateHandler(StartAngles[1], StartAngles[2],
+                StartAngles[3], GetInitialAngleStep, False, i + 1, PointCloud, False);
+            { OuputGlobalMinVolume removes hanlder from FHandlers list. }
+            Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
+            { Creates runner. }
+            Runner := TRunner.Create(nil);
+            { Assign computing method. }
+            Runner.OnCompute := Handler.OptimizeBoundingBox;
+            { Assign output method. It is synchronized with main VCL thread. }
+            Runner.OnOutput := Handler.DisplayOutput;
+            { Adds runner to the pool. }
+            Runners.Add(Runner);
+            { Starts execution. }
+            Runner.Run;
+        end;
+    end;
+
+    WaitForRunnerFinishing(Runners);
     { It is not necessarily to free separately all runners,
       because the list owns them and removes them itself. }
     Runners.Free;
     Assert(FHandlers.Count = 0, 'All handlers should be freed by the output method.');
 
-    QueryPerformanceCounter(EndTime);
-    ComputationTime := 0;
-    if PerformanceFrequency <> 0 then
-        ComputationTime := (EndTime - StartTime) / PerformanceFrequency;
+    FComputationTime.EndMeasurement;
     FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
     OutputResults(PointCloud);
-    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [ComputationTime]));
+    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
     { Releases model data. }
     FreePointCloud(PointCloud);
 end;

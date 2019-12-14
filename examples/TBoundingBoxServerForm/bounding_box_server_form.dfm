@@ -1,177 +1,236 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
   Left = 355
-  Height = 590
+  Height = 472
   Top = 171
-  Width = 1098
+  Width = 878
   BorderStyle = bsSingle
   Caption = 'Minimum Bounding Box Demo'
-  ClientHeight = 590
-  ClientWidth = 1098
+  ClientHeight = 472
+  ClientWidth = 878
   Color = clBtnFace
-  DesignTimePPI = 120
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -9
   Font.Name = 'Tahoma'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poDefault
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.6.0'
   object Label1: TLabel
-    Left = 10
-    Height = 13
-    Top = 56
-    Width = 38
+    Left = 8
+    Height = 10
+    Top = 45
+    Width = 36
     Caption = 'Output:'
     Color = clBtnFace
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     ParentColor = False
+    ParentFont = False
     Transparent = False
   end
   object Label2: TLabel
-    Left = 10
-    Height = 13
-    Top = 341
-    Width = 52
+    Left = 8
+    Height = 10
+    Top = 273
+    Width = 48
     Caption = 'Test Runs:'
     Color = clBtnFace
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     ParentColor = False
+    ParentFont = False
     Transparent = False
   end
   object Label3: TLabel
-    Left = 9
-    Height = 13
-    Top = 8
+    Left = 7
+    Height = 10
+    Top = 6
     Width = 32
     Caption = 'Model:'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     ParentColor = False
+    ParentFont = False
   end
   object Label4: TLabel
-    Left = 251
-    Height = 13
-    Top = 8
-    Width = 83
+    Left = 201
+    Height = 10
+    Top = 6
+    Width = 85
     Caption = 'Initial angle step:'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     ParentColor = False
+    ParentFont = False
   end
   object Label5: TLabel
-    Left = 251
-    Height = 13
-    Top = 30
+    Left = 201
+    Height = 10
+    Top = 24
     Width = 74
     Caption = 'Final tolerance:'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     ParentColor = False
+    ParentFont = False
   end
   object Label6: TLabel
-    Left = 251
-    Height = 13
-    Top = 52
-    Width = 73
+    Left = 201
+    Height = 10
+    Top = 42
+    Width = 72
     Caption = 'Exit derivative:'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     ParentColor = False
+    ParentFont = False
   end
   object BitBtnFindMinimumBoundingBox: TBitBtn
-    Left = 616
-    Height = 57
-    Top = 9
-    Width = 240
+    Left = 492
+    Height = 46
+    Top = 7
+    Width = 192
     Anchors = [akTop, akRight]
     Caption = 'Find Minimum Bounding Box'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     OnClick = BitBtnFindMinimumBoundingBoxClick
+    ParentFont = False
     TabOrder = 0
   end
   object Memo1: TMemo
-    Left = 8
-    Height = 257
-    Top = 72
-    Width = 1078
+    Left = 6
+    Height = 205
+    Top = 58
+    Width = 862
     Anchors = [akTop, akLeft, akRight, akBottom]
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -9
     Font.Name = 'Courier New'
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 1
   end
   object CheckBoxRandomData: TCheckBox
-    Left = 93
-    Height = 23
-    Top = 3
-    Width = 106
+    Left = 74
+    Height = 24
+    Top = 2
+    Width = 109
     Caption = 'Use random data'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
+    ParentFont = False
     TabOrder = 2
   end
   object ButtonBruteForce: TButton
-    Left = 872
-    Height = 25
-    Top = 8
-    Width = 130
+    Left = 697
+    Height = 20
+    Top = 6
+    Width = 104
     Anchors = [akTop, akRight]
     Caption = 'Brute Force'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     OnClick = ButtonBruteForceClick
+    ParentFont = False
     TabOrder = 3
   end
   object Memo2: TMemo
-    Left = 8
-    Height = 222
-    Top = 360
-    Width = 1078
+    Left = 6
+    Height = 178
+    Top = 288
+    Width = 862
     Anchors = [akLeft, akRight, akBottom]
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -9
     Font.Name = 'Courier New'
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 4
   end
   object ButtonStop: TButton
-    Left = 1017
-    Height = 58
-    Top = 8
-    Width = 69
+    Left = 813
+    Height = 46
+    Top = 6
+    Width = 55
     Anchors = [akTop, akRight]
     Caption = 'Stop'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     OnClick = ButtonStopClick
+    ParentFont = False
     TabOrder = 5
   end
   object ButtonRandomTest: TButton
-    Left = 872
-    Height = 25
-    Top = 41
-    Width = 130
+    Left = 697
+    Height = 20
+    Top = 33
+    Width = 104
     Anchors = [akTop, akRight]
     Caption = 'Random Test'
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
     OnClick = ButtonRandomTestClick
+    ParentFont = False
     TabOrder = 6
   end
   object ComboBoxFiles: TComboBox
-    Left = 8
-    Height = 21
-    Top = 30
-    Width = 193
-    ItemHeight = 13
+    Left = 6
+    Height = 27
+    Top = 24
+    Width = 154
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
+    ItemHeight = 0
     OnChange = ComboBoxFilesChange
+    ParentFont = False
     TabOrder = 7
   end
   object EditInitialAngleStep: TEdit
-    Left = 366
-    Height = 21
-    Top = 4
-    Width = 121
+    Left = 293
+    Height = 20
+    Top = 3
+    Width = 97
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
+    ParentFont = False
     TabOrder = 8
     Text = '37'
   end
   object EditFinalTolerance: TEdit
-    Left = 366
-    Height = 21
-    Top = 26
-    Width = 121
+    Left = 293
+    Height = 20
+    Top = 21
+    Width = 97
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
+    ParentFont = False
     TabOrder = 9
     Text = '0.00001'
   end
   object EditExitDerivate: TEdit
-    Left = 366
-    Height = 21
-    Top = 48
-    Width = 121
+    Left = 293
+    Height = 20
+    Top = 38
+    Width = 97
+    Font.Color = clWindowText
+    Font.Height = -9
+    Font.Name = 'Tahoma'
+    ParentFont = False
     TabOrder = 10
     Text = '0.5'
   end
