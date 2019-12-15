@@ -16,12 +16,16 @@ unit RunningThread;
 
 interface
 uses Classes, Tools, Forms,
-    {$IFNDEF Lazarus}
-      //TODO: set up proper module name for Delhpi build.
-      //DesignIntf;
-    {$ELSE}
-      PropEdits,
-    {$ENDIF}
+{$IFNDEF Lazarus}
+    //TODO: set up proper module name for Delhpi build.
+    //DesignIntf;
+{$ELSE}
+    PropEdits,
+{$ENDIF}
+{$IFDEF LINUX}
+{$linklib c}
+    ctypes,
+{$ENDIF LINUX}
     Contnrs;
 
 type
@@ -158,6 +162,13 @@ end;
 
 {$warnings on}
 
+{$IF DEFINED(LINUX)}
+const
+  _SC_NPROCESSORS_ONLN = 83;
+
+function sysconf(i: cint): clong; cdecl; external Name 'sysconf';
+{$ENDIF LINUX}
+
 constructor TRunnerPool.Create;
 var i, ThreadCount: Integer;
 begin
@@ -165,7 +176,11 @@ begin
     { Owns runner instances. }
     FRunners := TComponentList.Create(True);
     { Creates number of runners equal to number of CPU cores. }
+{$IF DEFINED(LINUX)}
+    ThreadCount := sysconf(_SC_NPROCESSORS_ONLN);
+{$ELSE}
     ThreadCount := TThread.ProcessorCount;
+{$ENDIF}
     for i := 0 to ThreadCount - 1 do
     begin
         FRunners.Add(TRunner.Create(nil));

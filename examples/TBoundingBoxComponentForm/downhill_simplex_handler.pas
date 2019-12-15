@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
 {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls, Windows,
+    StdCtrls,
 {$ENDIF}
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
@@ -45,6 +45,8 @@ type
         FComputationTime: Single;
         { Unique container id. It is used only to reference results. }
         FRunId: Integer;
+        { Measuring computation time. }
+        FPerformanceFrequency, FStartTime: Int64;
 
         function GetCycleCount: Integer;
         function GetEvaluationCount: Integer;
@@ -66,6 +68,10 @@ type
         procedure UpdateResults(Sender: TComponent; iDecision: TFloatDecision);
         { Returns flag of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
+        { Starts measuring computation time. }
+        procedure StartTimeMeasurement;
+        { Ends measuring computation time. }
+        procedure EndTimeMeasurement;
 
     public
         { If set simplex is recreated from original point on restarting,
@@ -218,38 +224,51 @@ begin
     inherited Destroy;
 end;
 
-procedure TDownHillSimplexHandler.OptimizeBoundingBox;
-var
-    fString: string;
-    fPerformanceFrequency, fStartTime, fEndTime: Int64;
+procedure TDownHillSimplexHandler.StartTimeMeasurement;
 begin
     { This supresses useless hints in Lazarus. }
-    fPerformanceFrequency := 0;
-    fStartTime := 0;
-    fEndTime := 0;
-    FComputationTime := 0;
+    FPerformanceFrequency := 0;
+    FStartTime := 0;
+    { Initializing performance counters. }
+{$IFNDEF Lazarus}
+    QueryPerformanceFrequency(FPerformanceFrequency);
+    QueryPerformanceCounter(FStartTime);
+{$ENDIF}
+end;
 
+procedure TDownHillSimplexHandler.EndTimeMeasurement;
+var
+    EndTime: Int64;
+begin
+    { Calculating computation time. }
+    EndTime := 0;
+{$IFNDEF Lazarus}
+    QueryPerformanceCounter(EndTime);
+{$ENDIF}
+    if FPerformanceFrequency <> 0 then
+        FComputationTime := (EndTime - FStartTime) / FPerformanceFrequency;
+end;
+
+procedure TDownHillSimplexHandler.OptimizeBoundingBox;
+var
+    Line: string;
+begin
     FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
 
-    { Initializing performance counters. }
-    QueryPerformanceFrequency(fPerformanceFrequency);
-    QueryPerformanceCounter(fStartTime);
+    StartTimeMeasurement;
     { Optimizing. }
     FDownhillSimplexAlgorithm.AlgorithmRealization;
-    { Calculating computation time. }
-    QueryPerformanceCounter(fEndTime);
-    if fPerformanceFrequency <> 0 then
-        FComputationTime := (fEndTime - fStartTime) / fPerformanceFrequency;
+    EndTimeMeasurement;
 
     { Gets parameters of best solution. }
     if FShowAlgoDetails then
     begin
-        fString := '  Result:' + sLineBreak;
-        fString := fString + '     Modified parameters:' +
+        Line := '  Result:' + sLineBreak;
+        Line := Line + '     Modified parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
-        fString := fString + '     Volume: ' + Format('%.4f', [FBoxVolume]) + sLineBreak;
-        DisplayDetails(fString);
+        Line := Line + '     Volume: ' + Format('%.4f', [FBoxVolume]) + sLineBreak;
+        DisplayDetails(Line);
     end;
 end;
 
