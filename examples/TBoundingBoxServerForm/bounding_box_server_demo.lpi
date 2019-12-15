@@ -76,7 +76,8 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-dLazarus"/>
+      <CustomOptions Value="-dLazarus
+-dHAS_GETCPUCOUNT"/>
       <OtherDefines Count="1">
         <Define0 Value="Lazarus"/>
       </OtherDefines>
