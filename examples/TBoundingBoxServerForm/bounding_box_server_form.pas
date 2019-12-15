@@ -241,7 +241,6 @@ end;
 procedure TBoundingBoxServerForm.FormDestroy(Sender: TObject);
 begin
     StopComputing;
-    FHandlers.Free;
 end;
 
 procedure TBoundingBoxServerForm.ComboBoxFilesChange(Sender: TObject);
