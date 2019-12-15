@@ -10,7 +10,7 @@ uses
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils,
 {$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
-    StdCtrls, Windows,
+    StdCtrls,
 {$ENDIF}
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
 
@@ -33,6 +33,18 @@ type
         property Gamma: Single read FGamma;
     end;
 
+    TComputationTime = class
+    private
+        FPerformanceFrequency, FStartTime: Int64;
+        FTime: Single;
+
+    public
+        procedure StartMeasurement;
+        procedure EndMeasurement;
+
+        property Time: Single read FTime;
+    end;
+
     TDownHillSimplexHandler = class;
     { External method displaying attributes of container instance. }
     THandlerOutputProcedure = procedure(Handler: TDownHillSimplexHandler) of object;
@@ -47,6 +59,8 @@ type
         { Minimum bounding box problem. }
         FDownhillSimplexAlgorithm: TDownhillSimplexAlgorithm;
         FHandlerOutputProcedure: THandlerOutputProcedure;
+        { Measures time of optimization. }
+        FComputationTime: TComputationTime;
 
         FStop: Boolean;
         FShowDetails: Boolean;
@@ -63,8 +77,6 @@ type
         { Vectors containing triplets of maximum and minimum coordinates of
           model points. They are used to compute bounding box volume. }
         FBoxMinCoords, FBoxMaxCoords: TDoubleVector3;
-        { Computation time. }
-        FComputationTime: Single;
         { Unique container id. It is used only to reference results. }
         FRunId: Integer;
 
@@ -129,7 +141,7 @@ type
         property RestartCount: Integer read GetRestartCount;
         property HandlerOutputProcedure: THandlerOutputProcedure
             write FHandlerOutputProcedure;
-        property ComputationTime: Single read FComputationTime;
+        property ComputationTime: TComputationTime read FComputationTime;
         property RunId: Integer read FRunId;
         property PointCloud: TPointCloud read FPointCloud;
     end;
@@ -143,6 +155,32 @@ uses bounding_box_server_form;
 function DegToRad(Deg: Double): Double;
 begin
     Result := Deg * PI / 180.0;
+end;
+
+procedure TComputationTime.StartMeasurement;
+begin
+    { Initializing performance counters. }
+    FPerformanceFrequency := 0;
+    FStartTime := 0;
+{$IFNDEF Lazarus}
+    QueryPerformanceFrequency(FPerformanceFrequency);
+    QueryPerformanceCounter(FStartTime);
+{$ENDIF}
+end;
+
+procedure TComputationTime.EndMeasurement;
+{$IFNDEF Lazarus}
+var
+    EndTime: Int64;
+{$ENDIF}
+begin
+    FTime := 0;
+{$IFNDEF Lazarus}
+    EndTime := 0;
+    QueryPerformanceCounter(EndTime);
+    if FPerformanceFrequency <> 0 then
+        FComputationTime := (EndTime - FStartTime) / FPerformanceFrequency;
+{$ENDIF}
 end;
 
 constructor TPointCloud.Create(AAlpha, ABeta, AGamma: Single);
@@ -253,37 +291,27 @@ begin
     FInitialAngleStep := AInitialAngleStep;
     FStop := False;
     FRunId := ARunId;
+    FComputationTime := TComputationTime.Create;
 end;
 
 destructor TDownHillSimplexHandler.Destroy;
 begin
     ClearPointCloud;
     FDownhillSimplexAlgorithm.Free;
+    FComputationTime.Free;
     inherited Destroy;
 end;
 
 procedure TDownHillSimplexHandler.OptimizeBoundingBox;
 var
     Line: string;
-    PerformanceFrequency, StartTime, EndTime: Int64;
 begin
-    { This supresses useless hints in Lazarus. }
-    PerformanceFrequency := 0;
-    StartTime := 0;
-    EndTime := 0;
-    FComputationTime := 0;
-
     FDownhillSimplexAlgorithm.DownhillSimplexServer := Self;
 
-    { Initializing performance counters. }
-    QueryPerformanceFrequency(PerformanceFrequency);
-    QueryPerformanceCounter(StartTime);
+    FComputationTime.StartMeasurement;
     { Optimizing. }
     FDownhillSimplexAlgorithm.AlgorithmRealization;
-    { Calculating computation time. }
-    QueryPerformanceCounter(EndTime);
-    if PerformanceFrequency <> 0 then
-        FComputationTime := (EndTime - StartTime) / PerformanceFrequency;
+    FComputationTime.EndMeasurement;
 
     { Gets parameters of best solution. }
     if FShowDetails then
