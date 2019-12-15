@@ -8,9 +8,10 @@
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="22" Y="4"/>
+        <EditorIndex Value="3"/>
+        <CursorPos Y="5"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
       <Unit1>
@@ -98,8 +99,8 @@
         <Filename Value="..\..\package\RunningThread.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="158"/>
-        <CursorPos Y="167"/>
+        <TopLine Value="167"/>
+        <CursorPos X="20" Y="180"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -268,24 +269,23 @@
       </Unit32>
       <Unit33>
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="8"/>
         <CursorPos X="65" Y="26"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="12"/>
       </Unit33>
       <Unit34>
         <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1689"/>
         <CursorPos X="65" Y="1708"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="10"/>
       </Unit34>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
     </OtherDefines>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="23" HistoryIndex="22">
       <Position1>
         <Filename Value="bounding_box_server_form.pas"/>
         <Caret Line="906" Column="37" TopLine="885"/>
@@ -351,53 +351,33 @@
         <Caret Line="168" Column="29" TopLine="149"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="28" Column="18" TopLine="8"/>
-      </Position17>
-      <Position18>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="30" Column="45" TopLine="8"/>
-      </Position18>
-      <Position19>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="26" Column="65" TopLine="8"/>
-      </Position19>
-      <Position20>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="27" Column="18" TopLine="8"/>
-      </Position20>
-      <Position21>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="28" Column="21" TopLine="8"/>
-      </Position21>
-      <Position22>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="30" Column="45" TopLine="8"/>
-      </Position22>
-      <Position23>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <Caret Line="26" Column="65" TopLine="8"/>
-      </Position23>
-      <Position24>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <Caret Line="168" Column="52" TopLine="149"/>
-      </Position24>
-      <Position25>
+      </Position17>
+      <Position18>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <Caret Line="172" TopLine="149"/>
-      </Position25>
-      <Position26>
+      </Position18>
+      <Position19>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <Caret Line="166" Column="15" TopLine="156"/>
-      </Position26>
-      <Position27>
+      </Position19>
+      <Position20>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <Caret Line="28" TopLine="13"/>
-      </Position27>
-      <Position28>
+      </Position20>
+      <Position21>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <Caret Line="166" Column="3" TopLine="155"/>
-      </Position28>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\package\RunningThread.pas"/>
+        <Caret Line="176" Column="127" TopLine="167"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\package\RunningThread.pas"/>
+        <Caret Line="180" Column="37" TopLine="167"/>
+      </Position23>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
