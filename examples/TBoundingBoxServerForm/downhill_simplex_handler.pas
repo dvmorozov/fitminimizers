@@ -36,13 +36,13 @@ type
     TComputationTime = class
     private
         FPerformanceFrequency, FStartTime: Int64;
-        FComputationTime: Single;
+        FTime: Single;
 
     public
         procedure StartMeasurement;
         procedure EndMeasurement;
 
-        property ComputationTime: Single read FComputationTime;
+        property Time: Single read FTime;
     end;
 
     TDownHillSimplexHandler = class;
@@ -174,7 +174,7 @@ var
     EndTime: Int64;
 {$ENDIF}
 begin
-    FComputationTime := 0;
+    FTime := 0;
 {$IFNDEF Lazarus}
     EndTime := 0;
     QueryPerformanceCounter(EndTime);

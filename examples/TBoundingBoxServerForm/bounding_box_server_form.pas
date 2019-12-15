@@ -507,7 +507,7 @@ begin
                 [DeltaVolume, BoxVolume, BoxSizes[1],
                 BoxSizes[2], BoxSizes[3], Alpha, Beta, Gamma,
                 PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
-                ComputationTime, CycleCount, EvaluationCount, RestartCount]);
+                ComputationTime.Time, CycleCount, EvaluationCount, RestartCount]);
             if DeltaVolume > FMaxDeltaVolume then
             begin
                 FMaxDeltaVolume := DeltaVolume;
@@ -659,7 +659,7 @@ begin
                         ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
                         [DeltaVolume, BoxVolume, BoxSizes[1],
                         BoxSizes[2], BoxSizes[3], Alpha, Beta,
-                        Gamma, Alpha, Beta, Gamma, ComputationTime,
+                        Gamma, Alpha, Beta, Gamma, ComputationTime.Time,
                         CycleCount, EvaluationCount, RestartCount]);
                     if DeltaVolume > FMaxDeltaVolume then
                     begin
@@ -729,7 +729,8 @@ begin
         Line := Format(
             ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
             [RunId, BoxVolume, BoxSizes[1], BoxSizes[2], BoxSizes[3],
-            Alpha, Beta, Gamma, ComputationTime, CycleCount, EvaluationCount,
+            Alpha, Beta, Gamma, ComputationTime.Time,
+            CycleCount, EvaluationCount,
             RestartCount]);
         Memo1.Lines.Add(Line);
         Application.ProcessMessages;
@@ -902,7 +903,8 @@ begin
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
     OutputResults(PointCloud);
-    Memo1.Lines.Add('Full Calc Time     : ' + Format(' %.4f', [FComputationTime]));
+    { Prints total computation time. }
+    Memo1.Lines.Add('Total Calc Time     : ' + Format(' %.4f', [FComputationTime.Time]));
     { Releases model data. }
     FreePointCloud(PointCloud);
 end;
