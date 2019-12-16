@@ -179,7 +179,7 @@ begin
     EndTime := 0;
     QueryPerformanceCounter(EndTime);
     if FPerformanceFrequency <> 0 then
-        FComputationTime := (EndTime - FStartTime) / FPerformanceFrequency;
+        FTime := (EndTime - FStartTime) / FPerformanceFrequency;
 {$ENDIF}
 end;
 
