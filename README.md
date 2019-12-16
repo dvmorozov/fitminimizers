@@ -1,5 +1,5 @@
 # fitminimizers
-Downhill simplex algorithm including variant with simulated annealing for Delphi & Lazarus. 
+Downhill simplex algorithm including variant with simulated annealing for Delphi & Lazarus (Windows, Linux). 
 
 This software is distributed under [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/), which allows you to use this component in commercial software.
 
@@ -12,7 +12,7 @@ Downhill simplex algorithm with simulated annealing.
 ## Demo applications
 The algorithm is abstracted from any particular task.
 As an example of optimization task the "minimum bounding box" problem is used.
-The goal is to find 3d box of minimum volume completely enclosing given set of points.
+The goal is to find 3D box of minimum volume completely enclosing given set of points.
 
 See
 [Minimum bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box)
@@ -20,8 +20,8 @@ See
 [Bounding volume](https://en.wikipedia.org/wiki/Bounding_volume)
 
 Initially model data containing set of points are loaded into the program.
-As parameters of optimization coordinate rotation angles are used. 
-Angles are varied until minimum volume of the box enclosing given points will be found.
+Rotation angles are used as parameters of optimization coordinate. 
+Angles are varied until minimum volume of the box enclosing given points is found.
 
 There are two variants of demo application having the same functionality. 
 The first one uses interface to provide algorithm with data and compute goal function.
@@ -29,7 +29,7 @@ It also demostrates an approach to parallel optimization of independent tasks.
 
 ![Minimum Bounding Box Demo](assets/2019-11-29_10h53_34.png)
 
-The second examples demonstrates using component on form to run optimization, which can
+The second example demonstrates using form component to run optimization, which can
 take significant time, in separate thread allowing interaction with application.
 
 ![Component Demo](assets/2019-11-29_14h11_17.png)
