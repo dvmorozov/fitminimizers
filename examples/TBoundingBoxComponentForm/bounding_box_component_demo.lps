@@ -17,6 +17,7 @@
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
+        <TopLine Value="54"/>
         <CursorPos X="74" Y="79"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
@@ -185,6 +186,7 @@
         <TopLine Value="1685"/>
         <CursorPos X="3" Y="1589"/>
         <UsageCount Value="20"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit22>
       <Unit23>
         <Filename Value="C:\lazarus\lcl\interfaces\win32\win32object.inc"/>
@@ -192,6 +194,7 @@
         <TopLine Value="391"/>
         <CursorPos Y="413"/>
         <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\package\MyExceptions.pas"/>
