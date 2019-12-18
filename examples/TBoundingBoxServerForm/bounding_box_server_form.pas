@@ -53,7 +53,6 @@ type
         { Contains cached data to avoid redundand file reading. }
         PointCloudCache: TPointCloud;
 
-        FShowAlgoDetails: Boolean;
         FShowPassed: Boolean;
         FStop: Boolean;
         { Keeps all instances of "handler" class for asynchronous operations. }
@@ -279,7 +278,6 @@ var
     Handler: TDownHillSimplexHandler;
     PointCloud: TPointCloud;
 begin
-    FShowAlgoDetails := True;
     FStop := False;
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
@@ -311,6 +309,8 @@ begin
     FRunner.OnOutput := Handler.DisplayOutput;
     { Starts computation in separate thread. }
     FRunner.Run;
+    //???
+    FRunner.Wait;
 end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
@@ -564,7 +564,6 @@ var
     Runner: TRunner;
     ThreadPool: TRunnerPool;
 begin
-    FShowAlgoDetails := False;
     FShowPassed := True;
     FStop := False;
     { Initializes global minimum parameters. }
@@ -628,7 +627,6 @@ var
     Handler: TDownHillSimplexHandler;
     PointCloud: TPointCloud;
 begin
-    FShowAlgoDetails := False;
     FStop := False;
     { Initializes global minimum parameters. }
     FMaxDeltaVolume := -1.0e20;
