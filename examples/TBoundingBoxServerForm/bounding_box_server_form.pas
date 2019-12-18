@@ -75,6 +75,8 @@ type
         FOptiResultBoxVolume: Double;
         { Measures total computation time of multiple runs. }
         FComputationTime: TComputationTime;
+        { Single pass runner. }
+        FRunner: TRunner;
 
         function GetInitialAngleStep: Double;
         procedure StopComputing;
@@ -105,6 +107,7 @@ type
         function LoadPointCloud(Alpha, Beta, Gamma: single): TPointCloud;
         { Generates point cloud from random data. }
         function GenerateRandomPointCloud: TPointCloud;
+        procedure FreeSinglePassRunner;
 
     public
         { Creates FHanlders before other operations. }
@@ -187,6 +190,16 @@ begin
     FReloadPointCloud := True;
 end;
 
+procedure TBoundingBoxServerForm.FreeSinglePassRunner;
+begin
+    if FRunner <> nil then
+    begin
+        FRunner.Wait;
+        FRunner.Free;
+        FRunner := nil;
+    end;
+end;
+
 constructor TBoundingBoxServerForm.Create(AOwner: TComponent);
 begin
     { Must be created before inherited constructor which causes initializing
@@ -198,6 +211,7 @@ end;
 
 destructor TBoundingBoxServerForm.Destroy;
 begin
+    FreeSinglePassRunner;
     FComputationTime.Free;
     FHandlers.Free;
     inherited;
@@ -260,7 +274,6 @@ end;
 
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 var
-    Runner: TRunner;
     { This "handler" instance is used to demonstrate execution of algorithm
       in separate thread by visual component TRunner attached to the form. }
     Handler: TDownHillSimplexHandler;
@@ -280,8 +293,9 @@ begin
         { Uses model data. }
         PointCloud := LoadPointCloud(0, 45, 45);
     end;
+    FreeSinglePassRunner;
     { Executes optimization algorithms in separate thread. }
-    Runner := TRunner.Create(nil);
+    FRunner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
     Handler := CreateHandler(0, 0, 0, GetInitialAngleStep, True, 1, PointCloud, True);
@@ -290,13 +304,13 @@ begin
     { Assign runner procedures. }
     { Executes optimization method in separated thread. This method
       should not modify any data except members of container instance. }
-    Runner.OnCompute := Handler.OptimizeBoundingBox;
+    FRunner.OnCompute := Handler.OptimizeBoundingBox;
     { Displays optimization results, this method is synchronized with
       main VCL thread. This method can modify any data of the form.
       Should not remove handler to allow subsequent runs. }
-    Runner.OnOutput := Handler.DisplayOutput;
+    FRunner.OnOutput := Handler.DisplayOutput;
     { Starts computation in separate thread. }
-    Runner.Run;
+    FRunner.Run;
 end;
 
 procedure TBoundingBoxServerForm.PostProcessStatistics;
@@ -585,7 +599,7 @@ begin
                         False, RunId, PointCloud, True);
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
-                    { OuputMinVolume removes hanlder from FHandlers list. }
+                    { OuputBruteForce removes hanlder from FHandlers list. }
                     Handler.HandlerOutputProcedure := OuputBruteForce;
                     { Assign runner procedures. }
                     { Executes optimization method in separated thread. This method
