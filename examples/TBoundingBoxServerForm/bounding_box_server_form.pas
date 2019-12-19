@@ -309,7 +309,7 @@ begin
     FRunner.OnOutput := Handler.DisplayOutput;
     { Starts computation in separate thread. }
     FRunner.Run;
-    //???
+    { Waits for termination. Otherwise under Linux segmentation fault is caused. }
     FRunner.Wait;
 end;
 
