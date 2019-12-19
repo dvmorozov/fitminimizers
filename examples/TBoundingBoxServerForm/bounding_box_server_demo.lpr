@@ -1,6 +1,5 @@
 program bounding_box_server_demo;
 
-{$mode objfpc}{$H+}
 {$define UseCThreads}
 
 uses {$IFDEF UNIX} {$IFDEF UseCThreads}

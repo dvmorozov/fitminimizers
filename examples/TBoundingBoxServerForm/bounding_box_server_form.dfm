@@ -1,7 +1,7 @@
 object BoundingBoxServerForm: TBoundingBoxServerForm
-  Left = 355
+  Left = 554
   Height = 472
-  Top = 171
+  Top = 131
   Width = 878
   BorderStyle = bsSingle
   Caption = 'Minimum Bounding Box Demo'
@@ -18,7 +18,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   object Label1: TLabel
     Left = 8
     Height = 10
-    Top = 45
+    Top = 48
     Width = 36
     Caption = 'Output:'
     Color = clBtnFace
@@ -30,7 +30,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Transparent = False
   end
   object Label2: TLabel
-    Left = 8
+    Left = 7
     Height = 10
     Top = 273
     Width = 48
@@ -115,8 +115,8 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object Memo1: TMemo
     Left = 6
-    Height = 205
-    Top = 58
+    Height = 197
+    Top = 64
     Width = 862
     Anchors = [akTop, akLeft, akRight, akBottom]
     Font.Color = clWindowText
@@ -129,7 +129,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   object CheckBoxRandomData: TCheckBox
     Left = 74
     Height = 24
-    Top = 2
+    Top = -1
     Width = 109
     Caption = 'Use random data'
     Font.Color = clWindowText
@@ -194,9 +194,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 6
   end
   object ComboBoxFiles: TComboBox
-    Left = 6
+    Left = 7
     Height = 27
-    Top = 24
+    Top = 21
     Width = 154
     Font.Color = clWindowText
     Font.Height = -9
