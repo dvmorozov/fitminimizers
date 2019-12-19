@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="2"/>
-      <BuildNr Value="3"/>
+      <BuildNr Value="9"/>
       <Attributes pvaDebug="True"/>
     </VersionInfo>
     <BuildModes Count="1">
@@ -84,7 +84,8 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-dLazarus"/>
+      <CustomOptions Value="-dLazarus
+-dUseCThreads"/>
       <OtherDefines Count="1">
         <Define0 Value="Lazarus"/>
       </OtherDefines>
