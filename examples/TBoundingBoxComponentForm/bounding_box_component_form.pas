@@ -24,7 +24,8 @@ type
     end;
 
     { TBoundingBoxComponentForm }
-    { Demonstrates the simplest way of integration of algorithm into application. }
+    { Demonstrates integration of algorithm into application by means
+      of form component. }
     TBoundingBoxComponentForm = class(TForm)
         ComboBoxFiles: TComboBox;
         CheckBoxRandomData: TCheckBox;

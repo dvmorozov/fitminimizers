@@ -18,7 +18,8 @@ uses
 
 type
     { TBoundingBoxServerForm }
-    { Demonstrates the simplest way of integration of algorithm into application. }
+    { Demonstrates integration of algorithm into application by implementing
+      special server interface. }
     TBoundingBoxServerForm = class(TForm)
         ComboBoxFiles: TComboBox;
         CheckBoxRandomData: TCheckBox;

@@ -9,6 +9,10 @@
       <Title Value="bounding_box_server_demo"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
+      <XPManifest>
+        <TextName Value="dvmorozov.fitminimizers.bounding_box_server_demo"/>
+        <TextDesc Value="Demonstrates integration of algorithm into application by implementing special server interface."/>
+      </XPManifest>
       <Icon Value="0"/>
     </General>
     <i18n>
@@ -18,8 +22,8 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <RevisionNr Value="2"/>
-      <BuildNr Value="9"/>
+      <RevisionNr Value="3"/>
+      <BuildNr Value="11"/>
       <Attributes pvaDebug="True"/>
     </VersionInfo>
     <BuildModes Count="1">
