@@ -17,7 +17,7 @@
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="54"/>
+        <TopLine Value="10"/>
         <CursorPos X="74" Y="79"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
@@ -29,10 +29,11 @@
         <ComponentName Value="BoundingBoxComponentForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="28"/>
-        <CursorPos X="21" Y="229"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="7" Y="27"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
