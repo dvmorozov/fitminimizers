@@ -20,8 +20,8 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="967"/>
-        <CursorPos X="29" Y="983"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="19" Y="16"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -31,7 +31,7 @@
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="303"/>
+        <TopLine Value="37"/>
         <CursorPos Y="313"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
@@ -98,10 +98,9 @@
       </Unit10>
       <Unit11>
         <Filename Value="..\..\package\RunningThread.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="166"/>
-        <CursorPos Y="184"/>
+        <CursorPos X="71" Y="178"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
