@@ -103,8 +103,9 @@ type
             OwnsPointCloud: Boolean): TDownHillSimplexHandler;
         { Releases point cloud data. }
         procedure FreePointCloud(PointCloud: TPointCloud);
-        { Loads point cloud from file selected by drop-down list. }
-        function LoadPointCloud(Alpha, Beta, Gamma: single): TPointCloud;
+        { Loads point cloud from file selected by drop-down list.
+          Rotates point coordinates by given angles. }
+        function LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
         { Generates point cloud from random data. }
         function GenerateRandomPointCloud: TPointCloud;
         procedure FreeSinglePassRunner;
@@ -267,6 +268,8 @@ begin
     FOptiResultBoxVolume := Handler.BoxVolume;
     FOptiResultBoxMaxCoords := Handler.BoxMaxCoords;
     FOptiResultBoxMinCoords := Handler.BoxMinCoords;
+    Memo1.Lines.Add('Final angles       :' + Format(' %10.4f %10.4f %10.4f',
+        [Handler.Alpha, Handler.Beta, Handler.Gamma]));
     OutputResults(Handler.PointCloud);
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -293,6 +296,7 @@ begin
         PointCloud := LoadPointCloud(0, 45, 45);
     end;
     FreeSinglePassRunner;
+
     { Executes optimization algorithms in separate thread. }
     FRunner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
@@ -465,12 +469,12 @@ begin
         Memo1.Lines.Add('');
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
-        Memo1.Lines.Add('Minimum Volume    : ' +
+        Memo1.Lines.Add('Minimum Volume     : ' +
             Format('%.4f (%6.3f %6.3f %6.3f)', [MinVolume, X, Y, Z]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
         Deviation := (FOptiResultBoxVolume - MinVolume) / MinVolume * 100;
-        Memo1.Lines.Add('Calculation Delta : ' +
+        Memo1.Lines.Add('Calculation Delta  : ' +
             Format('%.4f (%.2f%%)', [(FOptiResultBoxVolume - MinVolume), Deviation]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
@@ -762,12 +766,12 @@ begin
         Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
     Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
     Memo1.Lines.Add('');
-    Memo1.Lines.Add('Minimum Volume    : ' + Format(' %10.4f', [FOptiResultBoxVolume]));
+    Memo1.Lines.Add('Minimum Volume     :' + Format(' %10.4f', [FOptiResultBoxVolume]));
     BoxSizes[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
     BoxSizes[2] := FOptiResultBoxMaxCoords[2] - FOptiResultBoxMinCoords[2];
     BoxSizes[3] := FOptiResultBoxMaxCoords[3] - FOptiResultBoxMinCoords[3];
     SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
-    Memo1.Lines.Add('Minimum Box       : ' + Format(' %10.4f %10.4f %10.4f',
+    Memo1.Lines.Add('Minimum Box        :' + Format(' %10.4f %10.4f %10.4f',
         [BoxSizes[1], BoxSizes[2], BoxSizes[3]]));
     Application.ProcessMessages;
 end;
@@ -1016,6 +1020,8 @@ begin
         FReloadPointCloud := False;
     end;
 
+    Memo1.Lines.Add('Original angles    :' +
+        Format(' %10.4f %10.4f %10.4f', [Alpha, Beta, Gamma]));
     Result := TPointCloud.Create(Alpha, Beta, Gamma);
 
     RotX := MatrixRotX(DegToRad(Alpha));
