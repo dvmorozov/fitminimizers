@@ -106,6 +106,7 @@ type
         { Loads point cloud from file selected by drop-down list.
           Rotates point coordinates by given angles. }
         function LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
+        function GetRotationMatrix(Alpha, Beta, Gamma: Single): TMatrix;
         { Generates point cloud from random data. }
         function GenerateRandomPointCloud: TPointCloud;
         procedure FreeSinglePassRunner;
@@ -264,12 +265,26 @@ begin
 end;
 
 procedure TBoundingBoxServerForm.OuputMinVolume(Handler: TDownHillSimplexHandler);
+var
+    Matr: TMatrix;
+    Vector: T3Vector;
 begin
     FOptiResultBoxVolume := Handler.BoxVolume;
     FOptiResultBoxMaxCoords := Handler.BoxMaxCoords;
     FOptiResultBoxMinCoords := Handler.BoxMinCoords;
+
+    { Displays final angles. }
     Memo1.Lines.Add('Final angles       :' + Format(' %10.4f %10.4f %10.4f',
         [Handler.Alpha, Handler.Beta, Handler.Gamma]));
+
+    { Displays final vector. }
+    Matr := GetRotationMatrix(Handler.Alpha, Handler.Beta, Handler.Gamma);
+    { Rotates and displays etalon unit vector. }
+    Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+    MulVectMatr(Matr, Vector);
+    Memo1.Lines.Add('Final vector       :' +
+        Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
+
     OutputResults(Handler.PointCloud);
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -941,6 +956,21 @@ begin
     end;
 end;
 
+function TBoundingBoxServerForm.GetRotationMatrix(Alpha, Beta, Gamma: Single): TMatrix;
+var
+    RotX, RotY, RotZ, Matr: TMatrix;
+begin
+    RotX := MatrixRotX(DegToRad(Alpha));
+    RotY := MatrixRotY(DegToRad(Beta));
+    RotZ := MatrixRotZ(DegToRad(Gamma));
+    { Computes rotation matrix. }
+    Matr := UnitMatrix;
+    Mul3DMatrix(RotZ, Matr, Matr);
+    Mul3DMatrix(RotY, Matr, Matr);
+    Mul3DMatrix(RotX, Matr, Matr);
+    Result := Matr;
+end;
+
 function TBoundingBoxServerForm.LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
 type
     TOBJCoord = record // Stores X, Y, Z coordinates
@@ -1010,7 +1040,7 @@ type
 
 var
     OriginalPoint, RotatedPoint: P3DVector;
-    RotX, RotY, RotZ, Matr: TMatrix;
+    Matr: TMatrix;
     Vector: T3Vector;
     i: LongInt;
 begin
@@ -1024,14 +1054,15 @@ begin
         Format(' %10.4f %10.4f %10.4f', [Alpha, Beta, Gamma]));
     Result := TPointCloud.Create(Alpha, Beta, Gamma);
 
-    RotX := MatrixRotX(DegToRad(Alpha));
-    RotY := MatrixRotY(DegToRad(Beta));
-    RotZ := MatrixRotZ(DegToRad(Gamma));
-    { Computes rotation matrix. }
-    Matr := UnitMatrix;
-    Mul3DMatrix(RotZ, Matr, Matr);
-    Mul3DMatrix(RotY, Matr, Matr);
-    Mul3DMatrix(RotX, Matr, Matr);
+    Matr := GetRotationMatrix(Alpha, Beta, Gamma);
+
+    { Rotates and displays etalon unit vector. }
+    Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+    MulVectMatr(Matr, Vector);
+    Memo1.Lines.Add('Original vector    :' +
+        Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
+
+    Result := TPointCloud.Create(Alpha, Beta, Gamma);
 
     { Rotates data point. }
     for i := 0 to PointCloudCache.Count - 1 do
