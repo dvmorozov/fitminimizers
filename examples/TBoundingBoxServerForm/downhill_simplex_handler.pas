@@ -146,16 +146,9 @@ type
         property PointCloud: TPointCloud read FPointCloud;
     end;
 
-function DegToRad(Deg: Double): Double;
-
 implementation
 
 uses bounding_box_server_form;
-
-function DegToRad(Deg: Double): Double;
-begin
-    Result := Deg * PI / 180.0;
-end;
 
 procedure TComputationTime.StartMeasurement;
 begin
@@ -194,23 +187,6 @@ end;
 function TDownHillSimplexHandler.ComputeRotatedBoxVolume(AAlpha, ABeta, AGamma: Single;
     var AMinCoords, AMaxCoords: T3Vector): Double;
 
-    function GetRotationMatrix: TMatrix;
-    var
-        RotX, RotY, RotZ, Matr: TMatrix;
-    begin
-        { Computing rotation matrices.
-          Matrices are initalized inside functions. }
-        RotX := MatrixRotX(DegToRad(AAlpha));
-        RotY := MatrixRotY(DegToRad(ABeta));
-        RotZ := MatrixRotZ(DegToRad(AGamma));
-        { Computes rotation matrix. }
-        Matr := UnitMatrix;
-        Mul3DMatrix(RotZ, Matr, Matr);
-        Mul3DMatrix(RotY, Matr, Matr);
-        Mul3DMatrix(RotX, Matr, Matr);
-        Result := Matr;
-    end;
-
 var
     i: Integer;
     A, B, C: Double; //  Sizes of the box.
@@ -219,7 +195,7 @@ var
     Vector: T3Vector;
 begin
     { Computes volume of bounding box. }
-    Matr := GetRotationMatrix;
+    Matr := GetRotationMatrix(AAlpha, ABeta, AGamma);
     Point := FPointCloud[0];
     Vector := Point^.fVector;
     MulVectMatr(Matr, Vector);

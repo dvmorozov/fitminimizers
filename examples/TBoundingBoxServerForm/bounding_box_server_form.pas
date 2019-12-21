@@ -106,7 +106,6 @@ type
         { Loads point cloud from file selected by drop-down list.
           Rotates point coordinates by given angles. }
         function LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
-        function GetRotationMatrix(Alpha, Beta, Gamma: Single): TMatrix;
         { Generates point cloud from random data. }
         function GenerateRandomPointCloud: TPointCloud;
         procedure FreeSinglePassRunner;
@@ -954,21 +953,6 @@ begin
         end;
         PointCloud.Free;
     end;
-end;
-
-function TBoundingBoxServerForm.GetRotationMatrix(Alpha, Beta, Gamma: Single): TMatrix;
-var
-    RotX, RotY, RotZ, Matr: TMatrix;
-begin
-    RotX := MatrixRotX(DegToRad(Alpha));
-    RotY := MatrixRotY(DegToRad(Beta));
-    RotZ := MatrixRotZ(DegToRad(Gamma));
-    { Computes rotation matrix. }
-    Matr := UnitMatrix;
-    Mul3DMatrix(RotZ, Matr, Matr);
-    Mul3DMatrix(RotY, Matr, Matr);
-    Mul3DMatrix(RotX, Matr, Matr);
-    Result := Matr;
 end;
 
 function TBoundingBoxServerForm.LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
