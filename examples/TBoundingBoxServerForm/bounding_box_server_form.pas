@@ -295,6 +295,7 @@ var
       in separate thread by visual component TRunner attached to the form. }
     Handler: TDownHillSimplexHandler;
     PointCloud: TPointCloud;
+    InitialBoxVolume: Double;
 begin
     FStop := False;
     Memo1.Lines.Clear;
@@ -316,6 +317,9 @@ begin
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
     Handler := CreateHandler(0, 0, 0, GetInitialAngleStep, True, 1, PointCloud, True);
+    { Displays initial box volume. }
+    InitialBoxVolume := Handler.GetBoxVolume;
+    Memo1.Lines.Add('Initial box volume :' + Format(' %10.4f', [InitialBoxVolume]));
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := OuputMinVolume;
     { Assign runner procedures. }
