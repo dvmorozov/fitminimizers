@@ -105,7 +105,7 @@ type
         procedure FreePointCloud(PointCloud: TPointCloud);
         { Loads point cloud from file selected by drop-down list.
           Rotates point coordinates by given angles. }
-        function LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
+        function LoadPointCloud(Alpha, Beta, Gamma: Single; ShowDetails: Boolean): TPointCloud;
         { Generates point cloud from random data. }
         function GenerateRandomPointCloud: TPointCloud;
         procedure FreeSinglePassRunner;
@@ -308,7 +308,7 @@ begin
     else
     begin
         { Uses model data. }
-        PointCloud := LoadPointCloud(0, 45, 45);
+        PointCloud := LoadPointCloud(0, 45, 45, True);
     end;
     FreeSinglePassRunner;
 
@@ -613,7 +613,7 @@ begin
                     Beta := y * Steps;
                     Gamma := z * Steps;
                     { Loads data and rotates them by given angles. }
-                    PointCloud := LoadPointCloud(Alpha, Beta, Gamma);
+                    PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
                     Handler :=
@@ -672,7 +672,7 @@ begin
             Beta := Random * 180;
             Gamma := Random * 180;
 
-            PointCloud := LoadPointCloud(Alpha, Beta, Gamma);
+            PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
             Handler := CreateHandler(0, 0, 0, GetInitialAngleStep,
                 False, x, PointCloud, True);
             { Computes minimum volume directly in the calling thread.
@@ -883,7 +883,7 @@ begin
     { Loads model data in original orientation. }
     { Data are accessed from different threads.
       That's ok until data aren't changed. }
-    PointCloud := LoadPointCloud(0, 0, 0);
+    PointCloud := LoadPointCloud(0, 0, 0, False);
 
     RunCount := 3;
     if PointCloud.Count < 100000 then
@@ -959,7 +959,8 @@ begin
     end;
 end;
 
-function TBoundingBoxServerForm.LoadPointCloud(Alpha, Beta, Gamma: Single): TPointCloud;
+function TBoundingBoxServerForm.LoadPointCloud(
+    Alpha, Beta, Gamma: Single; ShowDetails: Boolean): TPointCloud;
 type
     TOBJCoord = record // Stores X, Y, Z coordinates
         X, Y, Z: Single;
@@ -1038,17 +1039,19 @@ begin
         FReloadPointCloud := False;
     end;
 
-    Memo1.Lines.Add('Original angles    :' +
-        Format(' %10.4f %10.4f %10.4f', [Alpha, Beta, Gamma]));
-    Result := TPointCloud.Create(Alpha, Beta, Gamma);
+    if ShowDetails then
+    begin
+        Memo1.Lines.Add('Original angles    :' +
+            Format(' %10.4f %10.4f %10.4f', [Alpha, Beta, Gamma]));
 
-    Matr := GetRotationMatrix(Alpha, Beta, Gamma);
+        Matr := GetRotationMatrix(Alpha, Beta, Gamma);
 
-    { Rotates and displays etalon unit vector. }
-    Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
-    MulVectMatr(Matr, Vector);
-    Memo1.Lines.Add('Original vector    :' +
-        Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
+        { Rotates and displays etalon unit vector. }
+        Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+        MulVectMatr(Matr, Vector);
+        Memo1.Lines.Add('Original vector    :' +
+            Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
+    end;
 
     Result := TPointCloud.Create(Alpha, Beta, Gamma);
 
