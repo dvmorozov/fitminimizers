@@ -86,9 +86,6 @@ type
 
         procedure ClearPointCloud;
 
-        function ComputeRotatedBoxVolume(AAlpha, ABeta, AGamma: Single;
-            var AMinCoords, AMaxCoords: T3Vector): Double;
-
         { IDownhillSimplexServer implementation. }
 
         { Returns initial characteristic length for every parameter. }
@@ -117,6 +114,8 @@ type
             AShowDetails: Boolean; ARunId: Integer;
             APointCloud: TPointCloud; AOwnsPointCloud: Boolean); reintroduce;
         destructor Destroy; override;
+        { Computes box volume according to current rotation angles. }
+        function GetBoxVolume: Double;
         { Initializes performance counters and starts optimization.
           The procedure should not have parameters because it is called
           from separate thread. }
@@ -184,8 +183,7 @@ begin
     FGamma := AGamma;
 end;
 
-function TDownHillSimplexHandler.ComputeRotatedBoxVolume(AAlpha, ABeta, AGamma: Single;
-    var AMinCoords, AMaxCoords: T3Vector): Double;
+function TDownHillSimplexHandler.GetBoxVolume: Double;
 
 var
     i: Integer;
@@ -195,33 +193,33 @@ var
     Vector: T3Vector;
 begin
     { Computes volume of bounding box. }
-    Matr := GetRotationMatrix(AAlpha, ABeta, AGamma);
+    Matr := GetRotationMatrix(FAlpha, FBeta, FGamma);
     Point := FPointCloud[0];
     Vector := Point^.fVector;
     MulVectMatr(Matr, Vector);
-    AMaxCoords := Vector;
-    AMinCoords := Vector;
+    FBoxMaxCoords := Vector;
+    FBoxMinCoords := Vector;
     for i := 1 to FPointCloud.Count - 1 do
     begin
         Point := FPointCloud[i];
         Vector := Point^.fVector;
         MulVectMatr(Matr, Vector);
-        if Vector[1] > AMaxCoords[1] then
-            AMaxCoords[1] := Vector[1];
-        if Vector[2] > AMaxCoords[2] then
-            AMaxCoords[2] := Vector[2];
-        if Vector[3] > AMaxCoords[3] then
-            AMaxCoords[3] := Vector[3];
-        if Vector[1] < AMinCoords[1] then
-            AMinCoords[1] := Vector[1];
-        if Vector[2] < AMinCoords[2] then
-            AMinCoords[2] := Vector[2];
-        if Vector[3] < AMinCoords[3] then
-            AMinCoords[3] := Vector[3];
+        if Vector[1] > FBoxMaxCoords[1] then
+            FBoxMaxCoords[1] := Vector[1];
+        if Vector[2] > FBoxMaxCoords[2] then
+            FBoxMaxCoords[2] := Vector[2];
+        if Vector[3] > FBoxMaxCoords[3] then
+            FBoxMaxCoords[3] := Vector[3];
+        if Vector[1] < FBoxMinCoords[1] then
+            FBoxMinCoords[1] := Vector[1];
+        if Vector[2] < FBoxMinCoords[2] then
+            FBoxMinCoords[2] := Vector[2];
+        if Vector[3] < FBoxMinCoords[3] then
+            FBoxMinCoords[3] := Vector[3];
     end;
-    A := AMaxCoords[1] - AMinCoords[1];
-    B := AMaxCoords[2] - AMinCoords[2];
-    C := AMaxCoords[3] - AMinCoords[3];
+    A := FBoxMaxCoords[1] - FBoxMinCoords[1];
+    B := FBoxMaxCoords[2] - FBoxMinCoords[2];
+    C := FBoxMaxCoords[3] - FBoxMinCoords[3];
     Result := A * B * C;
 end;
 
@@ -397,8 +395,7 @@ begin
     FBeta := Decision.Parameters[1];
     FGamma := Decision.Parameters[2];
     { Computes evaluation function. }
-    FBoxVolume := ComputeRotatedBoxVolume(FAlpha, FBeta, FGamma,
-        FBoxMinCoords, FBoxMaxCoords);
+    FBoxVolume := GetBoxVolume;
     Decision.Evaluation := FBoxVolume;
 
     if FShowDetails then
