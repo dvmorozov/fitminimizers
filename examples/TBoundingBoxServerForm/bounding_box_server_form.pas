@@ -268,23 +268,26 @@ var
     Matr: TMatrix;
     Vector: T3Vector;
 begin
-    FOptiResultBoxVolume := Handler.BoxVolume;
-    FOptiResultBoxMaxCoords := Handler.BoxMaxCoords;
-    FOptiResultBoxMinCoords := Handler.BoxMinCoords;
+    with Handler do
+    begin
+        FOptiResultBoxVolume := BoxVolume;
+        FOptiResultBoxMaxCoords := BoxMaxCoords;
+        FOptiResultBoxMinCoords := BoxMinCoords;
 
-    { Displays final angles. }
-    Memo1.Lines.Add('Final angles       :' + Format(' %10.4f %10.4f %10.4f',
-        [Handler.Alpha, Handler.Beta, Handler.Gamma]));
+        { Displays final angles. }
+        Memo1.Lines.Add('Final angles       :' + Format(' %10.4f %10.4f %10.4f',
+            [Alpha, Beta, Gamma]));
 
-    { Displays final vector. }
-    Matr := GetRotationMatrix(Handler.Alpha, Handler.Beta, Handler.Gamma);
-    { Rotates and displays etalon unit vector. }
-    Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
-    MulVectMatr(Matr, Vector);
-    Memo1.Lines.Add('Final vector       :' +
-        Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
+        { Displays final vector. }
+        Matr := GetRotationMatrix(Alpha, Beta, Gamma);
+        { Rotates and displays etalon unit vector. }
+        Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+        MulVectMatr(Matr, Vector);
+        Memo1.Lines.Add('Final vector       :' +
+            Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
 
-    OutputResults(Handler.PointCloud);
+        OutputResults(PointCloud);
+    end;
     { Removes and frees container. }
     FHandlers.Remove(Handler);
 end;
@@ -1043,13 +1046,13 @@ begin
 
     if ShowDetails then
     begin
-        Memo1.Lines.Add('Original angles    :' +
+        Memo1.Lines.Add('Initial angles     :' +
             Format(' %10.4f %10.4f %10.4f', [Alpha, Beta, Gamma]));
 
         { Rotates and displays etalon unit vector. }
         Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
         MulVectMatr(Matr, Vector);
-        Memo1.Lines.Add('Original vector    :' +
+        Memo1.Lines.Add('Initial vector     :' +
             Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
     end;
 
