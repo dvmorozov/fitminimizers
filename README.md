@@ -13,6 +13,7 @@ Downhill simplex algorithm with simulated annealing.
 The algorithm is abstracted from any particular task.
 As an example of optimization task the "minimum bounding box" problem is used.
 The goal is to find 3D box of minimum volume completely enclosing given set of points.
+Many thanks to Ingo Wulf for contributing into development and providing test models.
 
 See
 [Minimum bounding box](https://en.wikipedia.org/wiki/Minimum_bounding_box)
