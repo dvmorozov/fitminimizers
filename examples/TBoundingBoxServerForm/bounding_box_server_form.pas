@@ -1039,12 +1039,12 @@ begin
         FReloadPointCloud := False;
     end;
 
+    Matr := GetRotationMatrix(Alpha, Beta, Gamma);
+
     if ShowDetails then
     begin
         Memo1.Lines.Add('Original angles    :' +
             Format(' %10.4f %10.4f %10.4f', [Alpha, Beta, Gamma]));
-
-        Matr := GetRotationMatrix(Alpha, Beta, Gamma);
 
         { Rotates and displays etalon unit vector. }
         Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
