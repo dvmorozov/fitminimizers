@@ -56,6 +56,8 @@ procedure MulVectMatr(Matr: TMatrix; var Vector: T3Vector);
 procedure Mul3DMatrix(var A, B: TMatrix; var Matr: TMatrix);
 
 function Rad(Angle: Double): Double;
+function GetRotationMatrix(Alpha, Beta, Gamma: Single): TMatrix;
+function DegToRad(Deg: Double): Double;
 
 //  TODO: remove global variables.
 var
@@ -63,6 +65,28 @@ var
     RotXMatr, RotYMatr, RotZMatr, DilatMatr, TempMatr: TMatrix;
 
 implementation
+
+function DegToRad(Deg: Double): Double;
+begin
+    Result := Deg * PI / 180.0;
+end;
+
+function GetRotationMatrix(Alpha, Beta, Gamma: Single): TMatrix;
+var
+    RotX, RotY, RotZ, Matr: TMatrix;
+begin
+    { Computing rotation matrices.
+      Matrices are initalized inside functions. }
+    RotX := MatrixRotX(DegToRad(Alpha));
+    RotY := MatrixRotY(DegToRad(Beta));
+    RotZ := MatrixRotZ(DegToRad(Gamma));
+    { Computes rotation matrix. }
+    Matr := UnitMatrix;
+    Mul3DMatrix(RotZ, Matr, Matr);
+    Mul3DMatrix(RotY, Matr, Matr);
+    Mul3DMatrix(RotX, Matr, Matr);
+    Result := Matr;
+end;
 
 function Rad(Angle: Double): Double;
 begin
