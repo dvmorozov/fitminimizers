@@ -1,4 +1,7 @@
-@import "";
+---
+---
+
+@import "{{ site.theme }}";
 footer {
     width: 170px;
     float: left;
