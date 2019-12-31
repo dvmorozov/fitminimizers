@@ -3,7 +3,7 @@ gems:
   - jekyll-paginate
   - jekyll-seo-tag
 title: Downhill Simplex for Delphi
-description: Components implementing downhill simplex algorithm for Delphi & Lazarus (Windows, Linux).
+description: Components for Delphi & Lazarus (Windows, Linux).
 social:
   name: Dmitry Morozov
   links:
