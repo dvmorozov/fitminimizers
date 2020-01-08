@@ -14,7 +14,6 @@ uses
     Classes, SysUtils;
 
 type
-    //  Exception generated in the case of user mistake.
     EUserException = class(Exception);
 
 implementation
