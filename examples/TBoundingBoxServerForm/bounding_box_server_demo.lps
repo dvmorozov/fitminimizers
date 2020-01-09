@@ -40,8 +40,10 @@
       </Unit2>
       <Unit3>
         <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="15"/>
-        <CursorPos X="57" Y="150"/>
+        <TopLine Value="532"/>
+        <CursorPos X="49" Y="508"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -90,7 +92,6 @@
       </Unit8>
       <Unit9>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
         <TopLine Value="731"/>
         <CursorPos X="49" Y="710"/>
@@ -136,7 +137,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="908"/>
         <CursorPos X="25" Y="920"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="98"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit14>
@@ -152,7 +153,7 @@
         <Filename Value="..\..\package\MyExceptions.pas"/>
         <EditorIndex Value="8"/>
         <CursorPos Y="17"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="98"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit16>
