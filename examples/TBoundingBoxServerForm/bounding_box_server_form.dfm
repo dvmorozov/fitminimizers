@@ -2,11 +2,11 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   Left = 3
   Height = 400
   Top = 2
-  Width = 622
+  Width = 776
   BorderStyle = bsSingle
   Caption = 'Minimum Bounding Box Demo'
   ClientHeight = 400
-  ClientWidth = 622
+  ClientWidth = 776
   Color = clBtnFace
   Font.Color = clWindowText
   Font.Height = -9
@@ -100,7 +100,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Transparent = False
   end
   object BitBtnFindMinimumBoundingBox: TBitBtn
-    Left = 249
+    Left = 403
     Height = 44
     Top = 8
     Width = 192
@@ -117,7 +117,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Left = 6
     Height = 125
     Top = 64
-    Width = 606
+    Width = 760
     Anchors = [akTop, akLeft, akRight, akBottom]
     Font.Color = clWindowText
     Font.Height = -9
@@ -139,7 +139,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 2
   end
   object ButtonBruteForce: TButton
-    Left = 447
+    Left = 601
     Height = 20
     Top = 8
     Width = 104
@@ -156,7 +156,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     Left = 6
     Height = 178
     Top = 216
-    Width = 606
+    Width = 760
     Anchors = [akLeft, akRight, akBottom]
     Font.Color = clWindowText
     Font.Height = -9
@@ -166,7 +166,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 4
   end
   object ButtonStop: TButton
-    Left = 557
+    Left = 711
     Height = 44
     Top = 8
     Width = 55
@@ -180,7 +180,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
     TabOrder = 5
   end
   object ButtonRandomTest: TButton
-    Left = 447
+    Left = 601
     Height = 20
     Top = 32
     Width = 104
