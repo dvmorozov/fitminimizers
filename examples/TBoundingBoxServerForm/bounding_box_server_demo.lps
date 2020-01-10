@@ -8,7 +8,7 @@
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="12"/>
         <CursorPos Y="3"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -20,6 +20,7 @@
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <TopLine Value="306"/>
         <CursorPos X="5" Y="303"/>
         <FoldState Value=" T6:Q421 T1:T4D16"/>
@@ -40,16 +41,15 @@
       </Unit2>
       <Unit3>
         <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
-        <EditorIndex Value="15"/>
-        <TopLine Value="532"/>
-        <CursorPos X="49" Y="508"/>
+        <EditorIndex Value="16"/>
+        <CursorPos Y="4"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\package\AlgorithmContainer.pas"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="14"/>
         <CursorPos X="12" Y="37"/>
         <UsageCount Value="106"/>
         <Loaded Value="True"/>
@@ -58,7 +58,6 @@
       <Unit5>
         <Filename Value="..\..\package\CBRCComponent.pas"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="4"/>
         <CursorPos Y="22"/>
         <UsageCount Value="107"/>
         <Loaded Value="True"/>
@@ -74,8 +73,7 @@
       </Unit6>
       <Unit7>
         <Filename Value="..\..\package\RunningThread.pas"/>
-        <EditorIndex Value="12"/>
-        <TopLine Value="16"/>
+        <EditorIndex Value="13"/>
         <CursorPos X="7" Y="39"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
@@ -83,9 +81,7 @@
       </Unit7>
       <Unit8>
         <Filename Value="..\..\package\CombEnumerator.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="175"/>
         <CursorPos X="11" Y="195"/>
         <UsageCount Value="104"/>
         <Loaded Value="True"/>
@@ -94,7 +90,6 @@
       <Unit9>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="731"/>
         <CursorPos X="49" Y="710"/>
         <UsageCount Value="135"/>
         <Loaded Value="True"/>
@@ -103,7 +98,6 @@
       <Unit10>
         <Filename Value="..\..\package\SelfCheckedComponentList.pas"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="229"/>
         <CursorPos X="26" Y="247"/>
         <UsageCount Value="115"/>
         <Loaded Value="True"/>
@@ -112,7 +106,6 @@
       <Unit11>
         <Filename Value="..\..\package\Decisions.pas"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="79"/>
         <CursorPos X="18" Y="108"/>
         <UsageCount Value="104"/>
         <Loaded Value="True"/>
@@ -120,9 +113,10 @@
       </Unit11>
       <Unit12>
         <Filename Value="..\..\package\Tools.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="11"/>
         <CursorPos X="11" Y="21"/>
         <UsageCount Value="32"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit12>
       <Unit13>
@@ -136,7 +130,6 @@
       <Unit14>
         <Filename Value="..\..\package\SimpMath.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="908"/>
         <CursorPos X="25" Y="920"/>
         <UsageCount Value="120"/>
         <Loaded Value="True"/>
@@ -144,7 +137,7 @@
       </Unit14>
       <Unit15>
         <Filename Value="..\..\package\FitMinimizers.pas"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="15"/>
         <CursorPos X="41" Y="5"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
