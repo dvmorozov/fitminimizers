@@ -35,7 +35,8 @@ type
     TCreatingProcedure = procedure(Runner: TRunner) of object;
 
     TRunningThread = class(TThread)
-    { If process was terminated by means of object destruction then termination procedure is not called. }
+    { If process was terminated by means of object destruction then
+      termination procedure is not called. }
     public
         { Main computing procedure, it is not synchronized with VCL thread. }
         ComputingProcedure: TComputingProcedure;
