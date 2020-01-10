@@ -164,7 +164,6 @@
         <TopLine Value="184"/>
         <CursorPos X="8" Y="189"/>
         <UsageCount Value="16"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit18>
       <Unit19>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\redef.inc"/>
@@ -172,7 +171,6 @@
         <TopLine Value="4"/>
         <CursorPos X="15" Y="21"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit19>
       <Unit20>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\func.inc"/>
@@ -180,7 +178,6 @@
         <TopLine Value="145"/>
         <CursorPos X="187" Y="162"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit20>
       <Unit21>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\base.inc"/>
@@ -188,7 +185,6 @@
         <TopLine Value="84"/>
         <CursorPos X="24" Y="101"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit21>
       <Unit22>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win\wininc\defines.inc"/>
@@ -196,7 +192,6 @@
         <TopLine Value="1685"/>
         <CursorPos X="6" Y="1702"/>
         <UsageCount Value="7"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit22>
     </Units>
     <OtherDefines Count="1">
