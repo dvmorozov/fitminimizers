@@ -19,21 +19,26 @@ interface
 uses SysUtils;
 
 type
-    { Enumerates all possible combinations of a set of discrete values. Value must have at least single possible value. }
+    { Enumerates all possible combinations of a set of discrete values.
+      Value must have at least single possible value. }
     TCombEnumerator = class
     protected
-        { Contains numbers of possible values of discrete quantities. Quantities by themselves can be any. }
+        { Contains numbers of possible values of discrete quantities.
+          Quantities by themselves can be any. }
         NumbersOfValues: array of LongInt;
-        { Indexes of possible values of discrete quantities. Set of indexes enumerates possible combinations of quantity values.
-          Each index can take value from 0 to the value of corresponding item from NumberOfValues minus 1. }
+        { Indexes of possible values of discrete quantities. Set of indexes
+          enumerates possible combinations of quantity values.
+          Each index can take value from 0 to the value of corresponding
+          item from NumberOfValues minus 1. }
         ValuesIndexes: array of LongInt;
         { Through index of currently selected combination. }
         FCurrentComb: LongInt;
-        { Is True if current combination was set up via SetCurrentComb, False otherwise. }
+        { Is True if current combination was set up via SetCurrentComb. }
         FIsCombDefined: Boolean;
         { Returns total number of combinations. }
         function GetCombNumber: LongInt;
-        { Returns number of combinations which can be created with quantities belonging to given interval of indexes.
+        { Returns number of combinations which can be created with quantities
+          belonging to given interval of indexes.
           @param(StartIndex Index of quantity in the NumberOfValues array.)
           @param(StopIndex Index of quantity in the NumberOfValues array.) }
         function GetCombNumberStartStop(
@@ -58,7 +63,8 @@ type
         property ValuesNumber: LongInt read GetValuesNumber;
     end;
 
-    { Defines functionality of discrete quantity. Quantity must have at least single value. }
+    { Defines functionality of discrete quantity. Quantity must have
+      at least single value. }
     IDiscretValue = interface
         { Returns number of quantity values. }
         function GetNumberOfValues: LongInt;
@@ -137,7 +143,7 @@ var
     i: LongInt;
 begin
     Assert(not ((ACurrentComb < 0) or (ACurrentComb >= CombNumber)));
-    //  Algorithm selecting entity combination by through index.
+    { Algorithm selecting entity combination by through index. }
     TempCurrentComb := ACurrentComb;
     FCurrentComb := ACurrentComb;
     for i := 0 to ValuesNumber - 2 do
@@ -186,7 +192,8 @@ var
 begin
     inherited ClearListOfNumbersOfValues;
     for i := 0 to Length(FValuesList) - 1 do
-        FValuesList[i] := nil;  //  Calling _Release.
+        { Calls _Release. }
+        FValuesList[i] := nil;
     Finalize(FValuesList);
 end;
 
