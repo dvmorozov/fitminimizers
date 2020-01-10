@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="24">
+    <Units Count="23">
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -40,7 +40,6 @@
       </Unit2>
       <Unit3>
         <Filename Value="..\..\package\DownhillSimplexContainer.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="15"/>
         <TopLine Value="532"/>
         <CursorPos X="49" Y="508"/>
@@ -51,7 +50,7 @@
       <Unit4>
         <Filename Value="..\..\package\AlgorithmContainer.pas"/>
         <EditorIndex Value="13"/>
-        <CursorPos X="74" Y="15"/>
+        <CursorPos X="12" Y="37"/>
         <UsageCount Value="106"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -76,16 +75,18 @@
       <Unit7>
         <Filename Value="..\..\package\RunningThread.pas"/>
         <EditorIndex Value="12"/>
-        <TopLine Value="17"/>
-        <CursorPos X="71" Y="178"/>
+        <TopLine Value="16"/>
+        <CursorPos X="7" Y="39"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit7>
       <Unit8>
         <Filename Value="..\..\package\CombEnumerator.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <CursorPos X="45" Y="12"/>
+        <TopLine Value="175"/>
+        <CursorPos X="11" Y="195"/>
         <UsageCount Value="104"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -121,7 +122,7 @@
         <Filename Value="..\..\package\Tools.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="11" Y="21"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="32"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit12>
       <Unit13>
@@ -137,7 +138,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="908"/>
         <CursorPos X="25" Y="920"/>
-        <UsageCount Value="98"/>
+        <UsageCount Value="120"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit14>
@@ -153,7 +154,7 @@
         <Filename Value="..\..\package\MyExceptions.pas"/>
         <EditorIndex Value="8"/>
         <CursorPos Y="17"/>
-        <UsageCount Value="98"/>
+        <UsageCount Value="120"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit16>
@@ -161,7 +162,7 @@
         <Filename Value="..\TBoundingBoxComponentForm\bounding_box_component_form.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="5" Y="15"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="17"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit17>
       <Unit18>
@@ -169,7 +170,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="184"/>
         <CursorPos X="8" Y="189"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="16"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit18>
       <Unit19>
@@ -177,7 +178,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="4"/>
         <CursorPos X="15" Y="21"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="8"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit19>
       <Unit20>
@@ -185,7 +186,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="145"/>
         <CursorPos X="187" Y="162"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="8"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit20>
       <Unit21>
@@ -193,7 +194,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="84"/>
         <CursorPos X="24" Y="101"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="8"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit21>
       <Unit22>
@@ -201,16 +202,9 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1685"/>
         <CursorPos X="6" Y="1702"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="7"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit22>
-      <Unit23>
-        <Filename Value="C:\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="8"/>
-        <CursorPos X="65" Y="26"/>
-        <UsageCount Value="0"/>
-      </Unit23>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
