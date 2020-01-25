@@ -22,8 +22,8 @@
 -dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Version Minor="1" Release="1" Build="2"/>
-    <Files Count="13">
+    <Version Minor="1" Release="2" Build="4"/>
+    <Files Count="12">
       <Item1>
         <Filename Value="Tools.pas"/>
         <UnitName Value="Tools"/>
@@ -62,22 +62,18 @@
         <UnitName Value="DownhillSimplexContainer"/>
       </Item9>
       <Item10>
-        <Filename Value="FitMinimizers.pas"/>
-        <UnitName Value="FitMinimizers"/>
-      </Item10>
-      <Item11>
         <Filename Value="AlgorithmContainer.pas"/>
         <UnitName Value="AlgorithmContainer"/>
-      </Item11>
-      <Item12>
+      </Item10>
+      <Item11>
         <Filename Value="RunningThread.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="RunningThread"/>
-      </Item12>
-      <Item13>
+      </Item11>
+      <Item12>
         <Filename Value="CombEnumerator.pas"/>
         <UnitName Value="CombEnumerator"/>
-      </Item13>
+      </Item12>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
