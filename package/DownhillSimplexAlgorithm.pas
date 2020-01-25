@@ -12,9 +12,6 @@ interface
 
 uses
     Classes, SelfCheckedComponentList, Decisions, Algorithm, Tools,
-    {$IFNDEF Lazarus}
-    Windows,
-    {$ENDIF}
     SysUtils;
 
 type
