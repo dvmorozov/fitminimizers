@@ -3,6 +3,8 @@ Downhill simplex algorithm including variant with simulated annealing for Delphi
 
 This software is distributed under [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/), which allows you to use these components in commercial software.
 
+{% include google_ads.html %}
+
 ## TDownhillSimplexAlgorithm
 Classical implementation of downhill simplex algorithm.
 
