@@ -11,7 +11,7 @@ unit SelfCheckedComponentList;
 interface
 
 uses
-{$IFDEF Lazarus}
+{$IF DEFINED(FPC)}
     LCLIntf,
 {$ELSE}
     Types,  //  This causes warning when compiled under Lazarus.
@@ -63,9 +63,9 @@ type
         function Add(Item: TComponent): Integer; virtual;
         procedure Delete(Index: Integer); virtual;
         procedure Insert(Index: Integer; Item: TComponent); virtual;
-        function Extract(Item: Pointer): Pointer;
-        function Remove(Item: Pointer): Integer;
-        function IndexOf(Item: Pointer): Integer;
+        function Extract(Item: Pointer): Pointer; virtual;
+        function Remove(Item: Pointer): Integer; virtual;
+        function IndexOf(Item: Pointer): Integer; virtual;
 
         property Items[index: Integer]: TComponent read GetItem write SetItem;
         property Capacity: Integer read GetCapacity write SetCapacity;
@@ -161,7 +161,7 @@ end;
 
 function TSelfCheckedComponentList.Add;
 begin
-    Add := List.Add(Item);
+    Result := List.Add(Item);
 end;
 
 procedure TSelfCheckedComponentList.Sort(Compare: TListSortCompare);
