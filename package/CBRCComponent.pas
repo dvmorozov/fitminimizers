@@ -27,11 +27,19 @@ type
         function _AddRef: Integer; virtual; stdcall;
         function _Release: Integer; virtual; stdcall;
     public
+        constructor Create(AOwner: TComponent); override;
+
         procedure Free;
         property RefCount: LongInt read FRefCount;
     end;
 
 implementation
+
+constructor TCBRCComponent.Create;
+begin
+    inherited;
+    IntControlled := True;
+end;
 
 procedure TCBRCComponent.Free;
 begin
@@ -39,8 +47,6 @@ begin
     begin
         if RefCount = 0 then
             Destroy
-        else
-            IntControlled := True;
     end;
 end;
 
