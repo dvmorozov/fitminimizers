@@ -18,11 +18,10 @@
         </SyntaxOptions>
       </Parsing>
       <Other>
-        <CustomOptions Value="-dLazarus
--dUseCThreads"/>
+        <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Version Minor="1" Release="2" Build="4"/>
+    <Version Minor="1" Release="3" Build="5"/>
     <Files Count="12">
       <Item1>
         <Filename Value="Tools.pas"/>

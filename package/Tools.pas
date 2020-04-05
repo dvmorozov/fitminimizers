@@ -11,7 +11,7 @@ unit Tools;
 interface
 
 uses SysUtils, Classes, CBRCComponent
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     , Windows
 {$ENDIF};
 
