@@ -14,7 +14,8 @@ uses
 {$IF DEFINED(FPC)}
     LCLIntf,
 {$ELSE}
-    Types,  //  This causes warning when compiled under Lazarus.
+    { This causes warning when compiled under Lazarus. }
+    Types,
 {$ENDIF}
     SysUtils, Classes, CBRCComponent, Tools;
 
@@ -29,7 +30,7 @@ const
     SelfCheckedGUID: TGUID = '{E7E7008A-EE1C-4828-B1D6-A53806820A66}';
 
 type
-    //  By default release stored components.
+    { By default release stored components. }
     TSelfCheckedComponentList = class(TCBRCComponent, ISelfChecked)
     protected
         List: TList;

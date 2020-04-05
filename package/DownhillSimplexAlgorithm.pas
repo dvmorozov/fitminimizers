@@ -19,7 +19,7 @@ type
     public
     end;
 
-    //  Component-decision for simulated annealing optimization.
+    { Solution of simulated annealing optimization. }
     TDownhillSimplexSADecision = class(TDownhillSimplexDecision)
     protected
         FFluctEvaluation: Double;
@@ -28,22 +28,22 @@ type
         function GetCopy: TAbstractDecision; override;
 
     published
-        //  Value of estimation function with random additive value depending on the "temperature".
+        { Value of estimation function with random additive value depending on the "temperature". }
         property FluctEvaluation: Double read FFluctEvaluation write FFluctEvaluation;
     end;
 
     IDownhillSimplexServer = interface
         ['{2E685960-1C7C-11D4-893E-FA8655FAEA48}']
-        //  Return initial characteristic length for every parameter.
+        { Returns initial characteristic length for every parameter. }
         function GetInitParamLength(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
-        //  Set inital calculation point in internal representation.
-        //  The number of array element is equal to the number of parameters of task to be solved.
+        { Sets inital calculation point in internal representation.
+          The number of array element is equal to the number of parameters of task to be solved. }
         procedure FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
-        //  Calculate evaluation function for the point given in internal representation.
+        { Calculates evaluation function for the point given in internal representation. }
         procedure EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
         procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
-        //  Return flag of calculation termination.
+        { Returns flag of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
     end;
 
@@ -56,7 +56,9 @@ type
         FEvaluationCount: LongInt;
         FRestartCount: LongInt;
         FRestartDisabled: Boolean;
-        //  Set exit values
+
+        { Set of termination attributes. }
+
         FMaxCycles: integer;
         FMaxRestarts: integer;
         FFinalTolerance: Double;
@@ -66,33 +68,34 @@ type
         FSimplexStartStepRandomEnabled: Boolean;
         FSimplexDirectionChangingEnabled: Boolean;
         FSimplexStartStepMultiplierEnabled: Boolean;
-        //  Initial simplex size is multiplied by this number.
-        //  If enabled it is used on optimization restarting (experimental feature).
+
+        { Initial simplex size is multiplied by this number.
+          If enabled it is used on optimization restarting (experimental feature). }
         SimplexStartStepMultiplier: Double;
-        //  Set of solutions - vertexes of the simplex.
+        { Set of solutions - vertexes of the simplex. }
         Simplex: TSelfCheckedComponentList;
         ParametersSum: array of Double;
-        //  Best solution found over all optimization cycles.
+        { Best solution found over all optimization cycles. }
         BestDecision: TDownhillSimplexDecision;
 
         function TryNewDecision(const Highest: LongInt; Factor: Double): Double; virtual;
         function MoveWorstDecision(const Highest: LongInt;
             Factor: Double): TDownhillSimplexDecision;
-        //  Return new object-solution of the type appropriate for given algorithm.
+        { Returns new object-solution of the type appropriate for given algorithm. }
         function CreateAppropriateDecision: TDownhillSimplexDecision; virtual;
-        //  Return vertex of the simplex containing minimum value of goal function.
+        { Returns vertex of the simplex containing minimum value of goal function. }
         function GetBestDecision: TDownhillSimplexDecision;
         procedure CreateSimplexVertices(StartDecision: TDownhillSimplexDecision);
-        //  Replace selected solution with modified one.
+        { Replace selected solution with modified one. }
         procedure ReplaceDecision(OldDecision, NewDecision: TDownhillSimplexDecision);
-        //  Return indicies of the best solution, solution next to the best and worst solution.
+        { Return indicies of the best solution, solution next to the best and worst solution. }
         procedure GetIndicativeDecisions(var Highest, NextHighest, Lowest: LongInt);
             virtual;
-        //  For each parameter index computes sum of values for all vertexes.
+        { For each parameter index computes sum of values for all vertexes. }
         procedure GetParametersSum;
         procedure Start;
         procedure Restart;
-        //  Perform single optimization cycle.
+        { Perform single optimization cycle. }
         procedure BasicCalcCycle(const Highest, NextHighest, Lowest: LongInt);
 
         procedure SetFinalTolerance(AFinalTolerance: Double);
@@ -102,41 +105,42 @@ type
         procedure AlgorithmRealization; override;
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
-        //  The total number of optimization cycles.
+        { The total number of optimization cycles. }
         property CycleCount: Integer read FCycleCount;
-        //  The total number of target function evaluations during optimization.
+        { The total number of target function evaluations during optimization. }
         property EvaluationCount: Integer read FEvaluationCount;
-        //  The total number of algorithm restarts during optimization.
+        { The total number of algorithm restarts during optimization. }
         property RestartCount: Integer read FRestartCount;
         property MaxCycles: Integer read FMaxCycles write FMaxCycles;
         property MaxRestarts: Integer read FMaxRestarts write FMaxRestarts;
-
+        { Implementation of supporting interface. }
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
         property FinalTolerance: Double read FFinalTolerance write SetFinalTolerance;
-        //  Disables algorithm restarting after reaching local minimum.
-        //  Restarting can in some configuration spaces help to get to
-        //  better solution.
+        { Disables algorithm restarting after reaching local minimum.
+          Restarting can in some configuration spaces help to get to
+          better solution. }
         property RestartDisabled: Boolean read FRestartDisabled write FRestartDisabled;
-        //  Total number of parameters of the problem to be solved.
-        //  The number is defined after executing CreateSimplexVertices, should not be set up by client.
+        { Total number of parameters of the problem to be solved.
+          The number is defined after executing CreateSimplexVertices,
+          should not be set up by client. }
         property ParametersNumber: LongInt read FParametersNumber;
-        //  If difference in evaluation of best decision for the cycle
-        //  is less than given value then exit.
+        { If improvement in evaluation of best solution for the last cycle
+          is less than given value then terminates computation. }
         property ExitDerivative: Double read FExitDerivative write FExitDerivative;
-        //  Enables using SimplexStartStepMultiplier on optimization restarting.
-        //  The flag should not be used together with other SimplexXXXX flags.
+        { Enables using SimplexStartStepMultiplier on optimization restarting.
+          The flag should not be used together with other SimplexXXXX flags. }
         property SimplexStartStepMultiplierEnabled: Boolean
             read FSimplexStartStepMultiplierEnabled write FSimplexStartStepMultiplierEnabled;
-        //  Enables sequential changing of directions of initial steps
-        //  forming initial simplex vertices. Steps are taken into different
-        //  directions from the initial point according to restart counter.
-        //  Every new optimization cycle starts with its own initial simplex.
-        //  The flag should not be used together with other SimplexXXXX flags.
+        { Enables sequential changing of directions of initial steps
+          forming initial simplex vertices. Steps are taken into different
+          directions from the initial point according to restart counter.
+          Every new optimization cycle starts with its own initial simplex.
+          The flag should not be used together with other SimplexXXXX flags. }
         property SimplexDirectionChangingEnabled: Boolean
             read FSimplexDirectionChangingEnabled write FSimplexDirectionChangingEnabled;
-        //  Enables random multiplier in creating initial simplex vertices.
-        //  The flag should not be used together with other SimplexXXXX flags.
+        { Enables random multiplier in creating initial simplex vertices.
+          The flag should not be used together with other SimplexXXXX flags. }
         property SimplexStartStepRandomEnabled: Boolean
             read FSimplexStartStepRandomEnabled write FSimplexStartStepRandomEnabled;
     end;
@@ -144,8 +148,8 @@ type
     TDownhillSimplexSAAlgorithm = class(TDownhillSimplexAlgorithm)
     protected
         FTemperature: Double;
-        //  Return indicies of the best solution, solution next to the best and
-        //  worst solution after adding random fluctiations to evaluated values.
+        { Returns indicies of the best solution, solution next to the best and
+          worst solution after adding random fluctiations to evaluated values. }
         procedure GetIndicativeDecisions(
             var Highest, NextHighest, Lowest: LongInt); override;
         function TryNewDecision(const Highest: LongInt;
@@ -178,29 +182,29 @@ var
     Best, Temp: TDownhillSimplexDecision;
 begin
     Inc(FRestartCount);
-    //  Searches for solution having minimum value of goal function.
-    //  Reevaluates it to put the "server" into proper state.
-    //  This solution can be used (depending on server configuration)
-    //  as starting point in creating new simplex.
+    { Searches for solution having minimum value of goal function.
+      Reevaluates it to put the "server" into proper state.
+      This solution can be used (depending on server configuration)
+      as starting point in creating new simplex. }
     Best := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     with DownhillSimplexServer do
         EvaluateDecision(Self, Best);
     Inc(FEvaluationCount);
 
-    //  Initial simplex size is reduced by the factor if it's enabled.
+    { Initial simplex size is reduced by the factor if it's enabled. }
     if FSimplexStartStepMultiplierEnabled then
     begin
         SimplexStartStepMultiplier := SimplexStartStepMultiplier / 2;
     end;
 
-    //  Creates new starting point for recreating simplex.
+    { Creates new starting point for recreating simplex. }
     Temp := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
         FillStartDecision(Self, Temp);
-        //  It is up to the "server" to propose new starting point.
-        //  In the case if it is different from the best point
-        //  found on previous cycle, goal function should be computed.
+        { It is up to the "server" to propose new starting point.
+          In the case if it is different from the best point
+          found on previous cycle, goal function should be computed. }
         if not Best.Coincide(Temp) then
         begin
             EvaluateDecision(Self, Temp);
@@ -212,7 +216,7 @@ begin
             Temp := Best;
         end;
     end;
-    //  Recreates simplex points.
+    { Recreates simplex points. }
     CreateSimplexVertices(Temp);
 end;
 
@@ -224,7 +228,7 @@ begin
     FEvaluationCount := 0;
     FRestartCount := 0;
     SimplexStartStepMultiplier := 1;
-    //  Creates new starting point for recreating simplex.
+    { Creates new starting point for recreating simplex. }
     TempDecision := CreateAppropriateDecision;
     with DownhillSimplexServer do
     begin
@@ -232,9 +236,9 @@ begin
         EvaluateDecision(Self, TempDecision);
         Inc(FEvaluationCount);
     end;
-    //  Recreates simplex vertexes.
+    { Recreates simplex vertexes. }
     CreateSimplexVertices(TempDecision);
-    //  Searches for the best solution in simplex and stores it.
+    { Searches for the best solution in simplex and stores it. }
     UtilizeObject(BestDecision);
     BestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
     DownhillSimplexServer.UpdateResults(Self, BestDecision);
@@ -267,29 +271,28 @@ begin
 
     with DownhillSimplexServer do
     begin
-        //  Initializes parameter number.
+        { Initializes number of parameters. }
         SetParametersNumber(StartDecision.ParametersNumber);
         Simplex.Clear;
-        //  Original point is added as a vertex.
+        { Original point is added as a vertex. }
         Simplex.Add(StartDecision);
         for i := 0 to ParametersNumber - 1 do
         begin
-            //  Other N vertices are added.
+            { Other N vertices are added. }
             TempDecision := CreateAppropriateDecision;
             TempDecision.ParametersNumber := ParametersNumber;
-            //  Copying original vertex parameters to new vertex.
+            { Copying original vertex parameters to new vertex. }
             for j := 0 to ParametersNumber - 1 do
                 TempDecision.Parameters[j] := StartDecision.Parameters[j];
 
-            //  The i-th component is moved along corresponding basis vector.
-
-            //  Steps from original point are added along basis vectors
-            //  in opposite directions accorging to restart counter.
-            //  Basis vector is enumerated by parameter index.
+            { The i-th component is moved along corresponding basis vector.
+              Steps from original point are added along basis vectors
+              in opposite directions accorging to restart counter.
+              Basis vector is enumerated by parameter index. }
             SimplexStartStepDirection := 1;
             if FSimplexDirectionChangingEnabled then
             begin
-                //  Inverts direction.
+                { Inverts direction. }
                 if FRestartCount and (1 shl i) <> 0 then
                     SimplexStartStepDirection := -1;
             end;
@@ -299,8 +302,8 @@ begin
                 SimplexStartStepRandom := Random();
 
             TempDecision.Parameters[i] := TempDecision.Parameters[i] +
-                //  Takes into account all multipliers. All of them
-                //  should have default value 1.
+                { Takes into account all multipliers. All of them
+                  should have default value 1. }
                 SimplexStartStepRandom * 
                 SimplexStartStepDirection *
                 SimplexStartStepMultiplier *
@@ -424,7 +427,7 @@ begin
     TempDecision := CreateAppropriateDecision;
     TempDecision.ParametersNumber := ParametersNumber;
 
-    //  Vector is calculated to move the vertex through the center of mass.
+    { Vector is calculated to move the vertex through the center of mass. }
     Factor1 := (1 - Factor) / ParametersNumber;
     Factor2 := Factor1 - Factor;
     for j := 0 to ParametersNumber - 1 do
@@ -448,7 +451,7 @@ procedure TDownhillSimplexAlgorithm.ReplaceDecision(
 var
     Index: LongInt;
 begin
-    //  It's important to preserve order of items in the list!
+    { It's important to preserve order of items in the list. }
     Index := Simplex.IndexOf(OldDecision);
     Simplex.Extract(OldDecision);
     UtilizeObject(OldDecision);
@@ -517,7 +520,7 @@ begin
     with DownhillSimplexServer do
     begin
         TryResult := TryNewDecision(Highest, -1);
-        //  Order of items must be preserved!
+        { Order of items must be preserved. }
         if TryResult < TDownhillSimplexDecision(
             Simplex.Items[Lowest]).Evaluation then
             TryNewDecision(Highest, 2)
@@ -531,10 +534,10 @@ begin
                 TryResult := TryNewDecision(Highest, 0.5);
                 if TryResult >= SavedResult then
                 begin
-                    //  Decrements sizes of simplex toward best vertex.
-                    //  Calculates average positions between best vertex and
-                    //  every other vertex. Obtained values determine new
-                    //  position of the simplex.
+                    { Decrements sizes of simplex toward best vertex.
+                      Calculates average positions between best vertex and
+                      every other vertex. Obtained values determine new
+                      position of the simplex. }
                     SimplexCount := Simplex.Count;
                     for i := 0 to SimplexCount - 1 do
                     begin
@@ -546,7 +549,7 @@ begin
                                     TDownhillSimplexDecision(Simplex.Items[Lowest]).Parameters[j];
                                 CurParamValue :=
                                     TDownhillSimplexDecision(Simplex.Items[i]).Parameters[j];
-                                //  Computes middle point of simplex edge.
+                                { Computes middle point of simplex edge. }
                                 TDownhillSimplexDecision(
                                     Simplex.Items[i]).Parameters[j] :=
                                     0.5 * (CurParamValue + LowestParamValue);
@@ -575,7 +578,7 @@ begin
         raise EDownhillSimplexAlgorithm.Create('Server is not assigned...');
 
     Start;
-    //  Saves minimum value of goal function from initial simplex.
+    { Saves minimum value of goal function from initial simplex. }
     SavedLoEval := GetBestDecision.Evaluation;
 
     PrevTolDefined := False;
@@ -598,18 +601,18 @@ begin
             Tolerance := 2 * Abs(EvalHi - EvalLo) /
                 (Abs(EvalHi) + Abs(EvalLo) + TINY);
 
-            //  Tolerance directly depends on height of the simplex along
-            //  the axis of minimized function. Therefore when tolerance stops
-            //  decrease substantially for cycle it is necessary to terminate
-            //  calculation.
+            { Tolerance directly depends on height of the simplex along
+              the axis of minimized function. Therefore when tolerance stops
+              decrease substantially for cycle it is necessary to terminate
+              calculation. }
             if FinalTolDefined then
             begin
                 if Tolerance < FinalTolerance then
                 begin
                     CurLoEval := GetBestDecision.Evaluation;
-                    //  Size of simplex was reduced to minimal admissible value.
+                    { Size of simplex was reduced to minimal admissible value. }
                     if (not RestartDisabled)
-                        //  Checks other termination conditions.
+                        { Checks other termination conditions. }
                         and (
                             (FSimplexDirectionChangingEnabled and (FRestartCount < (1 shl ParametersNumber) - 1))
                          or (FSimplexStartStepMultiplierEnabled and (SimplexStartStepMultiplier > 0.01))
@@ -619,7 +622,7 @@ begin
                         and (FRestartCount < FMaxRestarts)
                     then
                     begin
-                        //  Saves minimum value of goal function among simplex vertices.
+                        { Saves minimum value of goal function among simplex vertices. }
                         SavedLoEval := GetBestDecision.Evaluation;
                         Restart;
                         Continue;
@@ -640,7 +643,7 @@ begin
 
             BasicCalcCycle(Highest, NextHighest, Lowest);
         end;
-        //  Set up parameters of best solution.
+        { Sets up parameters of best solution. }
         EvaluateDecision(Self, BestDecision);
         Inc(FEvaluationCount);
     end;
@@ -683,8 +686,6 @@ begin
             begin
                 if (GetBestDecision.Evaluation < SavedLoEval) and
                     (FRestartCount < FMaxRestarts) then
-
-
                 begin
                     SavedLoEval := GetBestDecision.Evaluation;
                     Restart;
@@ -703,7 +704,7 @@ begin
                 Temperature := Temperature * 0.95;
             end;    //  if CycleCounter = 1000 then...
         end;
-        //  Set up parameters of best solution.
+        { Sets up parameters of best solution. }
         EvaluateDecision(Self, BestDecision);
         Inc(FEvaluationCount);
     end;
