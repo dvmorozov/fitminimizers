@@ -11,8 +11,7 @@ unit DownhillSimplexAlgorithm;
 interface
 
 uses
-    Classes, SelfCheckedComponentList, Decisions, Algorithm, Tools,
-    SysUtils;
+    Classes, Contnrs, Decisions, Algorithm, Tools, SysUtils;
 
 type
     TDownhillSimplexDecision = class(TFloatDecision)
@@ -33,7 +32,6 @@ type
     end;
 
     IDownhillSimplexServer = interface
-        ['{2E685960-1C7C-11D4-893E-FA8655FAEA48}']
         //  Return initial characteristic length for every parameter.
         function GetInitParamLength(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
@@ -70,7 +68,7 @@ type
         //  If enabled it is used on optimization restarting (experimental feature).
         SimplexStartStepMultiplier: Double;
         //  Set of solutions - vertexes of the simplex.
-        Simplex: TSelfCheckedComponentList;
+        Simplex: TComponentList;
         ParametersSum: array of Double;
         //  Best solution found over all optimization cycles.
         BestDecision: TDownhillSimplexDecision;
@@ -711,8 +709,8 @@ end;
 
 constructor TDownhillSimplexAlgorithm.Create(AOwner: TComponent);
 begin
-    inherited Create(AOwner);
-    Simplex := TSelfCheckedComponentList.Create(nil);
+    inherited;
+    Simplex := TComponentList.Create;
     FSimplexStartStepMultiplierEnabled := False;
     FSimplexStartStepRandomEnabled := False;
     FSimplexDirectionChangingEnabled := False;

@@ -8,10 +8,9 @@ unit FitMinimizers;
 interface
 
 uses
-  Tools, SimpMath, MyExceptions, CBRCComponent, Algorithm, 
-  SelfCheckedComponentList, Decisions, DownhillSimplexAlgorithm, 
-  DownhillSimplexContainer, AlgorithmContainer, RunningThread, CombEnumerator, 
-  LazarusPackageIntf;
+  Tools, SimpMath, MyExceptions, CBRCComponent, Algorithm, Decisions, 
+  DownhillSimplexAlgorithm, DownhillSimplexContainer, AlgorithmContainer, 
+  RunningThread, CombEnumerator, LazarusPackageIntf;
 
 implementation
 
