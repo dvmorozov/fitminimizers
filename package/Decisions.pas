@@ -10,7 +10,7 @@ unit Decisions;
 
 interface
 
-uses SysUtils, Classes, SelfCheckedComponentList;
+uses SysUtils, Classes, Contnrs;
 
 const
     TINY = 1e-6;
@@ -170,7 +170,7 @@ type
 
     EDecisionsList = class(Exception);
 
-    TDecisionsList = class(TSelfCheckedComponentList)
+    TDecisionsList = class(TComponentList)
     public
         { Returns solution having maximum estimation value less than UpLimit,
           starting from 'StartIndex'. Items must be sorted by decreasing of
@@ -823,5 +823,4 @@ initialization
     RegisterClass(TFloatDecision);
     RegisterClass(TTwoDimFloatDecision);
     RegisterClass(TByteDecision);
-    RegisterClass(TDecisionsList);
 end.
