@@ -257,7 +257,7 @@ procedure TDownhillSimplexAlgorithm.CreateSimplexVertices(
     StartDecision: TDownhillSimplexDecision);
 var
     i, j: LongInt;
-    TempDecision: TDownhillSimplexDecision;
+    Decision: TDownhillSimplexDecision;
     SimplexStartStepDirection, SimplexStartStepRandom: Double;
 begin
     if FSimplexStartStepRandomEnabled then
@@ -273,11 +273,11 @@ begin
         for i := 0 to ParametersNumber - 1 do
         begin
             //  Other N vertices are added.
-            TempDecision := CreateAppropriateDecision;
-            TempDecision.ParametersNumber := ParametersNumber;
+            Decision := CreateAppropriateDecision;
+            Decision.ParametersNumber := ParametersNumber;
             //  Copying original vertex parameters to new vertex.
             for j := 0 to ParametersNumber - 1 do
-                TempDecision.Parameters[j] := StartDecision.Parameters[j];
+                Decision.Parameters[j] := StartDecision.Parameters[j];
 
             //  The i-th component is moved along corresponding basis vector.
 
@@ -296,7 +296,7 @@ begin
             if FSimplexStartStepRandomEnabled then
                 SimplexStartStepRandom := Random();
 
-            TempDecision.Parameters[i] := TempDecision.Parameters[i] +
+            Decision.Parameters[i] := Decision.Parameters[i] +
                 //  Takes into account all multipliers. All of them
                 //  should have default value 1.
                 SimplexStartStepRandom * 
@@ -304,9 +304,9 @@ begin
                 SimplexStartStepMultiplier *
                 GetInitialParameterStep(Self, i, StartDecision.ParametersNumber);
 
-            EvaluateDecision(Self, TempDecision);
+            EvaluateDecision(Self, Decision);
             Inc(FEvaluationCount);
-            Simplex.Add(TempDecision);
+            Simplex.Add(Decision);
         end;    //  for i := 0 to StartDecision.ParametersNumber - 1 do...
     end;    //  with DownhillSimplexServer do...
     GetParametersSum;
