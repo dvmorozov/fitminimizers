@@ -22,7 +22,6 @@
         <ResourceBaseClass Value="Form"/>
         <TopLine Value="119"/>
         <CursorPos Y="124"/>
-        <FoldState Value=" T6:Q421 T1:T4D16"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -231,7 +230,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1572"/>
         <CursorPos X="22" Y="1579"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit28>
       <Unit29>
@@ -244,55 +243,55 @@
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit29>
       <Unit30>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\unix\tthread.inc"/>
+        <Filename Value="\\usr\share\fpcsrc\3.0.4\rtl\unix\tthread.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="140"/>
         <CursorPos Y="158"/>
         <UsageCount Value="2"/>
       </Unit30>
       <Unit31>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
+        <Filename Value="\\usr\share\fpcsrc\3.0.4\rtl\inc\threadh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="8"/>
         <CursorPos X="65" Y="26"/>
         <UsageCount Value="6"/>
       </Unit31>
       <Unit32>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\objpas\classes\classesh.inc"/>
+        <Filename Value="\\usr\share\fpcsrc\3.0.4\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="26" Y="25"/>
         <UsageCount Value="4"/>
       </Unit32>
       <Unit33>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\lazarus\2.0.6\lcl\include\control.inc"/>
+        <Filename Value="\\usr\share\lazarus\2.0.6\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2897"/>
         <CursorPos X="38" Y="2912"/>
         <UsageCount Value="4"/>
       </Unit33>
       <Unit34>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\lazarus\2.0.6\lcl\include\application.inc"/>
+        <Filename Value="\\usr\share\lazarus\2.0.6\lcl\include\application.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1271"/>
         <CursorPos Y="1282"/>
         <UsageCount Value="5"/>
       </Unit34>
       <Unit35>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\fpcsrc\3.0.4\rtl\linux\sysosh.inc"/>
+        <Filename Value="\\usr\share\fpcsrc\3.0.4\rtl\linux\sysosh.inc"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="21"/>
         <UsageCount Value="4"/>
       </Unit35>
       <Unit36>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\lazarus\2.0.6\lcl\interfaces\gtk2\gtk2widgetset.inc"/>
+        <Filename Value="\\usr\share\lazarus\2.0.6\lcl\interfaces\gtk2\gtk2widgetset.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2342"/>
         <CursorPos Y="2353"/>
         <UsageCount Value="4"/>
       </Unit36>
       <Unit37>
-        <Filename Value="..\..\..\..\..\..\..\usr\share\lazarus\2.0.6\lcl\interfaces\gtk2\gtk2memostrings.inc"/>
+        <Filename Value="\\usr\share\lazarus\2.0.6\lcl\interfaces\gtk2\gtk2memostrings.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="52"/>
         <CursorPos Y="64"/>
