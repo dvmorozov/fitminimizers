@@ -33,7 +33,7 @@ type
 
     IDownhillSimplexServer = interface
         //  Return initial characteristic length for every parameter.
-        function GetInitParamLength(Sender: TComponent;
+        function GetInitialParameterStep(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
         //  Set inital calculation point in internal representation.
         //  The number of array element is equal to the number of parameters of task to be solved.
@@ -302,7 +302,7 @@ begin
                 SimplexStartStepRandom * 
                 SimplexStartStepDirection *
                 SimplexStartStepMultiplier *
-                GetInitParamLength(Self, i, StartDecision.ParametersNumber);
+                GetInitialParameterStep(Self, i, StartDecision.ParametersNumber);
 
             EvaluateDecision(Self, TempDecision);
             Inc(FEvaluationCount);

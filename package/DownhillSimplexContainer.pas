@@ -149,17 +149,17 @@ type
 
         { IDownhillSimplexServer implementation. }
         { Returns initial characteristic length for every parameter. }
-        function GetInitParamLength(Sender: TComponent;
-            ParameterNumber, ParametersCount: LongInt): Double; virtual;
+        function GetInitialParameterStep(Sender: TComponent;
+            ParameterNumber, ParametersCount: LongInt): Double;
         { Fills coordinates of initial simplex vertex. Only parameters
           are set up, the method doesn't compute goal function! }
         procedure FillStartDecision(Sender: TComponent;
-            StartDecision: TFloatDecision); virtual;
+            StartDecision: TFloatDecision);
         { Calculates function value for set of parameters of solution object. }
         procedure EvaluateDecision(Sender: TComponent;
-            Decision: TFloatDecision); virtual;
+            Decision: TFloatDecision);
         procedure UpdateResults(Sender: TComponent;
-            Decision: TFloatDecision); virtual;
+            Decision: TFloatDecision);
         { Calculates condition of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
 
@@ -211,7 +211,7 @@ type
         TVariableParameter;
 
 {$hints off}
-function TDownhillSimplexContainer.GetInitParamLength(Sender: TComponent;
+function TDownhillSimplexContainer.GetInitialParameterStep(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
     Result := 0.1;
