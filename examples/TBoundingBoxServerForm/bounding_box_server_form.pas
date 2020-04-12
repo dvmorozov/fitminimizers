@@ -3,15 +3,15 @@ unit bounding_box_server_form;
 interface
 
 uses
-  {$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types,
-  {$ELSE}
+{$ELSE}
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
-  {$ENDIF}
+{$ENDIF}
     Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
 {$ASSERTIONS ON}
@@ -801,7 +801,7 @@ procedure TBoundingBoxServerForm.WaitForRunnerFinishing(Runners: TComponentList)
 var
     i: LongInt;
     Runner: TRunner;
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     j: LongInt;
     MustContinue: Boolean;
     WaitResult: DWord;
@@ -813,7 +813,7 @@ begin
     for i := 0 to Runners.Count - 1 do
     begin
         Runner := TRunner(Runners[i]);
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
         Handle := Runner.Handle;
         MustContinue := True;
         while MustContinue do
