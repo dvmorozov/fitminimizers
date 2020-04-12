@@ -167,8 +167,8 @@ implementation
 
 procedure Register;
 begin
-    RegisterComponents('FitMinimizers', [TDownhillSimplexAlgorithm]);
-    RegisterComponents('FitMinimizers', [TDownhillSimplexSAAlgorithm]);
+    RegisterComponents('Fit', [TDownhillSimplexAlgorithm]);
+    RegisterComponents('Fit', [TDownhillSimplexSAAlgorithm]);
 end;
 
 procedure TDownhillSimplexAlgorithm.Restart;
