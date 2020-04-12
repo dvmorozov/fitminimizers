@@ -3,7 +3,7 @@ unit bounding_box_component_form;
 interface
 
 uses
-  {$IFNDEF Lazarus}
+  {$IF NOT DEFINED(FPC)}
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
