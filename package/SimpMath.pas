@@ -13,7 +13,7 @@ unit SimpMath;
 interface
 
 uses
-    Math, Classes, CBRCComponent, SysUtils;
+    Math, Classes, SysUtils;
 
 const
     TINY = 1e-6;
@@ -27,13 +27,13 @@ type
 
     IVector = interface;
 
-    { Vector space. }
+    //  Vector space.
     ISpace = interface
-        { Returns scalar (inner) product of vectors. }
+        //  Return scalar (inner) product of vectors.
         function GetScalarMul(const Vect1, Vect2: IVector): Double;
     end;
 
-    { Vector of arbitrary number of dimensions containing real numbers. }
+    //  Vector of arbitrary number of dimensions containing real numbers.
     IVector = interface
         function GetSpace: ISpace;
         procedure SetSpace(const ASpace: ISpace);
@@ -45,29 +45,29 @@ type
 
         property Space: ISpace read GetSpace write SetSpace;
         property Norma: Double read GetNorma;
-        { Returns number of vector coordinates (dimensions). }
+        //  Returns number of vector coordinates (dimensions).
         property CompsNumber: LongInt read GetCompsNumber;
-        { Gets/sets value of vector coordinate. Index is zero-based. }
+        //  Gets/sets value of vector coordinate. Index is zero-based.
         property Comps[index: LongInt]: Double read GetComp write SetComp;
         property NormComps[index: LongInt]: Double read GetNormComp;
     end;
 
-    { Vector of arbitrary number of dimensions containing complex number. }
+    //  Vector of arbitrary number of dimensions containing complex number.
     IComplexVector = interface(IVector)
         function GetImComp(index: LongInt): Double;
         procedure SetImComp(index: LongInt; AImComp: Double);
         function GetNormImComp(index: LongInt): Double;
 
-        { Imaginary parts of vector components. }
+        //  Imaginary parts of vector components.
         property ImComps[index: LongInt]: Double read GetImComp write SetImComp;
-        { Imaginary parts of normalized vector components. }
+        //  Imaginary parts of normalized vector components.
         property NormImComps[index: LongInt]: Double read GetNormImComp;
     end;
 
     E3DVector = class(Exception);
 
-    { Vector of 3-dimensional space. }
-    T3DVector = class(TCBRCComponent, IVector)
+    //  Vector of 3D space.
+    T3DVector = class(TComponent, IVector)
     protected
         FSpace: ISpace;
         FVector: TDoubleVector3;
@@ -80,7 +80,7 @@ type
         procedure SetNorma(const ANorma: Double); virtual; abstract;
         function GetCompsNumber: LongInt;
         function GetComp(index: LongInt): Double;
-        { TODO: normalized vector should be recomputed. }
+        //  TODO: normalized vector should be recomputed.
         procedure SetComp(index: LongInt; AComp: Double);
         function GetNormComp(index: LongInt): Double;
         function GetVector: TDoubleVector3;
@@ -97,8 +97,7 @@ type
 
     T3DComplexVector = class(T3DVector, IComplexVector)
     protected
-        { Imaginary part of complex vector. }
-        FImVector: TDoubleVector3;
+        FImVector: TDoubleVector3;  //  Imaginary part.
 
         function GetImComp(index: LongInt): Double; virtual; abstract;
         procedure SetImComp(index: LongInt; AImComp: Double); virtual; abstract;
@@ -108,18 +107,20 @@ type
         property NormImComps[index: LongInt]: Double read GetNormImComp;
     end;
 
-{ Theta must be in interval from 0 to pi; Phi - in interval from -pi to pi. }
+//  Theta must be in interval from 0 to pi; Phi - in interval from -pi to pi.
 procedure ConvertSphericalToDekart(Theta, Phi, R: Double; var x, y, z: Double);
 procedure ConvertDekartToSpherical(x, y, z: Double; var Theta, Phi, R: Double);
-{ Converts vector from cartesian coordinates to affine. }
+//  Convert vector from cartesian coordinates to affine.
+//  Parameter Alpha isn't used (see conditions below).
 procedure ConvertDekartToAphine(const A, B, C, Alpha, Beta, Gamma: Double;
     var Vector: TDoubleVector3);
-{ Converts vector from affine to cartesian coordinates.
-  Conversion is done in following assumptions:
-  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians),
-  besides Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3.
-  2. Axis e1 of affine coordinate system coincides with the axis e1 of cartesian coordinate system.
-  3. Axis e2 of affine coordinate system belongs to the e1e2 plane of cartesian coordinate system. }
+//  Convert vector from affine to cartesian coordinates.
+//  Parameter Alpha isn't used (see conditions below).
+//  Conversion is done in following assumptions:
+//  1. Alpha, Beta, Gamma - angles between axis in affine coordinates (expressed in radians),
+//  besides Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3.
+//  2. Axis e1 of affine coordinate system coincides with the axis e1 of cartesian coordinate system.
+//  3. Axis e2 of affine coordinate system belongs to the e1e2 plane of cartesian coordinate system.
 procedure ConvertAphineToDekart(const A, B, C, Alpha, Beta, Gamma: Double;
     var Vector: TDoubleVector3);
 
@@ -128,64 +129,64 @@ procedure DecTheta(Dec: Double; var Theta: Double);
 procedure IncPhi(Inc: Double; var Phi: Double);
 procedure IncTheta(Inc: Double; var Theta: Double);
 
-{ Puts given value into the interval. }
+//  Put given value into the interval.
 procedure PutValueIntoInterval(const MinLimit, MaxLimit: Double; var Value: Double);
-{ Returns True if Value belongs to the given interval. }
+//  Return True if Value belongs to the given interval, False otherwise.
 function IsValueIntoInterval(const MinLimit, MaxLimit, Value: Double): Boolean;
-{ Returns scalar (inner) product in orthonormal coordinate system. }
+//  Return scalar (inner) product in orthonormal coordinate system.
 function GetScalarMul(const Vect1, Vect2: TDoubleVector3): Double;
-{ Returns scalar (inner) product in affine coordinate system.
-  Angles between basis vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3. }
+//  Return scalar (inner) product in affine coordinate system.
+//  Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetScalarMulA(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
-{ Returns scalar (inner) product in affine coordinate system between normalized vectors.
-  Angles between basis vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3. }
+//  Return scalar (inner) product in affine coordinate system between normalized vectors.
+//  Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetScalarMulAN(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
-{ Returns angle between vectors. }
+//  Return angle between vectors.
 function GetAngle(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): Double;
-{ Returns cross product in affine coordinate system.
-  Angles between basis vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3. }
+//  Return cross product in affine coordinate system.
+//  Angles between basal vectors are given in radians: Gamma = e1^e2; Beta = e3^e1; Alpha = e2^e3.
 function GetVectorMulA(const Vect1, Vect2: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double): TDoubleVector3;
-{ Returns modulus of vector given in cartesian coordinate system. }
+//  Return modulus of vector given in cartesian coordinate system.
 function GetVectModule(const Vect: TDoubleVector3): Double;
-{ Returns modulus of vector given in affine coordinate system. }
+//  Return modulus of vector given in affine coordinate system.
 function GetVectModuleA(const Vect: TDoubleVector3;
     const A, B, C, Alpha, Beta, Gamma: Double): Double;
-{ Calculates unit vector for the vector given in cartesian coordinate system. }
+//  Calculate unit vector for the vector given in cartesian coordinate system.
 procedure GetUnitVect(const Vect: TDoubleVector3; var UnitVect: TDoubleVector3);
-{ Calculates unit vector for the vector given in affine coordinate system. }
+//  Calculate unit vector for the vector given in affine coordinate system.
 procedure GetUnitVectA(const Vect: TDoubleVector3;
     A, B, C, Alpha, Beta, Gamma: Double; var UnitVect: TDoubleVector3);
-{ Returns 3 mutual vectors to the given vectors forming basis with given parameters according to
-  Vect1 = (1/V)[e2 x e3], |Vect1| = (1/V)|e2||e3|Sin(Alpha),
-  Vect2 = (1/V)[e3 x e1], |Vect2| = (1/V)|e1||e3|Sin(Beta),
-  Vect3 = (1/V)[e1 x e2], |Vect3| = (1/V)|e1||e2|Sin(Gamma), where
-  |e1| = A, |e2| = B, |e3| = C,
-  Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3 (angles are given in radians),
-  V - volume of cell built on the basis vectors. }
+//  Return 3 mutual vectors to the given vectors forming basis with given parameters, besides
+//  Vect1 = (1/V)[e2 x e3], |Vect1| = (1/V)|e2||e3|Sin(Alpha),
+//  Vect2 = (1/V)[e3 x e1], |Vect2| = (1/V)|e1||e3|Sin(Beta),
+//  Vect3 = (1/V)[e1 x e2], |Vect3| = (1/V)|e1||e2|Sin(Gamma),
+//  |e1| = A, |e2| = B, |e3| = C,
+//  Gamma = e1^e2, Beta = e3^e1, Alpha = e2^e3 (angles are given in radians),
+//  V - volume of the cell built on the basal vectors.
 procedure GetMutualVectors(const A, B, C, Alpha, Beta, Gamma: Double;
     var Vect1, Vect2, Vect3: TDoubleVector3);
 
 procedure GetMutualVectorsInNewBasis(
-    { Parameters of initial basis in which all vectors are defined. }
+    //  Parameters of initial basis in which all vectors are defined.
     const A, B, C, Alpha, Beta, Gamma: Double;
-    { Vectors of new basis (are defined in the initial basis). }
+    //  Vectors of new basis (are defined in the initial basis).
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-    { Mutual vectors to the new vectors (are defined in the initial basis). }
+    //  Mutual vectors to the new vectors (are defined in the initial basis).
     var Vect1, Vect2, Vect3: TDoubleVector3);
 
-{ Returns volume of the cell built on the basis vectors. }
+//  Return volume of the cell built on the basal vectors.
 function GetVolume(const A, B, C, Alpha, Beta, Gamma: Double): Double;
-{ Returns coordinates of vector in new basis. }
+//  Return coordinates of vector in new basis.
 function GetVectInNewBasis(
-    { Parameters of initial basis in which all vectors are defined. }
+    //  Parameters of initial basis in which all vectors are defined.
     const A, B, C, Alpha, Beta, Gamma: Double;
-    { Vectors of new basis (are defined in the initial basis). }
+    //  Vectors of new basis (are defined in the initial basis).
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-    { Vector given in the initial basis. }
+    //  Vector given in the initial basis.
     InitialVect: TDoubleVector3): TDoubleVector3;
 
 function MulVectByValue(const Vect: TDoubleVector3; Value: Double): TDoubleVector3;
@@ -195,23 +196,17 @@ procedure SetVectModule(var Vect: TDoubleVector3;
 function GetSubVect(Vect1, Vect2: TDoubleVector3): TDoubleVector3;
 function ArcSin(x: Double): Double;
 function ArcCos(x: Double): Double;
-{ Returns decimal order of given number. }
+//  Return decimal order of given number.
 function GetNumberDegree(Number: Double): LongInt;
 function GetPowerOf10(Power: LongInt): Double;
 function Sign(Number: Double): LongInt;
 
-function Lagrange(
-    { The first item of each pair - X, the second - Y. }
-    PointsArray: TwoDimArray;
+function Lagrange(PointsArray: TwoDimArray;   //  The first - X, the second - Y.
     const X: Double): Double;
 
-function GaussPoint(
-    { Integral of function by interval of definition. }
-    const A,
+function GaussPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
-function LorentzPoint(
-    { Integral of function by interval of definition. }
-    const A,
+function LorentzPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 function PseudoVoigtPoint(const A, Sigma, Eta, x0, x: Double): Double;
 function AsymPseudoVoigtPoint(const A, Sigma, Eta, x0, x, DeltaSigma: Double): Double;
@@ -228,8 +223,7 @@ function CalcPolinom2(const A, B, C, x0, x: Double): Double;
 
 implementation
 
-{ Auxiliary functions to work with vectors. }
-
+//  Auxiliary functions to work with vectors.
 function GetD(const Alpha, Beta, Gamma: Double): Double; forward;
 function GetPAlpha(const Alpha, Beta, Gamma: Double): Double; forward;
 function GetPBeta(const Alpha, Beta, Gamma: Double): Double; forward;
@@ -444,9 +438,7 @@ begin
         Result := -1;
 end;
 
-function Lagrange(
-    { The first item of each pair - X, the second - Y. }
-    PointsArray: TwoDimArray;
+function Lagrange(PointsArray: TwoDimArray;(*The first - X, the second - Y*)
     const X: Double): Double;
 var
     Lagr: Double;
@@ -478,9 +470,7 @@ begin
 end;
 
 //  FWHM = 2 * Sqrt(2 * ln(2)) * Sigma
-function GaussPoint(
-    { Integral of function by interval of definition. }
-    const A,
+function GaussPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 begin
     Assert(A >= 0);
@@ -490,9 +480,7 @@ begin
 end;
 
 //  FWHM = Sigma
-function LorentzPoint(
-    { Integral of function by interval of definition. }
-    const A,
+function LorentzPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 begin
     Assert(A >= 0);
@@ -556,6 +544,18 @@ begin
         Result := A * ((1 - Eta) *
             (exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(Sigma))) + Eta *
             ((1 / (1 + Sqr(2 * (x - x0) / Sigma)))));
+
+
+
+
+
+
+
+
+
+
+
+
     end;
 end;
 
@@ -641,8 +641,8 @@ procedure ConvertDekartToAphine(const A, B, C, Alpha, Beta, Gamma: Double;
 var
     V1, V2, V3, Result: TDoubleVector3;
 begin
-    { Vectors of orthonormal coordinate system are calculated
-      in the basis of initial affine coordinates. }
+    //  Vectors of orthonormal coordinate system are calculated
+    //  in the basis of initial affine coordinates.
     V1[1] := 1;
     V1[2] := 0;
     V1[3] := 0;
@@ -654,7 +654,7 @@ begin
     GetUnitVectA(V3, A, B, C, Alpha, Beta, Gamma, V3);
     V2 := GetVectorMulA(V3, V1, A, B, C, Alpha, Beta, Gamma);
     GetUnitVectA(V2, A, B, C, Alpha, Beta, Gamma, V2);
-    { V1, V2, V3 - orthonormal basis built in initial basis. }
+    //  V1, V2, V3 - orthonormal basis built in initial basis.
     Result[1] := Vector[1] * V1[1] + Vector[2] * V2[1] + Vector[3] * V3[1];
     Result[2] := Vector[1] * V1[2] + Vector[2] * V2[2] + Vector[3] * V3[2];
     Result[3] := Vector[1] * V1[3] + Vector[2] * V2[3] + Vector[3] * V3[3];
@@ -666,9 +666,9 @@ procedure ConvertAphineToDekart(const A, B, C, Alpha, Beta, Gamma: Double;
 var
     V1, V2, V3, Result: TDoubleVector3;
 begin
-    { Mutual vectors to orthonormal basis coincide with vectors themselves.
-      Coordinates of vector in new basis are equal to inner products of
-      the vector with vectors mutual to vectors of new basis. }
+    //  Mutual vectors to orthonormal basis coincide with vectors themselves.
+    //  Coordinates of vector in new basis are equal to inner products of
+    //  the vector with vectors mutual to vectors of new basis.
     V1[1] := 1;
     V1[2] := 0;
     V1[3] := 0;
@@ -680,14 +680,14 @@ begin
     GetUnitVectA(V3, A, B, C, Alpha, Beta, Gamma, V3);
     V2 := GetVectorMulA(V3, V1, A, B, C, Alpha, Beta, Gamma);
     GetUnitVectA(V2, A, B, C, Alpha, Beta, Gamma, V2);
-    { V1, V2, V3 - orthonormal basis built in original basis. }
+    //  V1, V2, V3 - orthonormal basis built in original basis.
     Result[1] := GetScalarMulA(Vector, V1, A, B, C, Alpha, Beta, Gamma);
     Result[2] := GetScalarMulA(Vector, V2, A, B, C, Alpha, Beta, Gamma);
     Result[3] := GetScalarMulA(Vector, V3, A, B, C, Alpha, Beta, Gamma);
     Vector := Result;
 end;
 
-{ Calculates unit vector for the vector given in Cartesian system. }
+//  Calculate unit vector for the vector given in Cartesian system.
 procedure GetUnitVect(const Vect: TDoubleVector3; var UnitVect: TDoubleVector3);
 var
     Module: Double;
@@ -707,8 +707,8 @@ begin
     end;
 end;
 
-{ Calculates unit vector for the vector given in affine system. }
 procedure GetUnitVectA(
+    //  Calculate unit vector for the vector given in affine system.    
     const Vect: TDoubleVector3; A, B, C, Alpha, Beta, Gamma: Double;
     var UnitVect: TDoubleVector3);
 var
@@ -805,16 +805,16 @@ begin
 end;
 
 procedure GetMutualVectorsInNewBasis(
-    { Parameters of the original basis in which all vectors are given. }
+    //  Parameters of the original basis in which all vectors are given.
     const A, B, C, Alpha, Beta, Gamma: Double;
-    { Vectors of new basis defined via vectors of old basis. }
+    //  Vectors of new basis defined via vectors of old basis.
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-    { Mutual vectors to the vectors of new basis (defined in old basis). }
+    //  Mutual vectors to the vectors of new basis (defined in old basis).
     var Vect1, Vect2, Vect3: TDoubleVector3);
+//  Parameters of the new basis.    
 var
-    { Parameters of the new basis. }
     NewA, NewB, NewC, NewAlpha, NewBeta, NewGamma: Double;
-    { Volume of the parallelepiped built on the vectors of new basis. }
+    //  Volume of the parallelepiped built on the vectors of new basis.
     NewV: Double;
 begin
     NewA := GetVectModuleA(NewBasisVect1, A, B, C, Alpha, Beta, Gamma);
@@ -833,13 +833,13 @@ begin
     Vect3 := MulVectByValue(Vect3, 1 / NewV);
 end;
 
-{ Returns coordinates relative to new basis. }
+//  Return coordinates relative to new basis.
 function GetVectInNewBasis(
-    { Parameters of the original basis in which all vectors are given. }
+    //  Parameters of the original basis in which all vectors are given.
     const A, B, C, Alpha, Beta, Gamma: Double;
-    { Vectors of new basis defined via vectors of old basis. }
+    //  Vectors of new basis defined via vectors of old basis.
     NewBasisVect1, NewBasisVect2, NewBasisVect3: TDoubleVector3;
-    { Vector in the old basis. }
+    //  Vector in the old basis.
     InitialVect: TDoubleVector3): TDoubleVector3;
 var
     MutVect1, MutVect2, MutVect3: TDoubleVector3;
