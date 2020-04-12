@@ -21,8 +21,8 @@
         <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Version Minor="1" Release="4" Build="6"/>
-    <Files Count="11">
+    <Version Minor="1" Release="5" Build="7"/>
+    <Files Count="10">
       <Item1>
         <Filename Value="Tools.pas"/>
         <UnitName Value="Tools"/>
@@ -36,39 +36,35 @@
         <UnitName Value="MyExceptions"/>
       </Item3>
       <Item4>
-        <Filename Value="CBRCComponent.pas"/>
-        <UnitName Value="CBRCComponent"/>
-      </Item4>
-      <Item5>
         <Filename Value="Algorithm.pas"/>
         <UnitName Value="Algorithm"/>
-      </Item5>
-      <Item6>
+      </Item4>
+      <Item5>
         <Filename Value="Decisions.pas"/>
         <UnitName Value="Decisions"/>
-      </Item6>
-      <Item7>
+      </Item5>
+      <Item6>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="DownhillSimplexAlgorithm"/>
-      </Item7>
-      <Item8>
+      </Item6>
+      <Item7>
         <Filename Value="DownhillSimplexContainer.pas"/>
         <UnitName Value="DownhillSimplexContainer"/>
-      </Item8>
-      <Item9>
+      </Item7>
+      <Item8>
         <Filename Value="AlgorithmContainer.pas"/>
         <UnitName Value="AlgorithmContainer"/>
-      </Item9>
-      <Item10>
+      </Item8>
+      <Item9>
         <Filename Value="RunningThread.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="RunningThread"/>
-      </Item10>
-      <Item11>
+      </Item9>
+      <Item10>
         <Filename Value="CombEnumerator.pas"/>
         <UnitName Value="CombEnumerator"/>
-      </Item11>
+      </Item10>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
