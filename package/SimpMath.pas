@@ -13,7 +13,7 @@ unit SimpMath;
 interface
 
 uses
-    Math, Classes, CBRCComponent, SysUtils;
+    Math, Classes, SysUtils;
 
 const
     TINY = 1e-6;
@@ -67,7 +67,7 @@ type
     E3DVector = class(Exception);
 
     //  Vector of 3D space.
-    T3DVector = class(TCBRCComponent, IVector)
+    T3DVector = class(TComponent, IVector)
     protected
         FSpace: ISpace;
         FVector: TDoubleVector3;

@@ -18,7 +18,7 @@ interface
 
 uses
     Classes, DownhillSimplexAlgorithm, AlgorithmContainer, Decisions, SysUtils,
-    SimpMath, CombEnumerator, CBRCComponent, Tools;
+    SimpMath, CombEnumerator, Tools;
 
 const
     { Possible states of parameters in TDownhillRealParameters. }
@@ -74,7 +74,7 @@ type
     EDownhillRealParameters = class(Exception);
 
     { Container for algorithm parameters. }
-    TDownhillRealParameters = class(TCBRCComponent, IDownhillRealParameters)
+    TDownhillRealParameters = class(TComponent, IDownhillRealParameters)
     protected
         { Pointer to parameter array. }
         FParameters: Pointer;

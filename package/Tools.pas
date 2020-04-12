@@ -10,24 +10,18 @@ unit Tools;
 
 interface
 
-uses SysUtils, Classes, CBRCComponent
+uses SysUtils, Classes
 {$IF NOT DEFINED(FPC)}
     , Windows
 {$ENDIF};
 
-{ Destructs objects performing additional actions. To the moment it is only checking that
-  type is TCBRCComponent and calling its method Free. All application objects should be
-  destroyed by this function. }
 procedure UtilizeObject(PtrToObject: TObject);
 
 implementation
 
 procedure UtilizeObject(PtrToObject: TObject);
 begin
-    if PtrToObject is TCBRCComponent then
-        TCBRCComponent(PtrToObject).Free
-    else
-        PtrToObject.Free;
+    PtrToObject.Free;
 end;
 
 end.
