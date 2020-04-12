@@ -16,7 +16,7 @@ unit RunningThread;
 
 interface
 uses Classes, Tools, Forms,
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     //TODO: set up proper module name for Delhpi build.
     //DesignIntf;
 {$ELSE}
@@ -97,8 +97,8 @@ implementation
 
 procedure Register;
 begin
-{$IFDEF Lazarus}
-    RegisterComponents('FitMinimizers', [TRunner]);
+{$IF DEFINED(FPC)}
+    RegisterComponents('Fit', [TRunner]);
     RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnCompute',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutput',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TCreatingProcedure),TRunner,'OnCreate',TMethodProperty);

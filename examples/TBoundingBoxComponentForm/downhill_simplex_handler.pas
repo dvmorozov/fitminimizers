@@ -3,7 +3,7 @@ unit downhill_simplex_handler;
 interface
 
 uses
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     Winapi.Windows, Winapi.Messages,
     System.SysUtils, System.Variants, System.Classes,
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
@@ -55,7 +55,7 @@ type
         { IDownhillSimplexServer implementation. }
 
         { Returns initial characteristic length for every parameter. }
-        function GetInitParamLength(Sender: TComponent;
+        function GetInitialParameterStep(Sender: TComponent;
             ParameterNumber, ParametersCount: LongInt): Double;
         { Sets inital calculation point in internal representation.
           The number of array element is equal to the number of
@@ -230,7 +230,7 @@ begin
     FPerformanceFrequency := 0;
     FStartTime := 0;
     { Initializing performance counters. }
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     QueryPerformanceFrequency(FPerformanceFrequency);
     QueryPerformanceCounter(FStartTime);
 {$ENDIF}
@@ -242,7 +242,7 @@ var
 begin
     { Calculating computation time. }
     EndTime := 0;
-{$IFNDEF Lazarus}
+{$IF NOT DEFINED(FPC)}
     QueryPerformanceCounter(EndTime);
 {$ENDIF}
     if FPerformanceFrequency <> 0 then
@@ -331,7 +331,7 @@ begin
 end;
 
 {$hints off}
-function TDownHillSimplexHandler.GetInitParamLength(Sender: TComponent;
+function TDownHillSimplexHandler.GetInitialParameterStep(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
     Result := FInitParamLength;

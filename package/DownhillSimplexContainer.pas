@@ -18,7 +18,7 @@ interface
 
 uses
     Classes, DownhillSimplexAlgorithm, AlgorithmContainer, Decisions, SysUtils,
-    SimpMath, CombEnumerator, CBRCComponent, Tools;
+    SimpMath, CombEnumerator, Tools;
 
 const
     { Possible states of parameters in TDownhillRealParameters. }
@@ -74,7 +74,7 @@ type
     EDownhillRealParameters = class(Exception);
 
     { Container for algorithm parameters. }
-    TDownhillRealParameters = class(TCBRCComponent, IDownhillRealParameters)
+    TDownhillRealParameters = class(TComponent, IDownhillRealParameters)
     protected
         { Pointer to parameter array. }
         FParameters: Pointer;
@@ -116,8 +116,8 @@ type
 
     EDownhillSimplexContainer = class(Exception);
 
-    { Container is responsible for feeding algorithm with parameters 
-      and limiting values of parameters by cyclical boundary conditions. }
+    { Container is responsible for feeding algorithm with parameter
+      values and limiting values by cyclical boundary conditions. }
     TDownhillSimplexContainer = class(TAlgorithmContainer, IDownhillSimplexServer)
     protected
         { Array of interfaces used for getting parameters. }
@@ -131,8 +131,8 @@ type
         FRestartDisabled: Boolean;
         FExitDerivative: Double;
 
-        EOC: Boolean;
-        message: string;
+        FEndOfCalculation: Boolean;
+        FMessage: string;
         { Initializes environment and starts algorithm. }
         procedure Running; override;
         procedure RunningFinished; override;
@@ -147,18 +147,19 @@ type
         procedure CreateParameters;
         procedure DestroyAlgorithm; override;
 
+        { IDownhillSimplexServer implementation. }
         { Returns initial characteristic length for every parameter. }
-        function GetInitParamLength(Sender: TComponent;
-            ParameterNumber, ParametersCount: LongInt): Double; virtual;
+        function GetInitialParameterStep(Sender: TComponent;
+            ParameterNumber, ParametersCount: LongInt): Double;
         { Fills coordinates of initial simplex vertex. Only parameters
           are set up, the method doesn't compute goal function! }
         procedure FillStartDecision(Sender: TComponent;
-            StartDecision: TFloatDecision); virtual;
+            StartDecision: TFloatDecision);
         { Calculates function value for set of parameters of solution object. }
         procedure EvaluateDecision(Sender: TComponent;
-            Decision: TFloatDecision); virtual;
+            Decision: TFloatDecision);
         procedure UpdateResults(Sender: TComponent;
-            Decision: TFloatDecision); virtual;
+            Decision: TFloatDecision);
         { Calculates condition of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
 
@@ -210,10 +211,12 @@ type
         TVariableParameter;
 
 {$hints off}
-function TDownhillSimplexContainer.GetInitParamLength(Sender: TComponent;
+function TDownhillSimplexContainer.GetInitialParameterStep(Sender: TComponent;
     ParameterNumber, ParametersCount: LongInt): Double;
 begin
     Result := 0.1;
+    //  ??? vynesti v zapis' dlya parametra i sdelat' poisk
+    //  sootvetstvuyuschego parametra
 end;
 
 {$hints on}
@@ -222,46 +225,44 @@ procedure TDownhillSimplexContainer.FillStartDecision(Sender: TComponent;
     StartDecision: TFloatDecision);
 var
     i: LongInt;
-    TempParamsNumber: LongInt;
-    TempParameter: TVariableParameter;
+    CurParameter: TVariableParameter;
 begin
-    TempParamsNumber := ParametersNumber;
-    StartDecision.ParametersNumber := TempParamsNumber;
-    for i := 0 to TempParamsNumber - 1 do
+    StartDecision.ParametersNumber := ParametersNumber;
+    for i := 0 to ParametersNumber - 1 do
     begin
-        TempParameter := Parameter[i];
-        with TempParameter do
+        CurParameter := Parameter[i];
+        with CurParameter do
             if Limited and not IsValueIntoInterval(MinLimit, MaxLimit, Value) then
+                //  konechno, parametr mozhno bylo by ispravit' i zdes', no vse zhe
+                //  eto zadacha klienta - predostavit' pravil'nye nachal'nye parametry
                 raise EDownhillSimplexContainer.Create(
                     'Parameter value is not into the interval...')
             else
                 StartDecision.Parameters[i] := Value;
-    end; { for i := 0 to TempParametersNumber - 1 do...}
+    end;{for i := 0 to TempParametersNumber - 1 do...}
 end;
 
 procedure TDownhillSimplexContainer.FillParameters(Decision: TFloatDecision);
 var
     i: LongInt;
-    TempParamsNumber: LongInt;
-    TempParameter: TVariableParameter;
-    TempIDSP: IDownhillRealParameters;
+    CurParameter: TVariableParameter;
 begin
-    TempParamsNumber := ParametersNumber;
-    for i := 0 to TempParamsNumber - 1 do
+    for i := 0 to ParametersNumber - 1 do
     begin
-        TempParameter := Parameter[i];
-        TempParameter.Value := Decision.Parameters[i];
-        { Puts value into given interval. }
-        with TempParameter do
+        CurParameter := Parameter[i];
+        //  Copies new parameter value.
+        CurParameter.Value := Decision.Parameters[i];
+        with CurParameter do
             if Limited then
                 PutValueIntoInterval(MinLimit, MaxLimit, Value);
-        Parameter[i] := TempParameter;
+
+        Parameter[i] := CurParameter;
     end;
 
+    //  Notifies underlying components about CurParameter changing.
     for i := 0 to IDSPsNumber - 1 do
     begin
-        TempIDSP := IDSP[i];
-        TempIDSP.ParametersUpdated;
+        IDSP[i].ParametersUpdated;
     end;
 end;
 
@@ -275,9 +276,12 @@ end;
 procedure TDownhillSimplexContainer.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
 begin
-    { TODO: make sure that recomputing is actually necessary.
-      Decision.Evaluation should contain computed value. }
     EvaluateDecision(Sender, Decision);
+    //  pereschet resheniya zdes' neobhodim, tak kak v dannom
+    //  algoritme luchshiy rezul'tat ne obyazatel'no posledniy
+    //  (posle restarta)
+    //??? proverit', nuzhno li pereschityvat' - Evaluation d.
+    //  hranit' znachenie
     if Decision.Evaluation < TotalMinimum then
     begin
         TotalMinimum := Decision.Evaluation;
@@ -287,7 +291,7 @@ end;
 
 function TDownhillSimplexContainer.EndOfCalculation(Sender: TComponent): Boolean;
 begin
-    Result := EOC;
+    Result := FEndOfCalculation;
 end;
 
 constructor TDownhillSimplexContainer.Create(AOwner: TComponent);
@@ -311,8 +315,9 @@ var
     i: LongInt;
 begin
     for i := 0 to Length(FParametersInterfaces) - 1 do
-        { Decrements reference counter. }
-        FParametersInterfaces[i] := nil;
+        FParametersInterfaces[i] := nil;    //  dlya umen'sheniya schetchika ssylok
+    //  ??? budut li schetchiki ssylok korrektno
+    //  umen'shat'sya, esli prosto vyzyvat' Finalize
     Finalize(FParametersInterfaces);
     CombSelector.ClearDiscretValuesList;
 end;
@@ -355,7 +360,7 @@ end;
 
 procedure TDownhillSimplexContainer.StopAlgorithm;
 begin
-    EOC := True;
+    FEndOfCalculation := True;
 end;
 
 procedure TDownhillSimplexContainer.DestroyAlgorithm;
@@ -370,12 +375,12 @@ end;
 
 procedure TDownhillSimplexContainer.ShowMessage;
 begin
-    UpdatingResults.ShowMessage(Self, message);
+    UpdatingResults.ShowMessage(Self, FMessage);
 end;
 
 procedure TDownhillSimplexContainer.RunningFinished;
 begin
-    message := 'Calculation done...';
+    FMessage := 'Calculation done...';
     ShowMessage;
 end;
 
@@ -388,8 +393,8 @@ begin
         //    with Algorithm as TDownhillSimplexSAAlgorithm do
     begin
         DownhillSimplexServer := Self;
-        { Final tolerance should have non zero value,
-          otherwise computation will never end. }
+        //  Final tolerance should have non zero value,
+        //  otherwise computation will never end.
         FinalTolerance := Self.FinalTolerance;
         RestartDisabled := Self.RestartDisabled;
         ExitDerivative := Self.ExitDerivative;
@@ -406,10 +411,11 @@ begin
     UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, 0);
     for i := 0 to CombSelector.CombNumber - 1 do
     begin
-        if EOC then
+        if FEndOfCalculation then
             Exit;
         CombSelector.CurrentComb := i;
         CreateParameters;
+        //  sozdayutsya parametry dlya novoy kombinatsii
         if ParametersNumber <> 0 then
         begin
             CreateAlgorithm;
@@ -417,7 +423,7 @@ begin
         end
         else
         begin
-            message := 'List of parameters is empty for combination ' + IntToStr(i);
+            FMessage := 'List of parameters is empty for combination ' + IntToStr(i);
             ShowMessage;
         end;
         UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, i + 1);
@@ -444,26 +450,26 @@ end;
 function TDownhillSimplexContainer.GetParameter(index: LongInt): TVariableParameter;
 var
     i: LongInt;
-    TempIDSP: IDownhillRealParameters;
-    TempParamNumber: LongInt;
-    ParamSum: LongInt;
+    ParameterNumber: LongInt;
+    ParameterCount: LongInt;
 begin
     if (index < 0) then
         raise EDownhillSimplexContainer.Create('Invalid parameter index...');
-    ParamSum := 0;
+
+    ParameterCount := 0;
     for i := 0 to IDSPsNumber - 1 do
     begin
-        TempIDSP := IDSP[i];
-        TempParamNumber := TempIDSP.ParametersNumber;
-        { Searching of object which provides given parameter. }
-        if (index >= ParamSum) and (index < ParamSum + TempParamNumber) then
+        ParameterNumber := IDSP[i].ParametersNumber;
+        //  Searches underlying component responsible for that parameter.
+        if (index >= ParameterCount) and (index < ParameterCount + ParameterNumber) then
         begin
-            Result := TempIDSP.Parameter[index - ParamSum];
+            Result := IDSP[i].Parameter[index - ParameterCount];
             Exit;
         end
         else
-            ParamSum := ParamSum + TempParamNumber;
+            ParameterCount := ParameterCount + ParameterNumber;
     end;
+
     raise EDownhillSimplexContainer.Create('Invalid parameter index...');
 end;
 
@@ -471,25 +477,23 @@ procedure TDownhillSimplexContainer.SetParameter(index: LongInt;
     AParameter: TVariableParameter);
 var
     i: LongInt;
-    TempIDSP: IDownhillRealParameters;
-    TempParamNumber: LongInt;
-    ParamSum: LongInt;
+    ParameterNumber: LongInt;
+    ParameterCount: LongInt;
 begin
     if (index < 0) then
         raise EDownhillSimplexContainer.Create('Invalid parameter index...');
-    ParamSum := 0;
+    ParameterCount := 0;
     for i := 0 to IDSPsNumber - 1 do
     begin
-        TempIDSP := IDSP[i];
-        TempParamNumber := TempIDSP.ParametersNumber;
-        { Searching of object which provides given parameter. }
-        if (index >= ParamSum) and (index < ParamSum + TempParamNumber) then
+        ParameterNumber := IDSP[i].ParametersNumber;
+        //  poisk interfeysa v parametry kotorogo popadaet indeks
+        if (index >= ParameterCount) and (index < ParameterCount + ParameterNumber) then
         begin
-            TempIDSP.Parameter[index - ParamSum] := AParameter;
+            IDSP[i].Parameter[index - ParameterCount] := AParameter;
             Exit;
         end
         else
-            ParamSum := ParamSum + TempParamNumber;
+            ParameterCount := ParameterCount + ParameterNumber;
     end;
     raise EDownhillSimplexContainer.Create('Invalid parameter index...');
 end;
@@ -505,7 +509,7 @@ begin
         GetMem(FParameters, ActParNum * SizeOf(TVariableParameter));
         FParametersNumber := ActParNum;
         PhaseParameters := PH_WORKING;
-        { Phase should be set up before call of FillParameters. }
+        //  faza dolzhna byt' pravil'no ustanovlena pered FillParameters
         FillParameters;
     end
     else
