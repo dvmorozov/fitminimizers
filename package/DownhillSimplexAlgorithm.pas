@@ -69,7 +69,7 @@ type
         FSimplexStartStepMultiplier: Double;
         //  Set of solutions - vertexes of the simplex.
         FSimplex: TComponentList;
-        FCenterOfMass: array of Double;
+        FParametersSum: array of Double;
         //  Best solution found over all optimization cycles.
         FBestDecision: TDownhillSimplexDecision;
 
@@ -87,7 +87,7 @@ type
         procedure GetIndicativeDecisions(var Highest, NextHighest, Lowest: LongInt);
             virtual;
         //  For each parameter index computes sum of values for all vertexes.
-        procedure ComputeCenterOfMass;
+        procedure GetParametersSum;
         procedure Start;
         procedure Restart;
         //  Perform single optimization cycle.
@@ -309,7 +309,7 @@ begin
             FSimplex.Add(Decision);
         end;    //  for i := 0 to StartDecision.ParametersNumber - 1 do...
     end;    //  with DownhillSimplexServer do...
-    ComputeCenterOfMass;
+    GetParametersSum;
 end;
 
 procedure TDownhillSimplexAlgorithm.GetIndicativeDecisions(
@@ -415,6 +415,7 @@ function TDownhillSimplexAlgorithm.MoveWorstDecision(const Highest: LongInt;
     Factor: Double): TDownhillSimplexDecision;
 var
     HighestDecision, TempDecision: TDownhillSimplexDecision;
+    Factor1, Factor2: Double;
     j: LongInt;
 begin
     HighestDecision := TDownhillSimplexDecision(FSimplex.Items[Highest]);
@@ -422,9 +423,11 @@ begin
     TempDecision.ParametersNumber := ParametersNumber;
 
     //  Vector is calculated to move the vertex through the center of mass.
+    Factor1 := (1 - Factor) / ParametersNumber;
+    Factor2 := Factor1 - Factor;
     for j := 0 to ParametersNumber - 1 do
-        TempDecision.Parameters[j] := FCenterOfMass[j] +
-            Factor * (FCenterOfMass[j] - HighestDecision.Parameters[j]);
+        TempDecision.Parameters[j] :=
+            FParametersSum[j] * Factor1 - HighestDecision.Parameters[j] * Factor2;
 
     DownhillSimplexServer.EvaluateDecision(Self, TempDecision);
     Inc(FEvaluationCount);
@@ -448,7 +451,7 @@ begin
     FSimplex.Extract(OldDecision);
     UtilizeObject(OldDecision);
     FSimplex.Insert(Index, NewDecision);
-    ComputeCenterOfMass;
+    GetParametersSum;
 end;
 
 function TDownhillSimplexAlgorithm.TryNewDecision(const Highest: LongInt;
@@ -485,7 +488,7 @@ begin
         UtilizeObject(TempDecision);
 end;
 
-procedure TDownhillSimplexAlgorithm.ComputeCenterOfMass;
+procedure TDownhillSimplexAlgorithm.GetParametersSum;
 var
     i, j: LongInt;
     Sum: Double;
@@ -495,8 +498,7 @@ begin
         Sum := 0;
         for i := 0 to FSimplex.Count - 1 do
             Sum := Sum + TDownhillSimplexDecision(FSimplex.Items[i]).Parameters[j];
-
-        FCenterOfMass[j] := Sum / ParametersNumber;
+        FParametersSum[j] := Sum;
     end;
 end;
 
@@ -552,7 +554,7 @@ begin
                             Inc(FEvaluationCount);
                         end;    //  if i <> Lowest then...
                     end;
-                    ComputeCenterOfMass;
+                    GetParametersSum;
                 end;    //  if TryResult >= SavedResult then...
             end;    //  if TryResult >= TDownhillSimplexDecision(
         end;    //  else...
@@ -724,7 +726,7 @@ end;
 
 procedure TDownhillSimplexAlgorithm.SetParametersNumber(AParametersNumber: LongInt);
 begin
-    SetLength(FCenterOfMass, AParametersNumber);
+    SetLength(FParametersSum, AParametersNumber);
     FParametersNumber := AParametersNumber;
 end;
 
