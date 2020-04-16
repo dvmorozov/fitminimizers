@@ -21,7 +21,7 @@
         <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Version Minor="1" Release="5" Build="7"/>
+    <Version Minor="1" Release="6" Build="8"/>
     <Files Count="10">
       <Item1>
         <Filename Value="Tools.pas"/>

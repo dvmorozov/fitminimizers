@@ -20,13 +20,6 @@ uses
     Classes, DownhillSimplexAlgorithm, AlgorithmContainer, Decisions, SysUtils,
     SimpMath, CombEnumerator, Tools;
 
-const
-    { Possible states of parameters in TDownhillRealParameters. }
-    { Waiting for call of CreateParameters. }
-    PH_CREATING = 0;
-    { Processing. }
-    PH_WORKING = 1;
-
 type
     TVariableParameter = record
         Value: Double;
@@ -43,6 +36,10 @@ type
         function GetParametersNumber: LongInt;
         function GetParameter(index: LongInt): TVariableParameter;
         procedure SetParameter(index: LongInt; AParameter: TVariableParameter);
+
+        function GetVariationStep(index: LongInt): double;
+        procedure SetVariationStep(index: LongInt; Value: double);
+
         { Total number of variable parameters. }
         property ParametersNumber: LongInt read GetParametersNumber;
         property Parameter[index: LongInt]: TVariableParameter
@@ -69,49 +66,6 @@ type
         procedure ResetCurJobProgress(Sender: TComponent);
         procedure ShowMessage(Sender: TComponent; Msg: string);
         procedure UpdatingResults(Sender: TComponent);
-    end;
-
-    EDownhillRealParameters = class(Exception);
-
-    { Container for algorithm parameters. }
-    TDownhillRealParameters = class(TComponent, IDownhillRealParameters)
-    protected
-        { Pointer to parameter array. }
-        FParameters: Pointer;
-        { Total number of parameters in array. }
-        FParametersNumber: LongInt;
-        { Current state of parameter processing. }
-        PhaseParameters: Byte;
-
-        procedure CreateParameters; virtual;
-        procedure FreeParameters;
-        { Initializes parameters. }
-        procedure FillParameters; virtual; abstract;
-        { Converts parameters from array to components of vectors of magnetic moments. }
-        procedure ParametersUpdated; virtual; abstract;
-        { Returns actual number of parameters. }
-        function GetActualParametersNumber: LongInt; virtual; abstract;
-        function GetParametersNumber: LongInt;
-        function GetParameter(index: LongInt): TVariableParameter;
-        procedure SetParameter(index: LongInt; AParameter: TVariableParameter);
-
-        function GetNumberOfValues: LongInt; virtual; abstract;
-        function GetValueIndex: LongInt; virtual; abstract;
-        procedure SetValueIndex(const AValueIndex: LongInt); virtual; abstract;
-
-    public
-        constructor Create(AOwner: TComponent); override;
-        destructor Destroy; override;
-        { Implementation of IDownhillSimplexParameters }
-        { Number of variable parameters. }
-        property ParametersNumber: LongInt read GetParametersNumber;
-        property Parameter[index: LongInt]: TVariableParameter
-            read GetParameter write SetParameter;
-        { Implementation of IDiscretValue }
-        { Number of discrete values which the quantity can take. }
-        property NumberOfValues: LongInt read GetNumberOfValues;
-        { Index of discrete value selected at this moment. }
-        property ValueIndex: LongInt read GetValueIndex write SetValueIndex;
     end;
 
     EDownhillSimplexContainer = class(Exception);
@@ -496,75 +450,6 @@ begin
             ParameterCount := ParameterCount + ParameterNumber;
     end;
     raise EDownhillSimplexContainer.Create('Invalid parameter index...');
-end;
-
-procedure TDownhillRealParameters.CreateParameters;
-var
-    ActParNum: LongInt;
-begin
-    FreeParameters;
-    ActParNum := GetActualParametersNumber;
-    if ActParNum <> 0 then
-    begin
-        GetMem(FParameters, ActParNum * SizeOf(TVariableParameter));
-        FParametersNumber := ActParNum;
-        PhaseParameters := PH_WORKING;
-        //  faza dolzhna byt' pravil'no ustanovlena pered FillParameters
-        FillParameters;
-    end
-    else
-    begin
-        FParameters := nil;
-        FParametersNumber := 0;
-        PhaseParameters := PH_WORKING;
-    end;
-end;
-
-procedure TDownhillRealParameters.FreeParameters;
-begin
-    if PhaseParameters = PH_WORKING then
-        if Assigned(FParameters) then
-            FreeMem(FParameters(*, FParametersNumber * SizeOf(TVariableParameter)*));
-end;
-
-function TDownhillRealParameters.GetParameter(index: LongInt): TVariableParameter;
-begin
-    if (Index < 0) or (Index >= ParametersNumber) then
-        raise EDownhillRealParameters.Create('Invalid parameter index...')
-    else
-        Result := TParametersArray(FParameters^)[index];
-end;
-
-procedure TDownhillRealParameters.SetParameter(index: LongInt;
-    AParameter: TVariableParameter);
-begin
-    if (Index < 0) or (Index >= ParametersNumber) then
-        raise EDownhillRealParameters.Create('Invalid parameter index...')
-    else
-        TParametersArray(FParameters^)[index] := AParameter;
-end;
-
-function TDownhillRealParameters.GetParametersNumber: LongInt;
-begin
-    case PhaseParameters of
-        PH_CREATING: raise EDownhillRealParameters.Create(
-                'Parameters must be created...');
-        PH_WORKING: Result := FParametersNumber;
-        else
-            raise EDownhillRealParameters.Create('Invalid phase number...');
-    end;
-end;
-
-constructor TDownhillRealParameters.Create(AOwner: TComponent);
-begin
-    inherited Create(AOwner);
-    PhaseParameters := PH_CREATING;
-end;
-
-destructor TDownhillRealParameters.Destroy;
-begin
-    FreeParameters;
-    inherited Destroy;
 end;
 
 initialization
