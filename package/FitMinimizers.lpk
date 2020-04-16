@@ -21,7 +21,7 @@
         <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Version Minor="1" Release="7" Build="9"/>
+    <Version Minor="1" Release="8" Build="10"/>
     <Files Count="10">
       <Item1>
         <Filename Value="Tools.pas"/>
@@ -49,21 +49,21 @@
         <UnitName Value="DownhillSimplexAlgorithm"/>
       </Item6>
       <Item7>
-        <Filename Value="DownhillSimplexContainer.pas"/>
-        <UnitName Value="DownhillSimplexContainer"/>
-      </Item7>
-      <Item8>
         <Filename Value="AlgorithmContainer.pas"/>
         <UnitName Value="AlgorithmContainer"/>
-      </Item8>
-      <Item9>
+      </Item7>
+      <Item8>
         <Filename Value="RunningThread.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="RunningThread"/>
-      </Item9>
-      <Item10>
+      </Item8>
+      <Item9>
         <Filename Value="CombEnumerator.pas"/>
         <UnitName Value="CombEnumerator"/>
+      </Item9>
+      <Item10>
+        <Filename Value="DownhillSimplexServer.pas"/>
+        <UnitName Value="DownhillSimplexServer"/>
       </Item10>
     </Files>
     <RequiredPkgs Count="3">
