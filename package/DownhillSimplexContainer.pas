@@ -44,6 +44,8 @@ type
         property ParametersNumber: LongInt read GetParametersNumber;
         property Parameter[index: LongInt]: TVariableParameter
             read GetParameter write SetParameter;
+        property VariationStep[index: LongInt]: double
+            read GetVariationStep write SetVariationStep;
     end;
 
     { Provides additional methods to work with parameters. }
@@ -103,17 +105,13 @@ type
 
         { IDownhillSimplexServer implementation. }
         { Returns initial characteristic length for every parameter. }
-        function GetInitialParameterStep(Sender: TComponent;
-            ParameterNumber, ParametersCount: LongInt): Double;
+        function GetVariationStep(Sender: TComponent; index: LongInt): Double;
         { Fills coordinates of initial simplex vertex. Only parameters
           are set up, the method doesn't compute goal function! }
-        procedure FillStartDecision(Sender: TComponent;
-            StartDecision: TFloatDecision);
+        procedure FillStartDecision(Sender: TComponent; StartDecision: TFloatDecision);
         { Calculates function value for set of parameters of solution object. }
-        procedure EvaluateDecision(Sender: TComponent;
-            Decision: TFloatDecision);
-        procedure UpdateResults(Sender: TComponent;
-            Decision: TFloatDecision);
+        procedure EvaluateDecision(Sender: TComponent; Decision: TFloatDecision);
+        procedure UpdateResults(Sender: TComponent; Decision: TFloatDecision);
         { Calculates condition of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
 
@@ -165,12 +163,31 @@ type
         TVariableParameter;
 
 {$hints off}
-function TDownhillSimplexContainer.GetInitialParameterStep(Sender: TComponent;
-    ParameterNumber, ParametersCount: LongInt): Double;
+function TDownhillSimplexContainer.GetVariationStep(Sender: TComponent;
+    index: LongInt): Double;
+var
+    i: LongInt;
+    ParameterNumber: LongInt;
+    ParameterCount: LongInt;
 begin
-    Result := 0.1;
-    //  ??? vynesti v zapis' dlya parametra i sdelat' poisk
-    //  sootvetstvuyuschego parametra
+    if (index < 0) then
+        raise EDownhillSimplexContainer.Create('Invalid parameter index...');
+
+    ParameterCount := 0;
+    for i := 0 to IDSPsNumber - 1 do
+    begin
+        ParameterNumber := IDSP[i].ParametersNumber;
+        //  Searches underlying component responsible for that parameter.
+        if (index >= ParameterCount) and (index < ParameterCount + ParameterNumber) then
+        begin
+            Result := IDSP[i].VariationStep[index - ParameterCount];
+            Exit;
+        end
+        else
+            ParameterCount := ParameterCount + ParameterNumber;
+    end;
+
+    raise EDownhillSimplexContainer.Create('Invalid parameter index...');
 end;
 
 {$hints on}

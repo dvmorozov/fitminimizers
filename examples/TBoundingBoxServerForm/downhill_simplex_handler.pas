@@ -89,8 +89,7 @@ type
         { IDownhillSimplexServer implementation. }
 
         { Returns initial characteristic length for every parameter. }
-        function GetInitialParameterStep(Sender: TComponent;
-            ParameterNumber, ParametersCount: LongInt): Double;
+        function GetVariationStep(Sender: TComponent; index: LongInt): Double;
         { Sets inital calculation point in internal representation.
           The number of array element is equal to the number of
           variable parameters of task being solved. }
@@ -378,8 +377,8 @@ begin
 end;
 
 {$hints off}
-function TDownHillSimplexHandler.GetInitialParameterStep(Sender: TComponent;
-    ParameterNumber, ParametersCount: LongInt): Double;
+function TDownHillSimplexHandler.GetVariationStep(Sender: TComponent;
+    index: LongInt): Double;
 begin
     Result := FInitialAngleStep;
 end;
