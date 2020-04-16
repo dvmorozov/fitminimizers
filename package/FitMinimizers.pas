@@ -9,8 +9,8 @@ interface
 
 uses
   Tools, SimpMath, MyExceptions, Algorithm, Decisions, 
-  DownhillSimplexAlgorithm, DownhillSimplexContainer, AlgorithmContainer, 
-  RunningThread, CombEnumerator, LazarusPackageIntf;
+  DownhillSimplexAlgorithm, AlgorithmContainer, RunningThread, CombEnumerator, 
+  DownhillSimplexServer, LazarusPackageIntf;
 
 implementation
 
