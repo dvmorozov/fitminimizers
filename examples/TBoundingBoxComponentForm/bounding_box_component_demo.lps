@@ -17,8 +17,8 @@
         <Filename Value="downhill_simplex_handler.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="44"/>
-        <CursorPos X="22" Y="58"/>
+        <TopLine Value="310"/>
+        <CursorPos X="10" Y="334"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -364,7 +364,7 @@
       </Position28>
       <Position29>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="58" Column="41" TopLine="44"/>
+        <Caret Line="58" Column="32" TopLine="43"/>
       </Position29>
     </JumpHistory>
     <RunParams>
