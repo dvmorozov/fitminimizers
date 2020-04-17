@@ -74,7 +74,7 @@ type
 
     { Container is responsible for feeding algorithm with parameter
       values and limiting values by cyclical boundary conditions. }
-    TDownhillSimplexContainer = class(TAlgorithmContainer, IDownhillSimplexServer)
+    TDownhillSimplexServer = class(TAlgorithmContainer, IDownhillSimplexServer)
     protected
         { Array of interfaces used for getting parameters. }
         FParametersInterfaces: array of IDownhillRealParameters;
@@ -163,7 +163,7 @@ type
         TVariableParameter;
 
 {$hints off}
-function TDownhillSimplexContainer.GetVariationStep(Sender: TComponent;
+function TDownhillSimplexServer.GetVariationStep(Sender: TComponent;
     index: LongInt): Double;
 var
     i: LongInt;
@@ -192,7 +192,7 @@ end;
 
 {$hints on}
 
-procedure TDownhillSimplexContainer.FillStartDecision(Sender: TComponent;
+procedure TDownhillSimplexServer.FillStartDecision(Sender: TComponent;
     StartDecision: TFloatDecision);
 var
     i: LongInt;
@@ -213,7 +213,7 @@ begin
     end;{for i := 0 to TempParametersNumber - 1 do...}
 end;
 
-procedure TDownhillSimplexContainer.FillParameters(Decision: TFloatDecision);
+procedure TDownhillSimplexServer.FillParameters(Decision: TFloatDecision);
 var
     i: LongInt;
     CurParameter: TVariableParameter;
@@ -237,14 +237,14 @@ begin
     end;
 end;
 
-procedure TDownhillSimplexContainer.EvaluateDecision(Sender: TComponent;
+procedure TDownhillSimplexServer.EvaluateDecision(Sender: TComponent;
     Decision: TFloatDecision);
 begin
     FillParameters(Decision);
     Decision.Evaluation := OptimizedFunction.GetOptimizedFunction;
 end;
 
-procedure TDownhillSimplexContainer.UpdateResults(Sender: TComponent;
+procedure TDownhillSimplexServer.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
 begin
     EvaluateDecision(Sender, Decision);
@@ -260,18 +260,18 @@ begin
     end;
 end;
 
-function TDownhillSimplexContainer.EndOfCalculation(Sender: TComponent): Boolean;
+function TDownhillSimplexServer.EndOfCalculation(Sender: TComponent): Boolean;
 begin
     Result := FEndOfCalculation;
 end;
 
-constructor TDownhillSimplexContainer.Create(AOwner: TComponent);
+constructor TDownhillSimplexServer.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
     CombSelector := TCombSelector.Create;
 end;
 
-destructor TDownhillSimplexContainer.Destroy;
+destructor TDownhillSimplexServer.Destroy;
 begin
     StopAlgorithm;
     DestroyAlgorithm;
@@ -281,7 +281,7 @@ begin
     inherited Destroy;
 end;
 
-procedure TDownhillSimplexContainer.ClearListOfIDSPs;
+procedure TDownhillSimplexServer.ClearListOfIDSPs;
 var
     i: LongInt;
 begin
@@ -293,7 +293,7 @@ begin
     CombSelector.ClearDiscretValuesList;
 end;
 
-procedure TDownhillSimplexContainer.AddIDSPToList(
+procedure TDownhillSimplexServer.AddIDSPToList(
     const IDSP_: IDownhillRealParameters);
 begin
     SetLength(FParametersInterfaces, Length(FParametersInterfaces) + 1);
@@ -301,17 +301,17 @@ begin
     CombSelector.AddDiscretValue(IDSP_);
 end;
 
-function TDownhillSimplexContainer.GetIDSPsNumber: LongInt;
+function TDownhillSimplexServer.GetIDSPsNumber: LongInt;
 begin
     Result := Length(FParametersInterfaces);
 end;
 
-function TDownhillSimplexContainer.GetIDSP(index: LongInt): IDownhillRealParameters;
+function TDownhillSimplexServer.GetIDSP(index: LongInt): IDownhillRealParameters;
 begin
     Result := FParametersInterfaces[index];
 end;
 
-function TDownhillSimplexContainer.GetIUpdatingResults: IUpdatingResults;
+function TDownhillSimplexServer.GetIUpdatingResults: IUpdatingResults;
 begin
     if Assigned(FIUpdatingResults) then
         Result := FIUpdatingResults
@@ -320,7 +320,7 @@ begin
             'Updating results interface must be assigned...');
 end;
 
-function TDownhillSimplexContainer.GetIOptimizedFunction: IOptimizedFunction;
+function TDownhillSimplexServer.GetIOptimizedFunction: IOptimizedFunction;
 begin
     if Assigned(FIOptimizedFunction) then
         Result := FIOptimizedFunction
@@ -329,33 +329,33 @@ begin
             'Optimized function interface must be assigned...');
 end;
 
-procedure TDownhillSimplexContainer.StopAlgorithm;
+procedure TDownhillSimplexServer.StopAlgorithm;
 begin
     FEndOfCalculation := True;
 end;
 
-procedure TDownhillSimplexContainer.DestroyAlgorithm;
+procedure TDownhillSimplexServer.DestroyAlgorithm;
 begin
     UtilizeObject(Algorithm);
 end;
 
-procedure TDownhillSimplexContainer.UpdateMainForm;
+procedure TDownhillSimplexServer.UpdateMainForm;
 begin
     UpdatingResults.UpdatingResults(Self);
 end;
 
-procedure TDownhillSimplexContainer.ShowMessage;
+procedure TDownhillSimplexServer.ShowMessage;
 begin
     UpdatingResults.ShowMessage(Self, FMessage);
 end;
 
-procedure TDownhillSimplexContainer.RunningFinished;
+procedure TDownhillSimplexServer.RunningFinished;
 begin
     FMessage := 'Calculation done...';
     ShowMessage;
 end;
 
-procedure TDownhillSimplexContainer.CreateAlgorithm;
+procedure TDownhillSimplexServer.CreateAlgorithm;
 begin
     UtilizeObject(Algorithm);
     Algorithm := TDownhillSimplexAlgorithm.Create(nil);
@@ -373,7 +373,7 @@ begin
     end;
 end;
 
-procedure TDownhillSimplexContainer.Running;
+procedure TDownhillSimplexServer.Running;
 var
     i: LongInt;
 begin
@@ -401,7 +401,7 @@ begin
     end;
 end;
 
-function TDownhillSimplexContainer.GetParametersNumber: LongInt;
+function TDownhillSimplexServer.GetParametersNumber: LongInt;
 var
     i: LongInt;
 begin
@@ -410,7 +410,7 @@ begin
         Result := Result + IDSP[i].ParametersNumber;
 end;
 
-procedure TDownhillSimplexContainer.CreateParameters;
+procedure TDownhillSimplexServer.CreateParameters;
 var
     i: LongInt;
 begin
@@ -418,7 +418,7 @@ begin
         IDSP[i].CreateParameters;
 end;
 
-function TDownhillSimplexContainer.GetParameter(index: LongInt): TVariableParameter;
+function TDownhillSimplexServer.GetParameter(index: LongInt): TVariableParameter;
 var
     i: LongInt;
     ParameterNumber: LongInt;
@@ -444,7 +444,7 @@ begin
     raise EDownhillSimplexContainer.Create('Invalid parameter index...');
 end;
 
-procedure TDownhillSimplexContainer.SetParameter(index: LongInt;
+procedure TDownhillSimplexServer.SetParameter(index: LongInt;
     AParameter: TVariableParameter);
 var
     i: LongInt;
