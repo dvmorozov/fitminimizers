@@ -433,7 +433,7 @@ m2=n</panel_attributes>
       <w>140</w>
       <h>21</h>
     </coordinates>
-    <panel_attributes>TDownhillSimplexContainer</panel_attributes>
+    <panel_attributes>TDownhillSimplexServer</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
