@@ -133,7 +133,7 @@ type
 
     public
         { Overall minimum among all optimization cycles. }
-        TotalMinimum: Double;
+        FTotalMinimum: Double;
 
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
@@ -253,9 +253,9 @@ begin
     //  (posle restarta)
     //??? proverit', nuzhno li pereschityvat' - Evaluation d.
     //  hranit' znachenie
-    if Decision.Evaluation < TotalMinimum then
+    if Decision.Evaluation < FTotalMinimum then
     begin
-        TotalMinimum := Decision.Evaluation;
+        FTotalMinimum := Decision.Evaluation;
         UpdateMainForm;
     end;
 end;
@@ -377,7 +377,7 @@ procedure TDownhillSimplexServer.Running;
 var
     i: LongInt;
 begin
-    TotalMinimum := OptimizedFunction.GetOptimizedFunction;
+    FTotalMinimum := OptimizedFunction.GetOptimizedFunction;
     UpdatingResults.ResetCurJobProgress(Self);
     UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, 0);
     for i := 0 to CombSelector.CombNumber - 1 do
