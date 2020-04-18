@@ -247,12 +247,6 @@ end;
 procedure TDownhillSimplexServer.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
 begin
-    EvaluateDecision(Sender, Decision);
-    //  pereschet resheniya zdes' neobhodim, tak kak v dannom
-    //  algoritme luchshiy rezul'tat ne obyazatel'no posledniy
-    //  (posle restarta)
-    //??? proverit', nuzhno li pereschityvat' - Evaluation d.
-    //  hranit' znachenie
     if Decision.Evaluation < FTotalMinimum then
     begin
         FTotalMinimum := Decision.Evaluation;
