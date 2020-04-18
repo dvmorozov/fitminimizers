@@ -81,7 +81,7 @@ type
         FIOptimizedFunction: IOptimizedFunction;
         FIUpdatingResults: IUpdatingResults;
 
-        CombSelector: TCombSelector;
+        FCombSelector: TCombSelector;
 
         FFinalTolerance: Double;
         FRestartDisabled: Boolean;
@@ -262,7 +262,7 @@ end;
 constructor TDownhillSimplexServer.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
-    CombSelector := TCombSelector.Create;
+    FCombSelector := TCombSelector.Create;
 end;
 
 destructor TDownhillSimplexServer.Destroy;
@@ -271,7 +271,7 @@ begin
     DestroyAlgorithm;
 
     ClearListOfIDSPs;
-    UtilizeObject(CombSelector);
+    UtilizeObject(FCombSelector);
     inherited Destroy;
 end;
 
@@ -284,7 +284,7 @@ begin
     //  ??? budut li schetchiki ssylok korrektno
     //  umen'shat'sya, esli prosto vyzyvat' Finalize
     Finalize(FParametersInterfaces);
-    CombSelector.ClearDiscretValuesList;
+    FCombSelector.ClearDiscretValuesList;
 end;
 
 procedure TDownhillSimplexServer.AddIDSPToList(
@@ -292,7 +292,7 @@ procedure TDownhillSimplexServer.AddIDSPToList(
 begin
     SetLength(FParametersInterfaces, Length(FParametersInterfaces) + 1);
     FParametersInterfaces[Length(FParametersInterfaces) - 1] := IDSP_;
-    CombSelector.AddDiscretValue(IDSP_);
+    FCombSelector.AddDiscretValue(IDSP_);
 end;
 
 function TDownhillSimplexServer.GetIDSPsNumber: LongInt;
@@ -373,12 +373,12 @@ var
 begin
     FTotalMinimum := OptimizedFunction.GetOptimizedFunction;
     UpdatingResults.ResetCurJobProgress(Self);
-    UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, 0);
-    for i := 0 to CombSelector.CombNumber - 1 do
+    UpdatingResults.ShowCurJobProgress(Self, 0, FCombSelector.CombNumber, 0);
+    for i := 0 to FCombSelector.CombNumber - 1 do
     begin
         if FEndOfCalculation then
             Exit;
-        CombSelector.CurrentComb := i;
+        FCombSelector.CurrentComb := i;
         CreateParameters;
         //  sozdayutsya parametry dlya novoy kombinatsii
         if ParametersNumber <> 0 then
@@ -391,7 +391,7 @@ begin
             FMessage := 'List of parameters is empty for combination ' + IntToStr(i);
             ShowMessage;
         end;
-        UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, i + 1);
+        UpdatingResults.ShowCurJobProgress(Self, 0, FCombSelector.CombNumber, i + 1);
     end;
 end;
 
