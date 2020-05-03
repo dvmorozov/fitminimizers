@@ -57,7 +57,7 @@ type
         FMaxCycles: integer;
         FMaxRestarts: integer;
         FFinalTolerance: Double;
-        FinalTolDefined: Boolean;
+        FFinalTolDefined: Boolean;
         FExitDerivative: Double;
         FParametersNumber: LongInt;
         FSimplexStartStepRandomEnabled: Boolean;
@@ -110,7 +110,7 @@ type
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
-        property FinalTolerance: Double read FFinalTolerance write SetFinalTolerance;
+        property FinalTolerance: Double write SetFinalTolerance;
         //  Disables algorithm restarting after reaching local minimum.
         //  Restarting can in some configuration spaces help to get to
         //  better solution.
@@ -599,9 +599,9 @@ begin
             //  the axis of minimized function. Therefore when tolerance stops
             //  decrease substantially for cycle it is necessary to terminate
             //  calculation.
-            if FinalTolDefined then
+            if FFinalTolDefined then
             begin
-                if Tolerance < FinalTolerance then
+                if Tolerance < FFinalTolerance then
                 begin
                     CurLoEval := GetBestDecision.Evaluation;
                     //  Size of simplex was reduced to minimal admissible value.
@@ -676,7 +676,7 @@ begin
             Tolerance := 2 * Abs(EvalHi - EvalLo) /
                 (Abs(EvalHi) + Abs(EvalLo) + TINY);
 
-            if FinalTolDefined and (Tolerance < FinalTolerance) then
+            if FFinalTolDefined and (Tolerance < FFinalTolerance) then
             begin
                 if (GetBestDecision.Evaluation < SavedLoEval) and
                     (FRestartCount < FMaxRestarts) then
@@ -720,7 +720,7 @@ end;
 procedure TDownhillSimplexAlgorithm.SetFinalTolerance(AFinalTolerance: Double);
 begin
     FFinalTolerance := AFinalTolerance;
-    FinalTolDefined := True;
+    FFinalTolDefined := True;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetParametersNumber(AParametersNumber: LongInt);
