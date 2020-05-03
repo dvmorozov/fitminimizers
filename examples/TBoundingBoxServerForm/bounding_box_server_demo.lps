@@ -31,8 +31,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="357"/>
-        <CursorPos X="10" Y="381"/>
+        <TopLine Value="358"/>
+        <CursorPos X="13" Y="365"/>
         <UsageCount Value="256"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>

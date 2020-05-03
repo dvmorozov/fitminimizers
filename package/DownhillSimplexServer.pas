@@ -67,7 +67,7 @@ type
             MinValue, MaxValue, CurValue: LongInt);
         procedure ResetCurJobProgress(Sender: TComponent);
         procedure ShowMessage(Sender: TComponent; Msg: string);
-        procedure UpdatingResults(Sender: TComponent);
+        procedure UpdateResults(Sender: TComponent);
     end;
 
     EDownhillSimplexContainer = class(Exception);
@@ -78,10 +78,10 @@ type
     protected
         { Array of interfaces used for getting parameters. }
         FParametersInterfaces: array of IDownhillRealParameters;
-        FIOptimizedFunction: IOptimizedFunction;
-        FIUpdatingResults: IUpdatingResults;
+        FOptimizedFunction: IOptimizedFunction;
+        FUpdatingResults: IUpdatingResults;
 
-        CombSelector: TCombSelector;
+        FCombSelector: TCombSelector;
 
         FFinalTolerance: Double;
         FRestartDisabled: Boolean;
@@ -89,14 +89,14 @@ type
 
         FEndOfCalculation: Boolean;
         FMessage: string;
+        FTotalMinimumDecision: TFloatDecision;
+
         { Initializes environment and starts algorithm. }
         procedure Running; override;
         procedure RunningFinished; override;
 
-        { Wrapping method. It doesn't have parameters because is called by Synchronize. }
         procedure ShowMessage;
-        { Wrapping method. It doesn't have parameters because is called by Synchronize. }
-        procedure UpdateMainForm;
+        procedure SetTotatlMinimumDecision(ATotalMinimumDecision: TFloatDecision);
 
         procedure FillParameters(Decision: TFloatDecision); virtual;
         procedure CreateAlgorithm; override;
@@ -115,8 +115,8 @@ type
         { Calculates condition of calculation termination. }
         function EndOfCalculation(Sender: TComponent): Boolean;
 
-        function GetIUpdatingResults: IUpdatingResults;
-        function GetIOptimizedFunction: IOptimizedFunction;
+        function GetUpdatingResults: IUpdatingResults;
+        function GetOptimizedFunction: IOptimizedFunction;
 
         function GetIDSPsNumber: LongInt;
         function GetIDSP(index: LongInt): IDownhillRealParameters;
@@ -133,7 +133,7 @@ type
 
     public
         { Overall minimum among all optimization cycles. }
-        TotalMinimum: Double;
+        FTotalMinimum: Double;
 
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
@@ -144,9 +144,9 @@ type
         procedure AddIDSPToList(const IDSP_: IDownhillRealParameters);
 
         property OptimizedFunction: IOptimizedFunction
-            read GetIOptimizedFunction write FIOptimizedFunction;
+            read GetOptimizedFunction write FOptimizedFunction;
         property UpdatingResults: IUpdatingResults
-            read GetIUpdatingResults write FIUpdatingResults;
+            read GetUpdatingResults write FUpdatingResults;
 
         { Container must save copies of these properties because during
           calculation process algorithm object can be created a few times. }
@@ -247,17 +247,20 @@ end;
 procedure TDownhillSimplexServer.UpdateResults(Sender: TComponent;
     Decision: TFloatDecision);
 begin
-    EvaluateDecision(Sender, Decision);
-    //  pereschet resheniya zdes' neobhodim, tak kak v dannom
-    //  algoritme luchshiy rezul'tat ne obyazatel'no posledniy
-    //  (posle restarta)
-    //??? proverit', nuzhno li pereschityvat' - Evaluation d.
-    //  hranit' znachenie
-    if Decision.Evaluation < TotalMinimum then
+    if Decision.Evaluation < FTotalMinimum then
     begin
-        TotalMinimum := Decision.Evaluation;
-        UpdateMainForm;
+        FTotalMinimum := Decision.Evaluation;
+        SetTotatlMinimumDecision(TFloatDecision(Decision.GetCopy));
+        UpdatingResults.UpdateResults(Self);
     end;
+end;
+
+procedure TDownhillSimplexServer.SetTotatlMinimumDecision(
+    ATotalMinimumDecision: TFloatDecision);
+begin
+    if Assigned(FTotalMinimumDecision) then
+        FTotalMinimumDecision.Free;
+    FTotalMinimumDecision := ATotalMinimumDecision;
 end;
 
 function TDownhillSimplexServer.EndOfCalculation(Sender: TComponent): Boolean;
@@ -268,7 +271,7 @@ end;
 constructor TDownhillSimplexServer.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
-    CombSelector := TCombSelector.Create;
+    FCombSelector := TCombSelector.Create;
 end;
 
 destructor TDownhillSimplexServer.Destroy;
@@ -277,7 +280,7 @@ begin
     DestroyAlgorithm;
 
     ClearListOfIDSPs;
-    UtilizeObject(CombSelector);
+    UtilizeObject(FCombSelector);
     inherited Destroy;
 end;
 
@@ -290,7 +293,7 @@ begin
     //  ??? budut li schetchiki ssylok korrektno
     //  umen'shat'sya, esli prosto vyzyvat' Finalize
     Finalize(FParametersInterfaces);
-    CombSelector.ClearDiscretValuesList;
+    FCombSelector.ClearDiscretValuesList;
 end;
 
 procedure TDownhillSimplexServer.AddIDSPToList(
@@ -298,7 +301,7 @@ procedure TDownhillSimplexServer.AddIDSPToList(
 begin
     SetLength(FParametersInterfaces, Length(FParametersInterfaces) + 1);
     FParametersInterfaces[Length(FParametersInterfaces) - 1] := IDSP_;
-    CombSelector.AddDiscretValue(IDSP_);
+    FCombSelector.AddDiscretValue(IDSP_);
 end;
 
 function TDownhillSimplexServer.GetIDSPsNumber: LongInt;
@@ -311,19 +314,19 @@ begin
     Result := FParametersInterfaces[index];
 end;
 
-function TDownhillSimplexServer.GetIUpdatingResults: IUpdatingResults;
+function TDownhillSimplexServer.GetUpdatingResults: IUpdatingResults;
 begin
-    if Assigned(FIUpdatingResults) then
-        Result := FIUpdatingResults
+    if Assigned(FUpdatingResults) then
+        Result := FUpdatingResults
     else
         raise EDownhillSimplexContainer.Create(
             'Updating results interface must be assigned...');
 end;
 
-function TDownhillSimplexServer.GetIOptimizedFunction: IOptimizedFunction;
+function TDownhillSimplexServer.GetOptimizedFunction: IOptimizedFunction;
 begin
-    if Assigned(FIOptimizedFunction) then
-        Result := FIOptimizedFunction
+    if Assigned(FOptimizedFunction) then
+        Result := FOptimizedFunction
     else
         raise EDownhillSimplexContainer.Create(
             'Optimized function interface must be assigned...');
@@ -337,11 +340,6 @@ end;
 procedure TDownhillSimplexServer.DestroyAlgorithm;
 begin
     UtilizeObject(Algorithm);
-end;
-
-procedure TDownhillSimplexServer.UpdateMainForm;
-begin
-    UpdatingResults.UpdatingResults(Self);
 end;
 
 procedure TDownhillSimplexServer.ShowMessage;
@@ -377,14 +375,14 @@ procedure TDownhillSimplexServer.Running;
 var
     i: LongInt;
 begin
-    TotalMinimum := OptimizedFunction.GetOptimizedFunction;
+    FTotalMinimum := OptimizedFunction.GetOptimizedFunction;
     UpdatingResults.ResetCurJobProgress(Self);
-    UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, 0);
-    for i := 0 to CombSelector.CombNumber - 1 do
+    UpdatingResults.ShowCurJobProgress(Self, 0, FCombSelector.CombNumber, 0);
+    for i := 0 to FCombSelector.CombNumber - 1 do
     begin
         if FEndOfCalculation then
             Exit;
-        CombSelector.CurrentComb := i;
+        FCombSelector.CurrentComb := i;
         CreateParameters;
         //  sozdayutsya parametry dlya novoy kombinatsii
         if ParametersNumber <> 0 then
@@ -397,7 +395,7 @@ begin
             FMessage := 'List of parameters is empty for combination ' + IntToStr(i);
             ShowMessage;
         end;
-        UpdatingResults.ShowCurJobProgress(Self, 0, CombSelector.CombNumber, i + 1);
+        UpdatingResults.ShowCurJobProgress(Self, 0, FCombSelector.CombNumber, i + 1);
     end;
 end;
 

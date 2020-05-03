@@ -449,7 +449,10 @@ end;
 
 function TTwoDimFloatDecision.GetGenesNumber: LongInt;
 begin
-    Result := Length(FParameters);
+    if Assigned(FParameters) then
+        Result := Length(FParameters)
+    else
+        Result := 0;
 end;
 
 procedure TTwoDimFloatDecision.SetGenesNumber(AGenesNumber: LongInt);
