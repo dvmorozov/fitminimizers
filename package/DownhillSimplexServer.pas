@@ -150,10 +150,10 @@ type
 
         { Container must save copies of these properties because during
           calculation process algorithm object can be created a few times. }
-        property FinalTolerance: Double read FFinalTolerance write FFinalTolerance;
-        property RestartDisabled: Boolean read FRestartDisabled write FRestartDisabled;
+        property FinalTolerance: Double write FFinalTolerance;
+        property RestartDisabled: Boolean write FRestartDisabled;
         { Stops calculation if minimal value changed less than on this value for optimization cycle. }
-        property ExitDerivative: Double read FExitDerivative write FExitDerivative;
+        property ExitDerivative: Double write FExitDerivative;
     end;
 
 implementation
@@ -364,9 +364,10 @@ begin
         DownhillSimplexServer := Self;
         //  Final tolerance should have non zero value,
         //  otherwise computation will never end.
-        FinalTolerance := Self.FinalTolerance;
-        RestartDisabled := Self.RestartDisabled;
-        ExitDerivative := Self.ExitDerivative;
+        if FFinalTolerance <> 0 then
+            FinalTolerance := FFinalTolerance;
+        RestartDisabled := FRestartDisabled;
+        ExitDerivative := FExitDerivative;
         //  Temperature := 1;     //  for TDownhillSimplexSAAlgorithm
     end;
 end;
