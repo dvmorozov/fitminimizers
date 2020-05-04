@@ -158,10 +158,6 @@ type
 
 implementation
 
-type
-    TParametersArray = array[0..MaxInt div SizeOf(TVariableParameter) - 1] of
-        TVariableParameter;
-
 {$hints off}
 function TDownhillSimplexServer.GetVariationStep(Sender: TComponent;
     index: LongInt): Double;
