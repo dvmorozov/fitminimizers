@@ -52,12 +52,17 @@ type
         FCycleCount: LongInt;
         FEvaluationCount: LongInt;
         FRestartCount: LongInt;
+        { Disables algorithm restarting after reaching local minimum.
+          Restarting can in some configuration spaces help to get to
+          better solution. }
         FRestartDisabled: Boolean;
-        //  Set exit values
+        { Set exit values }
         FMaxCycles: integer;
         FMaxRestarts: integer;
         FFinalTolerance: Double;
         FFinalTolDefined: Boolean;
+        { If difference in evaluation of best decision for the cycle
+          is less than given value then exit. }
         FExitDerivative: Double;
         FParametersNumber: LongInt;
         FSimplexStartStepRandomEnabled: Boolean;
@@ -97,7 +102,10 @@ type
 
     public
         procedure AlgorithmRealization; override;
-        constructor Create(AOwner: TComponent); override;
+        constructor Create(AOwner: TComponent;
+            AFinalTolerance: Double;
+            ARestartDisabled: Boolean;
+            AExitDerivative: Double);
         destructor Destroy; override;
         //  The total number of optimization cycles.
         property CycleCount: Integer read FCycleCount;
@@ -110,17 +118,9 @@ type
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
-        property FinalTolerance: Double write SetFinalTolerance;
-        //  Disables algorithm restarting after reaching local minimum.
-        //  Restarting can in some configuration spaces help to get to
-        //  better solution.
-        property RestartDisabled: Boolean read FRestartDisabled write FRestartDisabled;
         //  Total number of parameters of the problem to be solved.
         //  The number is defined after executing CreateSimplexVertices, should not be set up by client.
         property ParametersNumber: LongInt read FParametersNumber;
-        //  If difference in evaluation of best decision for the cycle
-        //  is less than given value then exit.
-        property ExitDerivative: Double read FExitDerivative write FExitDerivative;
         //  Enables using FSimplexStartStepMultiplier on optimization restarting.
         //  The flag should not be used together with other SimplexXXXX flags.
         property SimplexStartStepMultiplierEnabled: Boolean
@@ -605,13 +605,13 @@ begin
                 begin
                     CurLoEval := GetBestDecision.Evaluation;
                     //  Size of simplex was reduced to minimal admissible value.
-                    if (not RestartDisabled)
+                    if (not FRestartDisabled)
                         //  Checks other termination conditions.
                         and (
                             (FSimplexDirectionChangingEnabled and (FRestartCount < (1 shl ParametersNumber) - 1))
                          or (FSimplexStartStepMultiplierEnabled and (FSimplexStartStepMultiplier > 0.01))
                          or ((not FSimplexDirectionChangingEnabled) and (not FSimplexStartStepMultiplierEnabled)
-                              and (Abs(CurLoEval - SavedLoEval) > ExitDerivative))
+                              and (Abs(CurLoEval - SavedLoEval) > FExitDerivative))
                          )
                         and (FRestartCount < FMaxRestarts)
                     then
@@ -706,15 +706,24 @@ begin
     end;
 end;
 
-constructor TDownhillSimplexAlgorithm.Create(AOwner: TComponent);
+constructor TDownhillSimplexAlgorithm.Create(AOwner: TComponent;
+            AFinalTolerance: Double;
+            ARestartDisabled: Boolean;
+            AExitDerivative: Double);
 begin
-    inherited;
+    inherited Create(AOwner);
     FSimplex := TComponentList.Create;
     FSimplexStartStepMultiplierEnabled := False;
     FSimplexStartStepRandomEnabled := False;
     FSimplexDirectionChangingEnabled := False;
     FMaxCycles := MaxInt;
     FMaxRestarts := MaxInt;
+    {  Final tolerance should have non zero value,
+       otherwise computation will never end. }
+    if AFinalTolerance <> 0 then
+        FFinalTolerance := AFinalTolerance;
+    FRestartDisabled := ARestartDisabled;
+    FExitDerivative := AExitDerivative;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetFinalTolerance(AFinalTolerance: Double);
