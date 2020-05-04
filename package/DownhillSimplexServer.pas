@@ -150,17 +150,13 @@ type
 
         { Container must save copies of these properties because during
           calculation process algorithm object can be created a few times. }
-        property FinalTolerance: Double read FFinalTolerance write FFinalTolerance;
-        property RestartDisabled: Boolean read FRestartDisabled write FRestartDisabled;
+        property FinalTolerance: Double write FFinalTolerance;
+        property RestartDisabled: Boolean write FRestartDisabled;
         { Stops calculation if minimal value changed less than on this value for optimization cycle. }
-        property ExitDerivative: Double read FExitDerivative write FExitDerivative;
+        property ExitDerivative: Double write FExitDerivative;
     end;
 
 implementation
-
-type
-    TParametersArray = array[0..MaxInt div SizeOf(TVariableParameter) - 1] of
-        TVariableParameter;
 
 {$hints off}
 function TDownhillSimplexServer.GetVariationStep(Sender: TComponent;
@@ -356,17 +352,13 @@ end;
 procedure TDownhillSimplexServer.CreateAlgorithm;
 begin
     UtilizeObject(Algorithm);
-    Algorithm := TDownhillSimplexAlgorithm.Create(nil);
+    Algorithm := TDownhillSimplexAlgorithm.Create(nil,
+        FFinalTolerance, FRestartDisabled, FExitDerivative);
     //    Algorithm := TDownhillSimplexSAAlgorithm.Create(nil);
     with Algorithm as TDownhillSimplexAlgorithm do
         //    with Algorithm as TDownhillSimplexSAAlgorithm do
     begin
         DownhillSimplexServer := Self;
-        //  Final tolerance should have non zero value,
-        //  otherwise computation will never end.
-        FinalTolerance := Self.FinalTolerance;
-        RestartDisabled := Self.RestartDisabled;
-        ExitDerivative := Self.ExitDerivative;
         //  Temperature := 1;     //  for TDownhillSimplexSAAlgorithm
     end;
 end;

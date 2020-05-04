@@ -193,14 +193,9 @@ constructor TDownHillSimplexHandler.Create(
     iShowDetails: Boolean; RunId: Integer);
 begin
     inherited Create(AOwner);
-    FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
-    { Initializing algorithm exit parameters. }
-    FDownhillSimplexAlgorithm.FinalTolerance := 0.00001;
-    FDownhillSimplexAlgorithm.ExitDerivative := 0.5;
-    FDownhillSimplexAlgorithm.RestartDisabled := False;
+    FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(
+        Self, iFinalTolerance, False, iExitDerivative);
     { FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled := True; }
-    FDownhillSimplexAlgorithm.FinalTolerance := iFinalTolerance;
-    FDownhillSimplexAlgorithm.ExitDerivative := iExitDerivative;
     FRecreateSimplexFromOriginal := False;
     { Initializing algorithm initial parameters. }
     FAlpha := iAlpha;

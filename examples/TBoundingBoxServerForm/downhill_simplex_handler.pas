@@ -242,14 +242,9 @@ begin
     FPointCloud := APointCloud;
     FOwnsPointCloud := AOwnsPointCloud;
 
-    FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(Self);
-    { Initializing algorithm exit parameters. }
-    FDownhillSimplexAlgorithm.FinalTolerance := 0.00001;
-    FDownhillSimplexAlgorithm.ExitDerivative := 0.5;
-    FDownhillSimplexAlgorithm.RestartDisabled := False;
+    FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(
+        Self, AFinalTolerance, False, AExitDerivative);
     { FDownhillSimplexAlgorithm.SimplexDirectionChangingEnabled := True; }
-    FDownhillSimplexAlgorithm.FinalTolerance := AFinalTolerance;
-    FDownhillSimplexAlgorithm.ExitDerivative := AExitDerivative;
     FRecreateSimplexFromOriginal := False;
     { Initializing algorithm initial parameters. }
     FAlpha := AAlpha;
