@@ -356,18 +356,13 @@ end;
 procedure TDownhillSimplexServer.CreateAlgorithm;
 begin
     UtilizeObject(Algorithm);
-    Algorithm := TDownhillSimplexAlgorithm.Create(nil);
+    Algorithm := TDownhillSimplexAlgorithm.Create(nil,
+        FFinalTolerance, FRestartDisabled, FExitDerivative);
     //    Algorithm := TDownhillSimplexSAAlgorithm.Create(nil);
     with Algorithm as TDownhillSimplexAlgorithm do
         //    with Algorithm as TDownhillSimplexSAAlgorithm do
     begin
         DownhillSimplexServer := Self;
-        //  Final tolerance should have non zero value,
-        //  otherwise computation will never end.
-        if FFinalTolerance <> 0 then
-            FinalTolerance := FFinalTolerance;
-        RestartDisabled := FRestartDisabled;
-        ExitDerivative := FExitDerivative;
         //  Temperature := 1;     //  for TDownhillSimplexSAAlgorithm
     end;
 end;
