@@ -97,7 +97,6 @@ type
         //  Perform single optimization cycle.
         procedure BasicCalcCycle(const Highest, NextHighest, Lowest: LongInt);
 
-        procedure SetFinalTolerance(AFinalTolerance: Double);
         procedure SetParametersNumber(AParametersNumber: LongInt);
 
     public
@@ -720,16 +719,14 @@ begin
     FMaxRestarts := MaxInt;
     {  Final tolerance should have non zero value,
        otherwise computation will never end. }
+    FFinalTolDefined := False;
     if AFinalTolerance <> 0 then
+    begin
         FFinalTolerance := AFinalTolerance;
+        FFinalTolDefined := True;
+    end;
     FRestartDisabled := ARestartDisabled;
     FExitDerivative := AExitDerivative;
-end;
-
-procedure TDownhillSimplexAlgorithm.SetFinalTolerance(AFinalTolerance: Double);
-begin
-    FFinalTolerance := AFinalTolerance;
-    FFinalTolDefined := True;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetParametersNumber(AParametersNumber: LongInt);
