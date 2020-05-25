@@ -104,7 +104,7 @@ type
         constructor Create(AOwner: TComponent;
             AFinalTolerance: Double;
             ARestartDisabled: Boolean;
-            AExitDerivative: Double);
+            AExitDerivative: Double); overload;
         destructor Destroy; override;
         //  The total number of optimization cycles.
         property CycleCount: Integer read FCycleCount;
