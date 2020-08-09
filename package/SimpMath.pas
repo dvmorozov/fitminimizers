@@ -563,8 +563,7 @@ procedure Gauss(PointsArray: TwoDimArray; const A, Sigma, x0: Double);
 var
     i: LongInt;
 begin
-    if not Assigned(PointsArray) then
-        raise EPointsArrayIsNotAssigned.Create('Points array is not assigned...');
+    Assert(Length(PointsArray) > 0);
 
     for i := 0 to Length(PointsArray) - 1 do
         PointsArray[i][2] := GaussPoint(A, Sigma, x0, PointsArray[i][1]);
