@@ -4,13 +4,14 @@
     <PathDelim Value="\"/>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="31">
+    <Units Count="32">
       <Unit0>
         <Filename Value="bounding_box_component_demo.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos Y="4"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="5" Y="16"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
       <Unit1>
@@ -28,18 +29,17 @@
         <ComponentName Value="BoundingBoxComponentForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="8"/>
-        <CursorPos Y="7"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="755"/>
+        <CursorPos X="26" Y="776"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit2>
       <Unit3>
         <Filename Value="bounding_box_component_form.dfm"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="26" Y="7"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="12"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit3>
       <Unit4>
@@ -47,7 +47,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="163"/>
         <CursorPos Y="179"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="25"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit4>
       <Unit5>
@@ -55,7 +55,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="203"/>
         <CursorPos Y="220"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="25"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit5>
       <Unit6>
@@ -63,14 +63,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="916"/>
         <CursorPos Y="935"/>
-        <UsageCount Value="32"/>
+        <UsageCount Value="24"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit6>
       <Unit7>
         <Filename Value="Tools.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="104" Y="9"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="26"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit7>
       <Unit8>
@@ -78,7 +78,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="34"/>
         <CursorPos X="80" Y="45"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="5"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit8>
       <Unit9>
@@ -86,53 +86,51 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="126"/>
         <CursorPos X="57" Y="150"/>
-        <UsageCount Value="108"/>
+        <UsageCount Value="100"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit9>
       <Unit10>
         <Filename Value="..\..\package\AlgorithmContainer.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="74" Y="15"/>
-        <UsageCount Value="133"/>
+        <UsageCount Value="125"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit10>
       <Unit11>
         <Filename Value="..\..\package\CBRCComponent.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="45" Y="15"/>
-        <UsageCount Value="88"/>
+        <UsageCount Value="80"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit11>
       <Unit12>
         <Filename Value="..\..\package\Algorithm.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="59" Y="13"/>
-        <UsageCount Value="126"/>
+        <UsageCount Value="118"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\..\package\RunningThread.pas"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="94"/>
-        <CursorPos X="28" Y="100"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="12"/>
+        <CursorPos X="36" Y="116"/>
         <UsageCount Value="138"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\package\CombEnumerator.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="77" Y="11"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="117"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="20"/>
-        <CursorPos X="41" Y="36"/>
-        <UsageCount Value="138"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="6"/>
+        <CursorPos X="32" Y="42"/>
+        <UsageCount Value="130"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit15>
       <Unit16>
@@ -140,7 +138,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="222"/>
         <CursorPos X="42" Y="248"/>
-        <UsageCount Value="114"/>
+        <UsageCount Value="106"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit16>
       <Unit17>
@@ -148,7 +146,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="236"/>
         <CursorPos X="33" Y="262"/>
-        <UsageCount Value="123"/>
+        <UsageCount Value="115"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit17>
       <Unit18>
@@ -156,7 +154,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="2"/>
         <CursorPos X="30" Y="28"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="23"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit18>
       <Unit19>
@@ -164,7 +162,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="117"/>
         <CursorPos X="23" Y="136"/>
-        <UsageCount Value="85"/>
+        <UsageCount Value="77"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit19>
       <Unit20>
@@ -172,213 +170,158 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="536"/>
         <CursorPos Y="562"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="20"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit20>
       <Unit21>
         <Filename Value="..\..\package\FitMinimizers.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="44" Y="12"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="25"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit21>
       <Unit22>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1685"/>
-        <CursorPos X="3" Y="1589"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="1673"/>
+        <CursorPos X="65" Y="1682"/>
+        <UsageCount Value="12"/>
       </Unit22>
       <Unit23>
         <Filename Value="C:\lazarus\lcl\interfaces\win32\win32object.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="391"/>
         <CursorPos Y="413"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="2"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\package\MyExceptions.pas"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="20"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit24>
       <Unit25>
         <Filename Value="backup\bounding_box_component_form.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="176"/>
+        <EditorIndex Value="1"/>
         <CursorPos X="40" Y="190"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="50"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit25>
       <Unit26>
         <Filename Value="backup\downhill_simplex_handler.pas"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="222"/>
         <CursorPos X="23" Y="245"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="2"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit26>
       <Unit27>
         <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="793"/>
-        <CursorPos X="23" Y="803"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="105"/>
+        <CursorPos X="53" Y="120"/>
+        <UsageCount Value="50"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit27>
       <Unit28>
         <Filename Value="..\TBoundingBoxServerForm\downhill_simplex_handler.pas"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="143"/>
-        <CursorPos X="23" Y="170"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="30" Y="112"/>
+        <UsageCount Value="2"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit28>
       <Unit29>
         <Filename Value="C:\lazarus\ide\lazarus.pp"/>
         <UnitName Value="Lazarus"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="2"/>
       </Unit29>
       <Unit30>
         <Filename Value="\\VBOXSVR\04_-_github\fitminimizers\package\DownhillSimplexServer.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="148"/>
         <CursorPos X="9" Y="160"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="2"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit30>
+      <Unit31>
+        <Filename Value="..\optimizing_app.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="121" Y="9"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit31>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="Lazarus"/>
     </OtherDefines>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="191" Column="29" TopLine="191"/>
+        <Caret Line="22" Column="53" TopLine="3"/>
       </Position1>
       <Position2>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="79" Column="53" TopLine="67"/>
+        <Caret Line="58" Column="32" TopLine="43"/>
       </Position2>
       <Position3>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="191" Column="34" TopLine="165"/>
+        <Caret Line="317" Column="22" TopLine="311"/>
       </Position3>
       <Position4>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="79" Column="59" TopLine="67"/>
+        <Caret Line="198" TopLine="183"/>
       </Position4>
       <Position5>
         <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="191" Column="39" TopLine="168"/>
+        <Caret Line="199" TopLine="186"/>
       </Position5>
       <Position6>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="79" Column="66" TopLine="67"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="808" Column="41" TopLine="6"/>
       </Position6>
       <Position7>
-        <Filename Value="..\..\package\RunningThread.pas"/>
-        <Caret Line="99" Column="16" TopLine="85"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="814" Column="26" TopLine="792"/>
       </Position7>
       <Position8>
-        <Filename Value="bounding_box_component_form.pas"/>
-        <Caret Line="7"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="881" Column="20" TopLine="869"/>
       </Position8>
       <Position9>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="7"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="921" Column="43" TopLine="901"/>
       </Position9>
       <Position10>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="233" Column="23" TopLine="219"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="917" Column="25" TopLine="900"/>
       </Position10>
       <Position11>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="245" Column="23" TopLine="222"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="921" Column="41" TopLine="900"/>
       </Position11>
       <Position12>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="233" Column="10" TopLine="222"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="92" Column="39" TopLine="44"/>
       </Position12>
       <Position13>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="6" Column="10"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="748" Column="54" TopLine="726"/>
       </Position13>
       <Position14>
-        <Filename Value="backup\bounding_box_component_form.pas"/>
-        <Caret Line="14"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="921" Column="49" TopLine="915"/>
       </Position14>
       <Position15>
-        <Filename Value="backup\bounding_box_component_form.pas"/>
-        <Caret Line="190" Column="40" TopLine="176"/>
+        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
+        <Caret Line="92" Column="19" TopLine="80"/>
       </Position15>
-      <Position16>
-        <Filename Value="backup\downhill_simplex_handler.pas"/>
-        <Caret Line="7"/>
-      </Position16>
-      <Position17>
-        <Filename Value="backup\downhill_simplex_handler.pas"/>
-        <Caret Line="233" Column="23" TopLine="219"/>
-      </Position17>
-      <Position18>
-        <Filename Value="backup\downhill_simplex_handler.pas"/>
-        <Caret Line="245" Column="23" TopLine="222"/>
-      </Position18>
-      <Position19>
-        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
-        <Caret Line="14"/>
-      </Position19>
-      <Position20>
-        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
-        <Caret Line="816" Column="10" TopLine="793"/>
-      </Position20>
-      <Position21>
-        <Filename Value="..\TBoundingBoxServerForm\bounding_box_server_form.pas"/>
-        <Caret Line="803" Column="23" TopLine="793"/>
-      </Position21>
-      <Position22>
-        <Filename Value="..\..\package\DownhillSimplexAlgorithm.pas"/>
-        <Caret Line="167" Column="27" TopLine="152"/>
-      </Position22>
-      <Position23>
-        <Filename Value="bounding_box_component_form.pas"/>
-        <Caret Line="7"/>
-      </Position23>
-      <Position24>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="20" Column="44" TopLine="4"/>
-      </Position24>
-      <Position25>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="58" Column="34" TopLine="19"/>
-      </Position25>
-      <Position26>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="22" Column="53" TopLine="3"/>
-      </Position26>
-      <Position27>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="58" Column="32" TopLine="43"/>
-      </Position27>
-      <Position28>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="317" Column="22" TopLine="311"/>
-      </Position28>
-      <Position29>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="198" TopLine="183"/>
-      </Position29>
-      <Position30>
-        <Filename Value="downhill_simplex_handler.pas"/>
-        <Caret Line="199" TopLine="186"/>
-      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
