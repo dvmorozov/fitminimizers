@@ -17,9 +17,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   LCLVersion = '2.0.6.0'
   object Label1: TLabel
     Left = 8
-    Height = 10
+    Height = 11
     Top = 48
-    Width = 36
+    Width = 32
     Caption = 'Output:'
     Color = clBtnFace
     Font.Color = clWindowText
@@ -31,9 +31,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object Label2: TLabel
     Left = 7
-    Height = 10
+    Height = 11
     Top = 273
-    Width = 48
+    Width = 44
     Caption = 'Test Runs:'
     Color = clBtnFace
     Font.Color = clWindowText
@@ -45,9 +45,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object Label3: TLabel
     Left = 7
-    Height = 10
+    Height = 11
     Top = 6
-    Width = 32
+    Width = 28
     Caption = 'Model:'
     Color = clBtnFace
     Font.Color = clWindowText
@@ -59,9 +59,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object Label4: TLabel
     Left = 201
-    Height = 10
+    Height = 11
     Top = 6
-    Width = 85
+    Width = 71
     Caption = 'Initial angle step:'
     Color = clBtnFace
     Font.Color = clWindowText
@@ -73,9 +73,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object Label5: TLabel
     Left = 201
-    Height = 10
+    Height = 11
     Top = 24
-    Width = 74
+    Width = 63
     Caption = 'Final tolerance:'
     Color = clBtnFace
     Font.Color = clWindowText
@@ -87,9 +87,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object Label6: TLabel
     Left = 201
-    Height = 10
+    Height = 11
     Top = 42
-    Width = 72
+    Width = 63
     Caption = 'Exit derivative:'
     Color = clBtnFace
     Font.Color = clWindowText
@@ -128,9 +128,9 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object CheckBoxRandomData: TCheckBox
     Left = 74
-    Height = 24
+    Height = 19
     Top = -1
-    Width = 109
+    Width = 91
     Caption = 'Use random data'
     Font.Color = clWindowText
     Font.Height = -9
@@ -195,20 +195,20 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object ComboBoxFiles: TComboBox
     Left = 7
-    Height = 27
+    Height = 19
     Top = 21
     Width = 154
     Font.Color = clWindowText
     Font.Height = -9
     Font.Name = 'Tahoma'
-    ItemHeight = 0
+    ItemHeight = 11
     OnChange = ComboBoxFilesChange
     ParentFont = False
     TabOrder = 7
   end
   object EditInitialAngleStep: TEdit
     Left = 293
-    Height = 20
+    Height = 19
     Top = 3
     Width = 97
     Font.Color = clWindowText
@@ -220,7 +220,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object EditFinalTolerance: TEdit
     Left = 293
-    Height = 20
+    Height = 19
     Top = 21
     Width = 97
     Font.Color = clWindowText
@@ -232,7 +232,7 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   end
   object EditExitDerivate: TEdit
     Left = 293
-    Height = 20
+    Height = 19
     Top = 38
     Width = 97
     Font.Color = clWindowText
