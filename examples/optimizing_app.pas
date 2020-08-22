@@ -5,6 +5,11 @@ unit optimizing_app;
 interface
 
 uses
+{$IF NOT DEFINED(FPC)}
+    System.StrUtils,
+{$ELSE}
+    StrUtils,
+{$ENDIF}
     Classes, SysUtils, Contnrs, RunningThread, SimpMath, Math3d,
     downhill_simplex_handler;
 
@@ -77,6 +82,8 @@ var
 
 implementation
 
+uses bounding_box_server_form;
+
 constructor TOptimizingApp.Create;
 var
     SearchRec: TSearchRec;
@@ -94,7 +101,6 @@ begin
     FFilePath := ExpandFileName(FFilePath) + 'Models' + PathDelim;
 
     ListOfFiles := TStringList.Create;
-    ListOfFiles.Clear;
     if FindFirst(FFilePath + '*.*', faAnyFile, SearchRec) = 0 then
     begin
         repeat
@@ -105,6 +111,8 @@ begin
             end;
         until FindNext(SearchRec) <> 0;
     end;
+
+    BoundingBoxServerForm.DisplayListOfModels(ListOfFiles);
 
     { For first load. }
     FReloadPointCloud := True;
@@ -198,9 +206,10 @@ begin
               this method to release them. See below. }
             Handler :=
                 CreateHandler(StartAngles[1], StartAngles[2],
-                StartAngles[3], GetInitialAngleStep, False, i + 1, PointCloud, False);
+                StartAngles[3], BoundingBoxServerForm.GetInitialAngleStep,
+                False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
-            Handler.HandlerOutputProcedure := OuputGlobalMinVolume;
+            Handler.HandlerOutputProcedure := BoundingBoxServerForm.OuputGlobalMinVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign computing method. }
@@ -224,9 +233,9 @@ begin
     FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
-    OutputResults(PointCloud);
+    BoundingBoxServerForm.OutputResults(PointCloud);
     { Prints total computation time. }
-    Memo1.Lines.Add('Total Calc Time     : ' + Format(' %.4f', [FComputationTime.Time]));
+    BoundingBoxServerForm.DisplayComputationTime(FComputationTime);
     { Releases model data. }
     FreePointCloud(PointCloud);
 end;
@@ -490,12 +499,13 @@ begin
     FRunner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
-    Handler := CreateHandler(0, 0, 0, GetInitialAngleStep, True, 1, PointCloud, True);
+    Handler := CreateHandler(0, 0, 0, BoundingBoxServerForm.GetInitialAngleStep,
+        True, 1, PointCloud, True);
     { Displays initial box volume. }
     InitialBoxVolume := Handler.GetBoxVolume;
     Memo1.Lines.Add('Initial box volume :' + Format(' %10.4f', [InitialBoxVolume]));
     { OuputMinVolume removes hanlder from FHandlers list. }
-    Handler.HandlerOutputProcedure := OuputMinVolume;
+    Handler.HandlerOutputProcedure := BoundingBoxServerForm.OuputMinVolume;
     { Assign runner procedures. }
     { Executes optimization method in separated thread. This method
       should not modify any data except members of container instance. }

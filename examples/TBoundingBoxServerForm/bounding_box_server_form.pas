@@ -63,7 +63,8 @@ type
         procedure OuputBruteForce(Handler: TDownHillSimplexHandler);
         { TODO: Make ShowDetails private member. }
         procedure OutputInitialAngles(Alpha, Beta, Gamma: Single; ShowDetails: Boolean);
-        procedure DisplayListOfModels;
+        procedure DisplayListOfModels(ListOfFiles: TStringList);
+        procedure DisplayComputationTime(ComputationTime: TComputationTime);
     end;
 
 var
@@ -643,9 +644,23 @@ begin
     end;
 end;
 
-procedure TBoundingBoxServerForm.DisplayListOfModels;
+procedure TBoundingBoxServerForm.DisplayListOfModels(ListOfFiles: TStringList);
+var
+    i: Integer;
 begin
-        ComboBoxFiles.ItemIndex := 0;
+    ComboBoxFiles.Items.Clear;
+
+    for i := 0 to i < ListOfFiles.Count do
+    begin
+        ComboBoxFiles.Items.Add(ListOfFiles[i]);
+    end;
+
+    ComboBoxFiles.ItemIndex := 0;
+end;
+
+procedure TBoundingBoxServerForm.DisplayComputationTime(ComputationTime: TComputationTime);
+begin
+    Memo1.Lines.Add('Total Calc Time     : ' + Format(' %.4f', [ComputationTime.Time]));
 end;
 
 end.
