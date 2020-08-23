@@ -50,21 +50,22 @@ type
     public
         function GetInitialAngleStep: Double;
         { Prints final results among a few runs. }
-        procedure OutputResults(PointCloud: TList);
+        procedure DisplayPointCloud(PointCloud: TList);
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure OuputGlobalMinVolume(Handler: TDownHillSimplexHandler);
+        procedure DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
         { Displays computation results of single run.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure OuputMinVolume(Handler: TDownHillSimplexHandler);
+        procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
         { Displays computation results of single run of brute force search. }
-        procedure OuputBruteForce(Handler: TDownHillSimplexHandler);
+        procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
         { TODO: Make ShowDetails private member. }
-        procedure OutputInitialAngles(Alpha, Beta, Gamma: Single; ShowDetails: Boolean);
+        procedure DisplayInitialAngles(Alpha, Beta, Gamma: Single; ShowDetails: Boolean);
         procedure DisplayListOfModels(ListOfFiles: TStringList);
         procedure DisplayComputationTime(ComputationTime: TComputationTime);
+        procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
     end;
 
 var
@@ -139,7 +140,7 @@ begin
     OptimizingApp.ReloadPointCloud := True;
 end;
 
-procedure TBoundingBoxServerForm.OuputMinVolume(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxServerForm.DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
 var
     Matr: TMatrix;
     Vector: T3Vector;
@@ -162,7 +163,7 @@ begin
         Memo1.Lines.Add('Final vector       :' +
             Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
 
-        OutputResults(PointCloud);
+        DisplayPointCloud(PointCloud);
     end;
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -358,7 +359,7 @@ begin
     end;
 end;
 
-procedure TBoundingBoxServerForm.OuputBruteForce(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxServerForm.DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
 var
     Line: string;
     DeltaVolume: Single;
@@ -461,8 +462,8 @@ begin
                         False, RunId, PointCloud, True);
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
-                    { OuputBruteForce removes hanlder from FHandlers list. }
-                    Handler.HandlerOutputProcedure := OuputBruteForce;
+                    { DisplayBruteForceResult removes hanlder from FHandlers list. }
+                    Handler.HandlerOutputProcedure := DisplayBruteForceResult;
                     { Assign runner procedures. }
                     { Executes optimization method in separated thread. This method
                       should not modify any data except members of container instance. }
@@ -573,7 +574,7 @@ begin
     StopComputing;
 end;
 
-procedure TBoundingBoxServerForm.OuputGlobalMinVolume(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxServerForm.DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
 var
     Line: string;
     BoxSizes: TDoubleVector3;
@@ -603,7 +604,7 @@ begin
     FHandlers.Remove(Handler);
 end;
 
-procedure TBoundingBoxServerForm.OutputResults(PointCloud: TList);
+procedure TBoundingBoxServerForm.DisplayPointCloud(PointCloud: TList);
 var
     BoxSizes: TDoubleVector3;
 begin
@@ -624,7 +625,7 @@ begin
     Application.ProcessMessages;
 end;
 
-procedure TBoundingBoxServerForm.OutputInitialAngles(Alpha, Beta, Gamma: Single;
+procedure TBoundingBoxServerForm.DisplayInitialAngles(Alpha, Beta, Gamma: Single;
     ShowDetails: Boolean);
 var
     Matr: TMatrix;
@@ -661,6 +662,11 @@ end;
 procedure TBoundingBoxServerForm.DisplayComputationTime(ComputationTime: TComputationTime);
 begin
     Memo1.Lines.Add('Total Calc Time     : ' + Format(' %.4f', [ComputationTime.Time]));
+end;
+
+procedure TBoundingBoxServerForm.DisplayInitialBoxVolume(InitialBoxVolume: Double);
+begin
+    Memo1.Lines.Add('Initial box volume :' + Format(' %10.4f', [InitialBoxVolume]));
 end;
 
 end.

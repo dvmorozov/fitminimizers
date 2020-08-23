@@ -330,11 +330,11 @@ objects.</panel_attributes>
     <coordinates>
       <x>434</x>
       <y>364</y>
-      <w>189</w>
+      <w>252</w>
       <h>133</h>
     </coordinates>
     <panel_attributes>lt=-()
-m1=Methods for setting up data and options</panel_attributes>
+m1=Methods for setting up options and calling operations</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;170.0</additional_attributes>
   </element>
   <element>

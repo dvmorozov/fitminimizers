@@ -10,12 +10,12 @@ uses
 {$ELSE}
     StrUtils,
 {$ENDIF}
-    Classes, SysUtils, Contnrs, RunningThread, SimpMath, Math3d,
+    Classes, SysUtils, Contnrs, Forms, RunningThread, SimpMath, Math3d,
     downhill_simplex_handler;
 
 type
     { Contains all application objects. }
-    TOptimizingApp = class
+    TOptimizingApp = class(TComponent)
     private
         FFilePath: String;
         { Notifies that selected file has been changed. }
@@ -69,7 +69,7 @@ type
 
     public
         { Creates FHanlders before other operations. }
-        constructor Create;
+        constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
 
         procedure FindMinimumBoundingBox(RandomData: Boolean);
@@ -84,7 +84,7 @@ implementation
 
 uses bounding_box_server_form;
 
-constructor TOptimizingApp.Create;
+constructor TOptimizingApp.Create(AOwner: TComponent);
 var
     SearchRec: TSearchRec;
     ListOfFiles: TStringList;
@@ -209,7 +209,7 @@ begin
                 StartAngles[3], BoundingBoxServerForm.GetInitialAngleStep,
                 False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
-            Handler.HandlerOutputProcedure := BoundingBoxServerForm.OuputGlobalMinVolume;
+            Handler.HandlerOutputProcedure := BoundingBoxServerForm.DisplayGlobalMinVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign computing method. }
@@ -233,7 +233,7 @@ begin
     FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
-    BoundingBoxServerForm.OutputResults(PointCloud);
+    BoundingBoxServerForm.DisplayPointCloud(PointCloud);
     { Prints total computation time. }
     BoundingBoxServerForm.DisplayComputationTime(FComputationTime);
     { Releases model data. }
@@ -417,7 +417,7 @@ begin
         FReloadPointCloud := False;
     end;
 
-    BoundingBoxServerForm.OutputInitialAngles(Alpha, Beta, Gamma, ShowDetails);
+    BoundingBoxServerForm.DisplayInitialAngles(Alpha, Beta, Gamma, ShowDetails);
 
     Matr := GetRotationMatrix(Alpha, Beta, Gamma);
 
@@ -503,9 +503,9 @@ begin
         True, 1, PointCloud, True);
     { Displays initial box volume. }
     InitialBoxVolume := Handler.GetBoxVolume;
-    Memo1.Lines.Add('Initial box volume :' + Format(' %10.4f', [InitialBoxVolume]));
+    BoundingBoxServerForm.DisplayInitialBoxVolume(InitialBoxVolume);
     { OuputMinVolume removes hanlder from FHandlers list. }
-    Handler.HandlerOutputProcedure := BoundingBoxServerForm.OuputMinVolume;
+    Handler.HandlerOutputProcedure := BoundingBoxServerForm.DisplayCurrentMinVolume;
     { Assign runner procedures. }
     { Executes optimization method in separated thread. This method
       should not modify any data except members of container instance. }
