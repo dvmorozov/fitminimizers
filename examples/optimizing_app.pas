@@ -302,18 +302,9 @@ function TOptimizingApp.CreateHandler(Alpha, Beta, Gamma: Double;
 var
     FinalTolerance, ExitDerivate: double;
 begin
-    { This suppresses useless hints in Lazarus. }
-    FinalTolerance := 0.00001;
-    ExitDerivate := 0.5;
+    FinalTolerance := BoundingBoxServerForm.GetFinalTolerance;
+    ExitDerivate := BoundingBoxServerForm.GetEditExitDerivate;
 
-    if not StrToValue(EditFinalTolerance.Text, FinalTolerance) then
-    begin
-        FinalTolerance := 0.00001; // default value
-    end;
-    if not StrToValue(EditExitDerivate.Text, ExitDerivate) then
-    begin
-        ExitDerivate := 0.5;       // default value
-    end;
     Result := TDownHillSimplexHandler.Create(self, Alpha, Beta,
         Gamma, InitialAngleStep, FinalTolerance, ExitDerivate,
         ShowDetails, RunId, PointCloud, OwnsPointCloud);
@@ -374,7 +365,7 @@ type
         FreePointCloud(PointCloudCache);
         PointCloudCache := TPointCloud.Create(0, 0, 0);
 
-        FileName := FFilePath + ComboBoxFiles.Text;
+        FileName := FFilePath + BoundingBoxServerForm.GetModelFileName;
         if FileExists(FileName) then
         begin
             { Data are loaded in original position. }
