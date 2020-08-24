@@ -49,6 +49,9 @@ type
 
     public
         function GetInitialAngleStep: Double;
+        function GetModelFileName: string;
+        function GetFinalTolerance: Double;
+        function GetEditExitDerivate: Double;
         { Prints final results among a few runs. }
         procedure DisplayPointCloud(PointCloud: TList);
         { Displays computation results and removes container.
@@ -667,6 +670,27 @@ end;
 procedure TBoundingBoxServerForm.DisplayInitialBoxVolume(InitialBoxVolume: Double);
 begin
     Memo1.Lines.Add('Initial box volume :' + Format(' %10.4f', [InitialBoxVolume]));
+end;
+
+function TBoundingBoxServerForm.GetModelFileName: string;
+begin
+    Result := ComboBoxFiles.Text;
+end;
+
+function TBoundingBoxServerForm.GetFinalTolerance: Double;
+begin
+    if not StrToValue(EditFinalTolerance.Text, Result) then
+    begin
+        Result := 0.00001;  // default value
+    end;
+end;
+
+function TBoundingBoxServerForm.GetEditExitDerivate: string;
+begin
+    if not StrToValue(EditExitDerivate.Text, Result) then
+    begin
+        Result := 0.5;      // default value
+    end;
 end;
 
 end.
