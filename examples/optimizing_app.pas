@@ -23,7 +23,6 @@ type
         { Contains cached data to avoid redundand file reading. }
         PointCloudCache: TPointCloud;
 
-        FShowPassed: Boolean;
         FStop: Boolean;
         { Keeps all instances of "handler" class for asynchronous operations. }
         FHandlers: TComponentList;
@@ -46,6 +45,8 @@ type
         FComputationTime: TComputationTime;
         { Single pass runner. }
         FRunner: TRunner;
+
+        procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
 
     public
         procedure StopComputing;
@@ -73,6 +74,7 @@ type
         destructor Destroy; override;
 
         procedure FindMinimumBoundingBox(RandomData: Boolean);
+        procedure BruteForce;
 
         property ReloadPointCloud: Boolean write FReloadPointCloud;
     end;
@@ -465,6 +467,20 @@ end;
 {$hints on}
 {$warnings on}
 
+procedure TOptimizingApp.DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
+begin
+    with Handler do
+    begin
+        FOptiResultBoxVolume := BoxVolume;
+        FOptiResultBoxMaxCoords := BoxMaxCoords;
+        FOptiResultBoxMinCoords := BoxMinCoords;
+
+        BoundingBoxServerForm.DisplayCurrentMinVolume(Handler);
+    end;
+    { Removes and frees container. }
+    FHandlers.Remove(Handler);
+end;
+
 procedure TOptimizingApp.FindMinimumBoundingBox(RandomData: Boolean);
 var
     { This "handler" instance is used to demonstrate execution of algorithm
@@ -496,7 +512,7 @@ begin
     InitialBoxVolume := Handler.GetBoxVolume;
     BoundingBoxServerForm.DisplayInitialBoxVolume(InitialBoxVolume);
     { OuputMinVolume removes hanlder from FHandlers list. }
-    Handler.HandlerOutputProcedure := BoundingBoxServerForm.DisplayCurrentMinVolume;
+    Handler.HandlerOutputProcedure := DisplayCurrentMinVolume;
     { Assign runner procedures. }
     { Executes optimization method in separated thread. This method
       should not modify any data except members of container instance. }
@@ -509,6 +525,68 @@ begin
     FRunner.Run;
     { Waits for termination. Otherwise under Linux segmentation fault is caused. }
     FRunner.Wait;
+end;
+
+procedure TOptimizingApp.BruteForce;
+const
+    Steps = 2;
+var
+    x, y, z: Integer;
+    Alpha, Beta, Gamma: Single;
+    Handler: TDownHillSimplexHandler;
+    RunId: Integer;
+    PointCloud: TPointCloud;
+    Runner: TRunner;
+    ThreadPool: TRunnerPool;
+begin
+    FStop := False;
+    { Initializes global minimum parameters. }
+    FMaxDeltaVolume := -1.0e20;
+    FMinDeltaVolume := 1.0e20;
+
+    Application.ProcessMessages;
+
+    { Computes optimized volume and box sizes. }
+    FindGlobalMinVolume;
+
+    ThreadPool := TRunnerPool.Create;
+    RunId := 1;
+    { Does the test for brute force orientation. }
+    for x := 0 to (179 div Steps) do
+        for y := 0 to (179 div Steps) do
+            for z := 0 to (179 div Steps) do
+            begin
+                if not FStop then
+                begin
+                    Alpha := x * Steps;
+                    Beta := y * Steps;
+                    Gamma := z * Steps;
+                    { Loads data and rotates them by given angles. }
+                    PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
+                    { Creates optimization container, which will be executed by separated thread.
+                      Handler owns point cloud, don't release it! }
+                    Handler :=
+                        CreateHandler(0, 0, 0, BoundingBoxServerForm.GetInitialAngleStep,
+                        False, RunId, PointCloud, True);
+                    { Searches for free runner. Synchronous calls are processed internally. }
+                    Runner := ThreadPool.GetFreeRunner;
+                    { DisplayBruteForceResult removes hanlder from FHandlers list. }
+                    Handler.HandlerOutputProcedure := BoundingBoxServerForm.DisplayBruteForceResult;
+                    { Assign runner procedures. }
+                    { Executes optimization method in separated thread. This method
+                      should not modify any data except members of container instance. }
+                    Runner.OnCompute := Handler.OptimizeBoundingBox;
+                    { Displays optimization results, this method is synchronized with
+                      main VCL thread. This method can modify any data of the form.
+                      Should not remove handler to allow subsequent runs. }
+                    Runner.OnOutput := Handler.DisplayOutput;
+                    { Starts computation in separate thread. }
+                    Runner.Run;
+                    Inc(RunId);
+                end;
+            end;
+    BoundingBoxServerForm.PostProcessStatistics;
+    ThreadPool.Free;
 end;
 
 end.
