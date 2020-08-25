@@ -47,6 +47,9 @@ type
         procedure ButtonStopClick(Sender: TObject);
         procedure ButtonRandomTestClick(Sender: TObject);
 
+    private
+        FShowPassed: Boolean;
+
     public
         function GetInitialAngleStep: Double;
         function GetModelFileName: string;
@@ -150,10 +153,6 @@ var
 begin
     with Handler do
     begin
-        FOptiResultBoxVolume := BoxVolume;
-        FOptiResultBoxMaxCoords := BoxMaxCoords;
-        FOptiResultBoxMinCoords := BoxMinCoords;
-
         { Displays final angles. }
         Memo1.Lines.Add('Final angles       :' + Format(' %10.4f %10.4f %10.4f',
             [Alpha, Beta, Gamma]));
@@ -168,8 +167,6 @@ begin
 
         DisplayPointCloud(PointCloud);
     end;
-    { Removes and frees container. }
-    FHandlers.Remove(Handler);
 end;
 
 procedure TBoundingBoxServerForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
@@ -265,6 +262,7 @@ begin
                         Deviation := (Value - MinVolume) / MinVolume;
                         Rate := 'Pass';
                         Passed := True;
+
                         if Deviation < Criterion1 then
                             Inc(PassCount1)
                         else
@@ -273,6 +271,7 @@ begin
                             Rate := 'F1';
                             Passed := False;
                         end;
+
                         if Deviation < Criterion01 then
                             Inc(PassCount01)
                         else
@@ -281,6 +280,7 @@ begin
                             Rate := 'F01';
                             Passed := False;
                         end;
+
                         if not Passed or FShowPassed then
                         begin
                             { Only "failed" tests are added to the resulting list. }
@@ -420,68 +420,13 @@ begin
 end;
 
 procedure TBoundingBoxServerForm.ButtonBruteForceClick(Sender: TObject);
-const
-    Steps = 2;
-var
-    x, y, z: Integer;
-    Alpha, Beta, Gamma: Single;
-    Handler: TDownHillSimplexHandler;
-    RunId: Integer;
-    PointCloud: TPointCloud;
-    Runner: TRunner;
-    ThreadPool: TRunnerPool;
 begin
-    FShowPassed := True;
-    FStop := False;
-    { Initializes global minimum parameters. }
-    FMaxDeltaVolume := -1.0e20;
-    FMinDeltaVolume := 1.0e20;
     { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
-    Application.ProcessMessages;
+    FShowPassed := True;
 
-    { Computes optimized volume and box sizes. }
-    FindGlobalMinVolume;
-
-    ThreadPool := TRunnerPool.Create;
-    RunId := 1;
-    { Does the test for brute force orientation. }
-    for x := 0 to (179 div Steps) do
-        for y := 0 to (179 div Steps) do
-            for z := 0 to (179 div Steps) do
-            begin
-                if not FStop then
-                begin
-                    Alpha := x * Steps;
-                    Beta := y * Steps;
-                    Gamma := z * Steps;
-                    { Loads data and rotates them by given angles. }
-                    PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
-                    { Creates optimization container, which will be executed by separated thread.
-                      Handler owns point cloud, don't release it! }
-                    Handler :=
-                        CreateHandler(0, 0, 0, GetInitialAngleStep,
-                        False, RunId, PointCloud, True);
-                    { Searches for free runner. Synchronous calls are processed internally. }
-                    Runner := ThreadPool.GetFreeRunner;
-                    { DisplayBruteForceResult removes hanlder from FHandlers list. }
-                    Handler.HandlerOutputProcedure := DisplayBruteForceResult;
-                    { Assign runner procedures. }
-                    { Executes optimization method in separated thread. This method
-                      should not modify any data except members of container instance. }
-                    Runner.OnCompute := Handler.OptimizeBoundingBox;
-                    { Displays optimization results, this method is synchronized with
-                      main VCL thread. This method can modify any data of the form.
-                      Should not remove handler to allow subsequent runs. }
-                    Runner.OnOutput := Handler.DisplayOutput;
-                    { Starts computation in separate thread. }
-                    Runner.Run;
-                    Inc(RunId);
-                end;
-            end;
-    PostProcessStatistics;
-    ThreadPool.Free;
+    OptimizingApp.BruteForce;
 end;
 
 procedure TBoundingBoxServerForm.ButtonRandomTestClick(Sender: TObject);
