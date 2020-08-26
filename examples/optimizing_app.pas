@@ -47,6 +47,7 @@ type
         FRunner: TRunner;
 
         procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
+        procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
 
     public
         procedure StopComputing;
@@ -77,6 +78,12 @@ type
         procedure BruteForce;
 
         property ReloadPointCloud: Boolean write FReloadPointCloud;
+        property OptiResultBoxVolume: Double read FOptiResultBoxVolume;
+        property MaxDeltaVolume: Single read FMaxDeltaVolume;
+        property MinDeltaVolume: Single read FMinDeltaVolume;
+        property MinBoxSizes: TDoubleVector3 read FMinBoxSizes;
+        property MaxBoxSizes: TDoubleVector3 read FMaxBoxSizes;
+        property GlobalMinVolume: Double read FGlobalMinVolume;
     end;
 
 var
@@ -481,6 +488,52 @@ begin
     FHandlers.Remove(Handler);
 end;
 
+procedure TOptimizingApp.DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
+var
+    DeltaVolume: Single;
+    BoxSizes: TDoubleVector3;
+begin
+    if not FStop then
+    begin
+        { Computes difference in volumes calculated
+          for original and rotated orientation. }
+        with Handler do
+        begin
+            DeltaVolume := (BoxVolume - FGlobalMinVolume);
+            { Computes lengths of edges of bounding box. }
+            BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+            BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+            BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+            { Sorts edges. }
+            SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
+
+            if DeltaVolume > FMaxDeltaVolume then
+            begin
+                FMaxDeltaVolume := DeltaVolume;
+                FMaxBoxSizes[1] := BoxSizes[1];
+                FMaxBoxSizes[2] := BoxSizes[2];
+                FMaxBoxSizes[3] := BoxSizes[3];
+                SortUp(FMaxBoxSizes[1], FMaxBoxSizes[2],
+                    FMaxBoxSizes[3]);
+            end;
+            if DeltaVolume < FMinDeltaVolume then
+            begin
+                FMinDeltaVolume := DeltaVolume;
+                FMinBoxSizes[1] := BoxSizes[1];
+                FMinBoxSizes[2] := BoxSizes[2];
+                FMinBoxSizes[3] := BoxSizes[3];
+                SortUp(FMinBoxSizes[1], FMinBoxSizes[2],
+                    FMinBoxSizes[3]);
+            end;
+
+            BoundingBoxServerForm.DisplayBruteForceResult(
+                Handler, DeltaVolume, BoxSizes);
+        end;
+    end;
+    { Removes and frees inserted container. }
+    FHandlers.Remove(Handler);
+end;
+
 procedure TOptimizingApp.FindMinimumBoundingBox(RandomData: Boolean);
 var
     { This "handler" instance is used to demonstrate execution of algorithm
@@ -571,7 +624,7 @@ begin
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
                     { DisplayBruteForceResult removes hanlder from FHandlers list. }
-                    Handler.HandlerOutputProcedure := BoundingBoxServerForm.DisplayBruteForceResult;
+                    Handler.HandlerOutputProcedure := DisplayBruteForceResult;
                     { Assign runner procedures. }
                     { Executes optimization method in separated thread. This method
                       should not modify any data except members of container instance. }

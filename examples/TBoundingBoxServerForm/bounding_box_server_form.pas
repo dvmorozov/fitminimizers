@@ -66,13 +66,17 @@ type
           Removes handler from FHandlers list. }
         procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
         { Displays computation results of single run of brute force search. }
-        procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
+        procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler;
+            DeltaVolume: Single;
+            BoxSizes: TDoubleVector3);
         { TODO: Make ShowDetails private member. }
         procedure DisplayInitialAngles(Alpha, Beta, Gamma: Single; ShowDetails: Boolean);
         procedure DisplayListOfModels(ListOfFiles: TStringList);
         procedure DisplayComputationTime(ComputationTime: TComputationTime);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
     end;
+
+procedure SortUp(var S1, S2, S3: Double);
 
 var
     BoundingBoxServerForm: TBoundingBoxServerForm;
@@ -335,9 +339,9 @@ begin
             Format('%.4f (%6.3f %6.3f %6.3f)', [MinVolume, X, Y, Z]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
-        Deviation := (FOptiResultBoxVolume - MinVolume) / MinVolume * 100;
+        Deviation := (OptimizingApp.OptiResultBoxVolume - MinVolume) / MinVolume * 100;
         Memo1.Lines.Add('Calculation Delta  : ' +
-            Format('%.4f (%.2f%%)', [(FOptiResultBoxVolume - MinVolume), Deviation]));
+            Format('%.4f (%.2f%%)', [(OptimizingApp.OptiResultBoxVolume - MinVolume), Deviation]));
         Memo1.Lines.Add(
             '----------------------------------------------------------------------------');
         Memo1.Lines.Add('Passrate 0.1%     : ' + Format('%.4f%%',
@@ -362,61 +366,35 @@ begin
     end;
 end;
 
-procedure TBoundingBoxServerForm.DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxServerForm.DisplayBruteForceResult(
+    Handler: TDownHillSimplexHandler;
+    DeltaVolume: Single;
+    BoxSizes: TDoubleVector3);
 var
     Line: string;
-    DeltaVolume: Single;
-    BoxSizes: TDoubleVector3;
 begin
-    if not FStop then
+    { Computes difference in volumes calculated
+      for original and rotated orientation. }
+    with Handler do
     begin
-        { Computes difference in volumes calculated
-          for original and rotated orientation. }
-        with Handler do
-        begin
-            DeltaVolume := (BoxVolume - FGlobalMinVolume);
-            { Computes lengths of edges of bounding box. }
-            BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-            BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-            BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-            { Sorts edges. }
-            SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
-            Line :=
-                Format(
-                ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                [DeltaVolume, BoxVolume, BoxSizes[1],
-                BoxSizes[2], BoxSizes[3], Alpha, Beta, Gamma,
-                PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
-                ComputationTime.Time, CycleCount, EvaluationCount, RestartCount]);
-            if DeltaVolume > FMaxDeltaVolume then
-            begin
-                FMaxDeltaVolume := DeltaVolume;
-                FMaxBoxSizes[1] := BoxSizes[1];
-                FMaxBoxSizes[2] := BoxSizes[2];
-                FMaxBoxSizes[3] := BoxSizes[3];
-                SortUp(FMaxBoxSizes[1], FMaxBoxSizes[2],
-                    FMaxBoxSizes[3]);
-            end;
-            if DeltaVolume < FMinDeltaVolume then
-            begin
-                FMinDeltaVolume := DeltaVolume;
-                FMinBoxSizes[1] := BoxSizes[1];
-                FMinBoxSizes[2] := BoxSizes[2];
-                FMinBoxSizes[3] := BoxSizes[3];
-                SortUp(FMinBoxSizes[1], FMinBoxSizes[2],
-                    FMinBoxSizes[3]);
-            end;
-            Memo2.Lines.Add(Line);
-            Label2.Caption :=
-                Format(
-                'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                [FMinDeltaVolume, FMinBoxSizes[1], FMinBoxSizes[2],
-                FMinBoxSizes[3], FMaxDeltaVolume, FMaxBoxSizes[1],
-                FMaxBoxSizes[2], FMaxBoxSizes[3]]);
-        end;
+        DeltaVolume := (BoxVolume - OptimizingApp.GlobalMinVolume);
+        Line :=
+            Format(
+            ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
+            [DeltaVolume, BoxVolume, BoxSizes[1],
+            BoxSizes[2], BoxSizes[3], Alpha, Beta, Gamma,
+            PointCloud.Alpha, PointCloud.Beta, PointCloud.Gamma,
+            ComputationTime.Time, CycleCount, EvaluationCount, RestartCount]);
+        Memo2.Lines.Add(Line);
+
+        Label2.Caption :=
+            Format(
+            'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
+            [OptimizingApp.MinDeltaVolume,
+             OptimizingApp.MinBoxSizes[1], OptimizingApp.MinBoxSizes[2], OptimizingApp.MinBoxSizes[3],
+             OptimizingApp.MaxDeltaVolume,
+             OptimizingApp.MaxBoxSizes[1], OptimizingApp.MaxBoxSizes[2], OptimizingApp.MaxBoxSizes[3]]);
     end;
-    { Removes and frees inserted container. }
-    FHandlers.Remove(Handler);
 end;
 
 procedure TBoundingBoxServerForm.ButtonBruteForceClick(Sender: TObject);
