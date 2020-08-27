@@ -48,6 +48,7 @@ type
 
         procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
         procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
+        procedure DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
 
     public
         procedure StopComputing;
@@ -76,6 +77,7 @@ type
 
         procedure FindMinimumBoundingBox(RandomData: Boolean);
         procedure BruteForce;
+        procedure RandomTest;
 
         property ReloadPointCloud: Boolean write FReloadPointCloud;
         property OptiResultBoxVolume: Double read FOptiResultBoxVolume;
@@ -84,6 +86,8 @@ type
         property MinBoxSizes: TDoubleVector3 read FMinBoxSizes;
         property MaxBoxSizes: TDoubleVector3 read FMaxBoxSizes;
         property GlobalMinVolume: Double read FGlobalMinVolume;
+        property OptiResultBoxMinCoords: TDoubleVector3 read FOptiResultBoxMinCoords;
+        property OptiResultBoxMaxCoords: TDoubleVector3 read FOptiResultBoxMaxCoords;
     end;
 
 var
@@ -218,7 +222,7 @@ begin
                 StartAngles[3], BoundingBoxServerForm.GetInitialAngleStep,
                 False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
-            Handler.HandlerOutputProcedure := BoundingBoxServerForm.DisplayGlobalMinVolume;
+            Handler.HandlerOutputProcedure := DisplayGlobalMinVolume;
             { Creates runner. }
             Runner := TRunner.Create(nil);
             { Assign computing method. }
@@ -534,6 +538,29 @@ begin
     FHandlers.Remove(Handler);
 end;
 
+procedure TOptimizingApp.DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
+var
+    BoxSizes: TDoubleVector3;
+begin
+    with Handler do
+    begin
+        if BoxVolume < FGlobalMinVolume then
+        begin
+            FGlobalMinVolume := BoxVolume;
+            FMaxCoords := BoxMaxCoords;
+            FMinCoords := BoxMinCoords;
+        end;
+        BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+        BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+        BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+        SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
+
+        BoundingBoxServerForm.DisplayGlobalMinVolume(Handler, BoxSizes);
+    end;
+    { Removes and frees container. }
+    FHandlers.Remove(Handler);
+end;
+
 procedure TOptimizingApp.FindMinimumBoundingBox(RandomData: Boolean);
 var
     { This "handler" instance is used to demonstrate execution of algorithm
@@ -597,8 +624,6 @@ begin
     FMaxDeltaVolume := -1.0e20;
     FMinDeltaVolume := 1.0e20;
 
-    Application.ProcessMessages;
-
     { Computes optimized volume and box sizes. }
     FindGlobalMinVolume;
 
@@ -636,10 +661,83 @@ begin
                     { Starts computation in separate thread. }
                     Runner.Run;
                     Inc(RunId);
+                    Application.ProcessMessages;
                 end;
             end;
-    BoundingBoxServerForm.PostProcessStatistics;
     ThreadPool.Free;
+end;
+
+procedure TOptimizingApp.RandomTest;
+var
+    x: Integer;
+    Line: string;
+    Alpha, Beta, Gamma: Single;
+    DeltaVolume: Single;
+    BoxSizes: TDoubleVector3;
+    Handler: TDownHillSimplexHandler;
+    PointCloud: TPointCloud;
+begin
+    FStop := False;
+    { Initializes global minimum parameters. }
+    FMaxDeltaVolume := -1.0e20;
+    FMinDeltaVolume := 1.0e20;
+
+    { Computes optimized volume and box sizes. }
+    FindGlobalMinVolume;
+
+    { Does the test for random orientation. }
+    Randomize;
+    for x := 0 to 99999 do
+    begin
+        if not FStop then
+        begin
+            Alpha := Random * 180;
+            Beta := Random * 180;
+            Gamma := Random * 180;
+
+            PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
+            Handler := CreateHandler(0, 0, 0, BoundingBoxServerForm.GetInitialAngleStep,
+                False, x, PointCloud, True);
+            { Computes minimum volume directly in the calling thread.
+              It could be refactored to use thread pool as it was done
+              for "brute force" search. }
+            Handler.OptimizeBoundingBox;
+            if not FStop then
+            begin
+                with Handler do
+                begin
+                    DeltaVolume := (BoxVolume - FGlobalMinVolume);
+                    BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
+                    BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
+                    BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
+                    SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
+
+                    if DeltaVolume > FMaxDeltaVolume then
+                    begin
+                        FMaxDeltaVolume := DeltaVolume;
+                        FMaxBoxSizes[1] := BoxSizes[1];
+                        FMaxBoxSizes[2] := BoxSizes[2];
+                        FMaxBoxSizes[3] := BoxSizes[3];
+                        SortUp(FMaxBoxSizes[1], FMaxBoxSizes[2], FMaxBoxSizes[3]);
+                    end;
+                    if DeltaVolume < FMinDeltaVolume then
+                    begin
+                        FMinDeltaVolume := DeltaVolume;
+                        FMinBoxSizes[1] := BoxSizes[1];
+                        FMinBoxSizes[2] := BoxSizes[2];
+                        FMinBoxSizes[3] := BoxSizes[3];
+                        SortUp(FMinBoxSizes[1], FMinBoxSizes[2], FMinBoxSizes[3]);
+                    end;
+
+                    BoundingBoxServerForm.DisplayBruteForceResult(
+                      Handler, DeltaVolume, BoxSizes);
+                end;
+            end;
+            { Removes and frees inserted container. }
+            FHandlers.Remove(Handler);
+            Application.ProcessMessages;
+        end;
+    end;
 end;
 
 end.
