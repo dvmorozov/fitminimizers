@@ -41,14 +41,14 @@ type
         procedure ComboBoxFilesChange(Sender: TObject);
         procedure FormDestroy(Sender: TObject);
         procedure BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
-        procedure FormCreate(Sender: TObject);
-        procedure PostProcessStatistics;
         procedure ButtonBruteForceClick(Sender: TObject);
         procedure ButtonStopClick(Sender: TObject);
         procedure ButtonRandomTestClick(Sender: TObject);
 
     private
         FShowPassed: Boolean;
+
+        procedure PostProcessStatistics;
 
     public
         function GetInitialAngleStep: Double;
@@ -60,7 +60,8 @@ type
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
+        procedure DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler;
+            BoxSizes: TDoubleVector3);
         { Displays computation results of single run.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
@@ -405,118 +406,31 @@ begin
     FShowPassed := True;
 
     OptimizingApp.BruteForce;
+    PostProcessStatistics;
 end;
 
 procedure TBoundingBoxServerForm.ButtonRandomTestClick(Sender: TObject);
-var
-    x: Integer;
-    Line: string;
-    Alpha, Beta, Gamma: Single;
-    DeltaVolume: Single;
-    BoxSizes: TDoubleVector3;
-    Handler: TDownHillSimplexHandler;
-    PointCloud: TPointCloud;
 begin
-    FStop := False;
-    { Initializes global minimum parameters. }
-    FMaxDeltaVolume := -1.0e20;
-    FMinDeltaVolume := 1.0e20;
     { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
-    Application.ProcessMessages;
 
-    { Computes optimized volume and box sizes. }
-    FindGlobalMinVolume;
-
-    { Does the test for random orientation. }
-    Randomize;
-    for x := 0 to 99999 do
-    begin
-        if not FStop then
-        begin
-            Alpha := Random * 180;
-            Beta := Random * 180;
-            Gamma := Random * 180;
-
-            PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
-            Handler := CreateHandler(0, 0, 0, GetInitialAngleStep,
-                False, x, PointCloud, True);
-            { Computes minimum volume directly in the calling thread.
-              It could be refactored to use thread pool as it was done
-              for "brute force" search. }
-            Handler.OptimizeBoundingBox;
-            if not FStop then
-            begin
-                with Handler do
-                begin
-                    DeltaVolume := (BoxVolume - FGlobalMinVolume);
-                    BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-                    BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-                    BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-                    SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
-                    Line :=
-                        Format(
-                        ' %10.2f %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) -- (%6.2f %6.2f %6.2f) --- %7.4f -- %4d -- %4d -- %2d',
-                        [DeltaVolume, BoxVolume, BoxSizes[1],
-                        BoxSizes[2], BoxSizes[3], Alpha, Beta,
-                        Gamma, Alpha, Beta, Gamma, ComputationTime.Time,
-                        CycleCount, EvaluationCount, RestartCount]);
-                    if DeltaVolume > FMaxDeltaVolume then
-                    begin
-                        FMaxDeltaVolume := DeltaVolume;
-                        FMaxBoxSizes[1] := BoxSizes[1];
-                        FMaxBoxSizes[2] := BoxSizes[2];
-                        FMaxBoxSizes[3] := BoxSizes[3];
-                        SortUp(FMaxBoxSizes[1], FMaxBoxSizes[2], FMaxBoxSizes[3]);
-                    end;
-                    if DeltaVolume < FMinDeltaVolume then
-                    begin
-                        FMinDeltaVolume := DeltaVolume;
-                        FMinBoxSizes[1] := BoxSizes[1];
-                        FMinBoxSizes[2] := BoxSizes[2];
-                        FMinBoxSizes[3] := BoxSizes[3];
-                        SortUp(FMinBoxSizes[1], FMinBoxSizes[2], FMinBoxSizes[3]);
-                    end;
-                    Memo2.Lines.Add(Line);
-                    Label2.Caption :=
-                        Format(
-                        'MinDelta Volume: %8.2f (%6.4f %6.4f %6.4f) ---  MaxDelta Volume: %8.2f (%6.4f %6.4f %6.4f)',
-                        [FMinDeltaVolume, FMinBoxSizes[1], FMinBoxSizes[2],
-                        FMinBoxSizes[3], FMaxDeltaVolume, FMaxBoxSizes[1],
-                        FMaxBoxSizes[2], FMaxBoxSizes[3]]);
-                end;
-            end;
-            { Removes and frees inserted container. }
-            FHandlers.Remove(Handler);
-            Application.ProcessMessages;
-        end;
-    end;
+    OptimizingApp.RandomTest;
     PostProcessStatistics;
 end;
 
 procedure TBoundingBoxServerForm.ButtonStopClick(Sender: TObject);
 begin
-    StopComputing;
+    OptimizingApp.StopComputing;
 end;
 
-procedure TBoundingBoxServerForm.DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxServerForm.DisplayGlobalMinVolume(
+    Handler: TDownHillSimplexHandler; BoxSizes: TDoubleVector3);
 var
     Line: string;
-    BoxSizes: TDoubleVector3;
 begin
     with Handler do
     begin
-        if BoxVolume < FGlobalMinVolume then
-        begin
-            FGlobalMinVolume := BoxVolume;
-            FMaxCoords := BoxMaxCoords;
-            FMinCoords := BoxMinCoords;
-        end;
-        BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
-        BoxSizes[2] := BoxMaxCoords[2] - BoxMinCoords[2];
-        BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
-        SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
         Line := Format(
             ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
             [RunId, BoxVolume, BoxSizes[1], BoxSizes[2], BoxSizes[3],
@@ -524,10 +438,7 @@ begin
             CycleCount, EvaluationCount,
             RestartCount]);
         Memo1.Lines.Add(Line);
-        Application.ProcessMessages;
     end;
-    { Removes and frees container. }
-    FHandlers.Remove(Handler);
 end;
 
 procedure TBoundingBoxServerForm.DisplayPointCloud(PointCloud: TList);
@@ -541,20 +452,20 @@ begin
         Memo1.Lines.Add('File: ' + ComboBoxFiles.Text);
     Memo1.Lines.Add('No of Points: ' + Format(' %10d', [PointCloud.Count]));
     Memo1.Lines.Add('');
-    Memo1.Lines.Add('Minimum Volume     :' + Format(' %10.4f', [FOptiResultBoxVolume]));
-    BoxSizes[1] := FOptiResultBoxMaxCoords[1] - FOptiResultBoxMinCoords[1];
-    BoxSizes[2] := FOptiResultBoxMaxCoords[2] - FOptiResultBoxMinCoords[2];
-    BoxSizes[3] := FOptiResultBoxMaxCoords[3] - FOptiResultBoxMinCoords[3];
+    Memo1.Lines.Add('Minimum Volume     :' + Format(' %10.4f', [OptimizingApp.OptiResultBoxVolume]));
+    BoxSizes[1] := OptimizingApp.OptiResultBoxMaxCoords[1] - OptimizingApp.OptiResultBoxMinCoords[1];
+    BoxSizes[2] := OptimizingApp.OptiResultBoxMaxCoords[2] - OptimizingApp.OptiResultBoxMinCoords[2];
+    BoxSizes[3] := OptimizingApp.OptiResultBoxMaxCoords[3] - OptimizingApp.OptiResultBoxMinCoords[3];
     SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
     Memo1.Lines.Add('Minimum Box        :' + Format(' %10.4f %10.4f %10.4f',
         [BoxSizes[1], BoxSizes[2], BoxSizes[3]]));
-    Application.ProcessMessages;
 end;
 
 procedure TBoundingBoxServerForm.DisplayInitialAngles(Alpha, Beta, Gamma: Single;
     ShowDetails: Boolean);
 var
     Matr: TMatrix;
+    Vector: T3Vector;
 begin
     Matr := GetRotationMatrix(Alpha, Beta, Gamma);
 
@@ -565,6 +476,7 @@ begin
 
         { Rotates and displays etalon unit vector. }
         Vector[1] := 1; Vector[2] := 0; Vector[3] := 0;
+        Matr := GetRotationMatrix(Alpha, Beta, Gamma);
         MulVectMatr(Matr, Vector);
         Memo1.Lines.Add('Initial vector     :' +
             Format(' %10.4f %10.4f %10.4f', [Vector[1], Vector[2], Vector[3]]));
@@ -577,7 +489,7 @@ var
 begin
     ComboBoxFiles.Items.Clear;
 
-    for i := 0 to i < ListOfFiles.Count do
+    for i := 0 to ListOfFiles.Count - 1 do
     begin
         ComboBoxFiles.Items.Add(ListOfFiles[i]);
     end;
@@ -608,7 +520,7 @@ begin
     end;
 end;
 
-function TBoundingBoxServerForm.GetEditExitDerivate: string;
+function TBoundingBoxServerForm.GetEditExitDerivate: Double;
 begin
     if not StrToValue(EditExitDerivate.Text, Result) then
     begin
