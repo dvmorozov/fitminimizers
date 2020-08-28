@@ -12,9 +12,10 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
 
 begin
     RequireDerivedFormResource := True;
-    OptimizingApp := TOptimizingApp.Create(nil);
 
     Application.Initialize;
     Application.CreateForm(TBoundingBoxServerForm, BoundingBoxServerForm);
+    { Must be after form creation. }
+    OptimizingApp := TOptimizingApp.Create(nil);
     Application.Run;
 end.
