@@ -6,7 +6,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
     cthreads, {$ENDIF} {$ENDIF}
     Interfaces, // this includes the LCL widgetset
     Forms,
-    bounding_box_server_form, optimizing_app;
+    bounding_box_server_form, optimizing_app, int_user_interaction;
 
 {$R *.res}
 
