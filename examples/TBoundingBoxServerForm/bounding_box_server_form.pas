@@ -12,7 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
 {$ENDIF}
-    SimpMath, Math3d, downhill_simplex_handler,
+    SimpMath, Math3d, bounding_box_server,
     int_user_interaction;
 
 {$ASSERTIONS ON}
@@ -61,14 +61,14 @@ type
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler;
+        procedure DisplayGlobalMinVolume(Handler: TBoundingBoxServer;
             BoxSizes: TDoubleVector3);
         { Displays computation results of single run.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
+        procedure DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
         { Displays computation results of single run of brute force search. }
-        procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler;
+        procedure DisplayBruteForceResult(Handler: TBoundingBoxServer;
             DeltaVolume: Single;
             BoxSizes: TDoubleVector3);
         { TODO: Make ShowDetails private member. }
@@ -152,7 +152,7 @@ begin
     OptimizingApp.ReloadPointCloud := True;
 end;
 
-procedure TBoundingBoxServerForm.DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
+procedure TBoundingBoxServerForm.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
 var
     Matr: TMatrix;
     Vector: T3Vector;
@@ -369,7 +369,7 @@ begin
 end;
 
 procedure TBoundingBoxServerForm.DisplayBruteForceResult(
-    Handler: TDownHillSimplexHandler;
+    Handler: TBoundingBoxServer;
     DeltaVolume: Single;
     BoxSizes: TDoubleVector3);
 var
@@ -426,7 +426,7 @@ begin
 end;
 
 procedure TBoundingBoxServerForm.DisplayGlobalMinVolume(
-    Handler: TDownHillSimplexHandler; BoxSizes: TDoubleVector3);
+    Handler: TBoundingBoxServer; BoxSizes: TDoubleVector3);
 var
     Line: string;
 begin

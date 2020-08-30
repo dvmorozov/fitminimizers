@@ -9,7 +9,7 @@ uses
     StrUtils,
 {$ENDIF}
     Classes, SysUtils, Contnrs, Forms, RunningThread, SimpMath, Math3d,
-    downhill_simplex_handler;
+    bounding_box_server;
 
 type
     { Contains all application objects. }
@@ -44,9 +44,9 @@ type
         { Single pass runner. }
         FRunner: TRunner;
 
-        procedure DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
-        procedure DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
-        procedure DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
+        procedure DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
+        procedure DisplayBruteForceResult(Handler: TBoundingBoxServer);
+        procedure DisplayGlobalMinVolume(Handler: TBoundingBoxServer);
 
     public
         procedure StopComputing;
@@ -58,7 +58,7 @@ type
         function CreateHandler(Alpha, Beta, Gamma: Double;
             InitialAngleStep: Double; ShowDetails: Boolean;
             RunId: Integer; PointCloud: TPointCloud;
-            OwnsPointCloud: Boolean): TDownHillSimplexHandler;
+            OwnsPointCloud: Boolean): TBoundingBoxServer;
         { Releases point cloud data. }
         procedure FreePointCloud(PointCloud: TPointCloud);
         { Loads point cloud from file selected by drop-down list.
@@ -154,7 +154,7 @@ begin
     FStop := True;
     { Stops all handlers. }
     for i := 0 to FHandlers.Count - 1 do
-        TDownHillSimplexHandler(FHandlers[i]).Stop;
+        TBoundingBoxServer(FHandlers[i]).Stop;
 end;
 
 procedure TOptimizingApp.FindGlobalMinVolume;
@@ -182,7 +182,7 @@ var
     i: integer;
     RunCount: integer;
     StartAngles: TDoubleVector3;
-    Handler: TDownHillSimplexHandler;
+    Handler: TBoundingBoxServer;
     Runner: TRunner;
     Runners: TComponentList;
     PointCloud: TPointCloud;
@@ -309,14 +309,14 @@ end;
 
 function TOptimizingApp.CreateHandler(Alpha, Beta, Gamma: Double;
     InitialAngleStep: Double; ShowDetails: Boolean; RunId: Integer;
-    PointCloud: TPointCloud; OwnsPointCloud: Boolean): TDownHillSimplexHandler;
+    PointCloud: TPointCloud; OwnsPointCloud: Boolean): TBoundingBoxServer;
 var
     FinalTolerance, ExitDerivate: double;
 begin
     FinalTolerance := BoundingBoxServerForm.GetFinalTolerance;
     ExitDerivate := BoundingBoxServerForm.GetEditExitDerivate;
 
-    Result := TDownHillSimplexHandler.Create(self, Alpha, Beta,
+    Result := TBoundingBoxServer.Create(self, Alpha, Beta,
         Gamma, InitialAngleStep, FinalTolerance, ExitDerivate,
         ShowDetails, RunId, PointCloud, OwnsPointCloud);
     { Adds to the list for asynchronous operations. }
@@ -476,7 +476,7 @@ end;
 {$hints on}
 {$warnings on}
 
-procedure TOptimizingApp.DisplayCurrentMinVolume(Handler: TDownHillSimplexHandler);
+procedure TOptimizingApp.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
 begin
     with Handler do
     begin
@@ -490,7 +490,7 @@ begin
     FHandlers.Remove(Handler);
 end;
 
-procedure TOptimizingApp.DisplayBruteForceResult(Handler: TDownHillSimplexHandler);
+procedure TOptimizingApp.DisplayBruteForceResult(Handler: TBoundingBoxServer);
 var
     DeltaVolume: Single;
     BoxSizes: TDoubleVector3;
@@ -536,7 +536,7 @@ begin
     FHandlers.Remove(Handler);
 end;
 
-procedure TOptimizingApp.DisplayGlobalMinVolume(Handler: TDownHillSimplexHandler);
+procedure TOptimizingApp.DisplayGlobalMinVolume(Handler: TBoundingBoxServer);
 var
     BoxSizes: TDoubleVector3;
 begin
@@ -563,7 +563,7 @@ procedure TOptimizingApp.FindMinimumBoundingBox(RandomData: Boolean);
 var
     { This "handler" instance is used to demonstrate execution of algorithm
       in separate thread by visual component TRunner attached to the form. }
-    Handler: TDownHillSimplexHandler;
+    Handler: TBoundingBoxServer;
     PointCloud: TPointCloud;
     InitialBoxVolume: Double;
 begin
@@ -611,7 +611,7 @@ const
 var
     x, y, z: Integer;
     Alpha, Beta, Gamma: Single;
-    Handler: TDownHillSimplexHandler;
+    Handler: TBoundingBoxServer;
     RunId: Integer;
     PointCloud: TPointCloud;
     Runner: TRunner;
@@ -671,7 +671,7 @@ var
     Alpha, Beta, Gamma: Single;
     DeltaVolume: Single;
     BoxSizes: TDoubleVector3;
-    Handler: TDownHillSimplexHandler;
+    Handler: TBoundingBoxServer;
     PointCloud: TPointCloud;
 begin
     FStop := False;
