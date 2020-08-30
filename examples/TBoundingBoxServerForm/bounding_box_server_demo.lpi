@@ -23,7 +23,7 @@
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="11"/>
-      <BuildNr Value="27"/>
+      <BuildNr Value="28"/>
       <Attributes pvaDebug="True"/>
     </VersionInfo>
     <BuildModes Count="1">
@@ -59,7 +59,7 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="downhill_simplex_handler.pas"/>
+        <Filename Value="bounding_box_server.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
       <Unit3>
