@@ -12,7 +12,8 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
 {$ENDIF}
-    Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
+    SimpMath, Math3d, downhill_simplex_handler,
+    int_user_interaction;
 
 {$ASSERTIONS ON}
 
@@ -20,7 +21,7 @@ type
     { TBoundingBoxServerForm }
     { Demonstrates integration of algorithm into application by implementing
       special server interface. }
-    TBoundingBoxServerForm = class(TForm)
+    TBoundingBoxServerForm = class(TForm, IUserInteraction)
         ComboBoxFiles: TComboBox;
         CheckBoxRandomData: TCheckBox;
         Label1: TLabel;
@@ -514,18 +515,14 @@ end;
 
 function TBoundingBoxServerForm.GetFinalTolerance: Double;
 begin
-    if not StrToValue(EditFinalTolerance.Text, Result) then
-    begin
-        Result := 0.00001;  // default value
-    end;
+    Result := 0.00001;  // default value
+    StrToValue(EditFinalTolerance.Text, Result);
 end;
 
 function TBoundingBoxServerForm.GetEditExitDerivate: Double;
 begin
-    if not StrToValue(EditExitDerivate.Text, Result) then
-    begin
-        Result := 0.5;      // default value
-    end;
+    Result := 0.5;      // default value
+    StrToValue(EditExitDerivate.Text, Result);
 end;
 
 end.

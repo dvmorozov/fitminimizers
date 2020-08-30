@@ -1,7 +1,5 @@
 unit optimizing_app;
 
-{$mode delphi}
-
 interface
 
 uses
@@ -670,7 +668,6 @@ end;
 procedure TOptimizingApp.RandomTest;
 var
     x: Integer;
-    Line: string;
     Alpha, Beta, Gamma: Single;
     DeltaVolume: Single;
     BoxSizes: TDoubleVector3;
