@@ -11,7 +11,6 @@ object BoundingBoxServerForm: TBoundingBoxServerForm
   Font.Color = clWindowText
   Font.Height = -9
   Font.Name = 'Tahoma'
-  OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poDefault
   LCLVersion = '2.0.6.0'
