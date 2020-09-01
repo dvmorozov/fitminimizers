@@ -13,7 +13,7 @@ unit SimpMath;
 interface
 
 uses
-    Math, Classes, CBRCComponent, SysUtils;
+    Math, Classes, SysUtils;
 
 const
     TINY = 1e-6;
@@ -67,7 +67,7 @@ type
     E3DVector = class(Exception);
 
     //  Vector of 3D space.
-    T3DVector = class(TCBRCComponent, IVector)
+    T3DVector = class(TComponent, IVector)
     protected
         FSpace: ISpace;
         FVector: TDoubleVector3;
@@ -563,8 +563,7 @@ procedure Gauss(PointsArray: TwoDimArray; const A, Sigma, x0: Double);
 var
     i: LongInt;
 begin
-    if not Assigned(PointsArray) then
-        raise EPointsArrayIsNotAssigned.Create('Points array is not assigned...');
+    Assert(Length(PointsArray) > 0);
 
     for i := 0 to Length(PointsArray) - 1 do
         PointsArray[i][2] := GaussPoint(A, Sigma, x0, PointsArray[i][1]);

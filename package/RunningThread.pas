@@ -15,15 +15,18 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 unit RunningThread;
 
 interface
-
-    {$IFNDEF Lazarus}
-uses Classes, Tools;
-      //TODO: set up proper module name for Delhpi build.
-      //DesignIntf;
-    {$ELSE}
-uses Classes, Tools,
-      PropEdits;
-    {$ENDIF}
+uses Classes, Tools, Forms,
+{$IF NOT DEFINED(FPC)}
+    //TODO: set up proper module name for Delhpi build.
+    //DesignIntf;
+{$ELSE}
+    PropEdits,
+{$ENDIF}
+{$IFDEF LINUX}
+{$linklib c}
+    ctypes,
+{$ENDIF LINUX}
+    Contnrs;
 
 type
     TComputingProcedure = procedure of object;
@@ -59,6 +62,7 @@ type
         procedure Wait;
         { Calls OnCreate if assigned. }
         procedure Loaded; override;
+        function Finished: Boolean;
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
@@ -72,14 +76,28 @@ type
         property Handle: THandle read GetHandle;
     end;
 
+    TRunnerPool = class(TObject)
+    private
+        FRunners: TComponentList;
+
+    public
+        constructor Create; reintroduce;
+        destructor Destroy; override;
+        { Returns instance of runner ready to start new task.
+          Waits internally if necessary. }
+        function GetFreeRunner: TRunner;
+        { Waits for all runners finishing. }
+        procedure WaitAll;
+    end;
+
 procedure Register;
 
 implementation
 
 procedure Register;
 begin
-{$IFDEF Lazarus}
-    RegisterComponents('FitMinimizers', [TRunner]);
+{$IF DEFINED(FPC)}
+    RegisterComponents('Fit', [TRunner]);
     RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnCompute',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutput',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TCreatingProcedure),TRunner,'OnCreate',TMethodProperty);
@@ -104,7 +122,7 @@ end;
 destructor TRunner.Destroy;
 begin
     Wait;
-    inherited Destroy;
+    inherited;
 end;
 
 {$warnings off}
@@ -132,9 +150,91 @@ end;
 
 function TRunner.GetHandle: THandle;
 begin
-  Result:= FRunningThread.Handle;
+    Result:= FRunningThread.Handle;
+end;
+
+function TRunner.Finished: Boolean;
+begin
+    Result := True;
+    if FRunningThread <> nil then
+        Result := FRunningThread.Finished;
 end;
 
 {$warnings on}
+
+{$IF DEFINED(LINUX)}
+const
+  _SC_NPROCESSORS_ONLN = 83;
+
+function sysconf(i: cint): clong; cdecl; external Name 'sysconf';
+{$ENDIF LINUX}
+
+constructor TRunnerPool.Create;
+var i, ThreadCount: Integer;
+begin
+    inherited;
+    { Owns runner instances. }
+    FRunners := TComponentList.Create(True);
+    { Creates number of runners equal to number of CPU cores. }
+{$IF DEFINED(LINUX)}
+    ThreadCount := sysconf(_SC_NPROCESSORS_ONLN);
+{$ELSE}
+    ThreadCount := TThread.ProcessorCount;
+{$ENDIF}
+    for i := 0 to ThreadCount - 1 do
+    begin
+        FRunners.Add(TRunner.Create(nil));
+    end;
+end;
+
+destructor TRunnerPool.Destroy;
+begin
+    { Waits for finishing. }
+    WaitAll;
+    { Destroys all runner instances. }
+    FRunners.Free;
+    inherited;
+end;
+
+function TRunnerPool.GetFreeRunner: TRunner;
+var
+    i: LongInt;
+    Runner: TRunner;
+begin
+    Result := nil;
+    if FRunners.Count > 0 then
+    begin
+        { Returns the first free runner if any exsits. }
+        while True do
+        begin
+            for i := 0 to FRunners.Count - 1 do
+            begin
+                Runner := TRunner(FRunners[i]);
+                if Runner.Finished then
+                begin
+                    Result := Runner;
+                    Exit;
+                end;
+            end;
+            { This must be called to process synchronous calls of output methods,
+              using any waiting method here can cause deadlock because waiting
+              will never finish because synchronous call will be never processed. }
+            Application.ProcessMessages;
+        end;
+    end;
+end;
+
+procedure TRunnerPool.WaitAll;
+var
+    i: LongInt;
+    Runner: TRunner;
+begin
+    for i := 0 to FRunners.Count - 1 do
+        begin
+            Runner := TRunner(FRunners[i]);
+            if not Runner.Finished then
+                Runner.Wait;
+        end;
+end;
 
 end.
