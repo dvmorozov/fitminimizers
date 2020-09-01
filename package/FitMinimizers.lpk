@@ -1,28 +1,28 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="3">
+  <Package Version="4">
     <PathDelim Value="\"/>
     <Name Value="FitMinimizers"/>
+    <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
-      <Version Value="5"/>
+      <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <Libraries Value="lib\i386-win32\"/>
+        <Libraries Value="lib\i386-win32"/>
+        <OtherUnitFiles Value="."/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Parsing>
         <SyntaxOptions>
-          <DelphiCompat Value="True"/>
+          <SyntaxMode Value="Delphi"/>
         </SyntaxOptions>
       </Parsing>
       <Other>
-        <CustomOptions Value="-dLazarus
-"/>
-        <CompilerPath Value="$(CompPath)"/>
+        <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
-    <Version Minor="1" Build="1"/>
-    <Files Count="12">
+    <Version Minor="1" Release="10" Build="12"/>
+    <Files Count="10">
       <Item1>
         <Filename Value="Tools.pas"/>
         <UnitName Value="Tools"/>
@@ -36,57 +36,49 @@
         <UnitName Value="MyExceptions"/>
       </Item3>
       <Item4>
-        <Filename Value="CBRCComponent.pas"/>
-        <UnitName Value="CBRCComponent"/>
-      </Item4>
-      <Item5>
         <Filename Value="Algorithm.pas"/>
         <UnitName Value="Algorithm"/>
-      </Item5>
-      <Item6>
-        <Filename Value="SelfCheckedComponentList.pas"/>
-        <UnitName Value="SelfCheckedComponentList"/>
-      </Item6>
-      <Item7>
+      </Item4>
+      <Item5>
         <Filename Value="Decisions.pas"/>
         <UnitName Value="Decisions"/>
-      </Item7>
-      <Item8>
+      </Item5>
+      <Item6>
         <Filename Value="DownhillSimplexAlgorithm.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="DownhillSimplexAlgorithm"/>
-      </Item8>
-      <Item9>
-        <Filename Value="DownhillSimplexContainer.pas"/>
-        <UnitName Value="DownhillSimplexContainer"/>
-      </Item9>
-      <Item10>
+      </Item6>
+      <Item7>
         <Filename Value="AlgorithmContainer.pas"/>
         <UnitName Value="AlgorithmContainer"/>
-      </Item10>
-      <Item11>
+      </Item7>
+      <Item8>
         <Filename Value="RunningThread.pas"/>
+        <HasRegisterProc Value="True"/>
         <UnitName Value="RunningThread"/>
-      </Item11>
-      <Item12>
+      </Item8>
+      <Item9>
         <Filename Value="CombEnumerator.pas"/>
         <UnitName Value="CombEnumerator"/>
-      </Item12>
+      </Item9>
+      <Item10>
+        <Filename Value="DownhillSimplexServer.pas"/>
+        <UnitName Value="DownhillSimplexServer"/>
+      </Item10>
     </Files>
-    <Type Value="RunAndDesignTime"/>
     <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="FCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item1>
       <Item2>
         <PackageName Value="LCL"/>
       </Item2>
       <Item3>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="FCL"/>
       </Item3>
     </RequiredPkgs>
     <UsageOptions>
-      <UnitPath Value="$(PkgOutDir)\"/>
+      <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
     <PublishOptions>
       <Version Value="2"/>
