@@ -93,7 +93,7 @@ var
 
 implementation
 
-uses bounding_box_server_form;
+uses bounding_box_form;
 
 constructor TOptimizingApp.Create(AOwner: TComponent);
 var

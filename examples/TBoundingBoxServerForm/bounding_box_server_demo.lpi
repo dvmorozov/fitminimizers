@@ -23,7 +23,7 @@
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
       <RevisionNr Value="11"/>
-      <BuildNr Value="28"/>
+      <BuildNr Value="29"/>
       <Attributes pvaDebug="True"/>
     </VersionInfo>
     <BuildModes Count="1">
@@ -52,7 +52,7 @@
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="bounding_box_server_form.pas"/>
+        <Filename Value="bounding_box_form.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BoundingBoxServerForm"/>
         <HasResources Value="True"/>

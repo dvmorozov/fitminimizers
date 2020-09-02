@@ -146,7 +146,7 @@ type
 
 implementation
 
-uses bounding_box_server_form;
+uses bounding_box_form;
 
 procedure TComputationTime.StartMeasurement;
 begin
