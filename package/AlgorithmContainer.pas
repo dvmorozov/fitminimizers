@@ -70,8 +70,8 @@ constructor TRunningAlgorithmContainer.Create(AOwner: TComponent);
 begin
     inherited Create(AOwner);
     Runner := TRunner.Create(nil);
-    Runner.OnCompute := Running;
-    Runner.OnOutput := RunningFinished;
+    Runner.OnCompute := @Running;
+    Runner.OnOutput := @RunningFinished;
 end;
 
 destructor TRunningAlgorithmContainer.Destroy;

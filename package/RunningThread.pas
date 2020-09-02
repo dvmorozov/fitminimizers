@@ -157,7 +157,7 @@ function TRunner.Finished: Boolean;
 begin
     Result := True;
     if FRunningThread <> nil then
-        Result := FRunningThread.Finished;
+        FRunningThread.WaitFor;
 end;
 
 {$warnings on}
@@ -179,7 +179,7 @@ begin
 {$IF DEFINED(LINUX)}
     ThreadCount := sysconf(_SC_NPROCESSORS_ONLN);
 {$ELSE}
-    ThreadCount := TThread.ProcessorCount;
+    ThreadCount := 4;
 {$ENDIF}
     for i := 0 to ThreadCount - 1 do
     begin

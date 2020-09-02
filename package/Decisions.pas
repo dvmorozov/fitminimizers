@@ -190,8 +190,8 @@ function EvalDownSortFunc(Item1, Item2: Pointer): Integer;
 function EvalUpSortFunc(Item1, Item2: Pointer): Integer;
 
 const
-    EvalDownSort: TListSortCompare = EvalDownSortFunc;
-    EvalUpSort: TListSortCompare = EvalUpSortFunc;
+    EvalDownSort: TListSortCompare = @EvalDownSortFunc;
+    EvalUpSort: TListSortCompare = @EvalUpSortFunc;
 
 implementation
 
