@@ -4,12 +4,14 @@ interface
 
 uses
 {$IF NOT DEFINED(FPC)}
-    System.StrUtils,
+    Winapi.Windows, Winapi.Messages,
+    System.SysUtils, System.Variants, System.Classes,
+    Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+    Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types, System.Contnrs,
 {$ELSE}
-    StrUtils,
+    StrUtils, Classes, Contnrs, Forms,
 {$ENDIF}
-    Classes, SysUtils, Contnrs, Forms, RunningThread, SimpMath, Math3d,
-    bounding_box_server;
+    RunningThread, SimpMath, Math3d, bounding_box_server;
 
 type
     { Contains all application objects. }
@@ -294,7 +296,7 @@ begin
                     GetAsyncKeyState(27);
                     { Stops calculation of other threads. }
                     for j := 0 to FHandlers.Count - 1 do
-                        TDownHillSimplexHandler(FHandlers[j]).Stop;
+                        TBoundingBoxServer(FHandlers[j]).Stop;
                 end;
             end;
             if WaitResult = WAIT_FAILED then
