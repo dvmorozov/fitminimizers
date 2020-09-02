@@ -11,6 +11,9 @@ unit DownhillSimplexAlgorithm;
 interface
 
 uses
+{$IF NOT DEFINED(FPC)}
+    System.Types,
+{$ENDIF}
     Classes, Contnrs, Decisions, Algorithm, Tools, SysUtils;
 
 type
@@ -104,7 +107,7 @@ type
         constructor Create(AOwner: TComponent;
             AFinalTolerance: Double;
             ARestartDisabled: Boolean;
-            AExitDerivative: Double); override;
+            AExitDerivative: Double); overload;
         destructor Destroy; override;
         //  The total number of optimization cycles.
         property CycleCount: Integer read FCycleCount;

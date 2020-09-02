@@ -3,7 +3,7 @@ program bounding_box_server_demo;
 uses
   Vcl.Forms,
   bounding_box_form in 'bounding_box_form.pas' {Form1},
-  downhill_simplex_handler in 'downhill_simplex_handler.pas';
+  bounding_box_server in 'bounding_box_server.pas';
 
 {$R *.res}
 
