@@ -9,7 +9,8 @@ uses
     Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
     Vcl.StdCtrls, Vcl.Buttons, System.StrUtils, System.Types, System.Contnrs,
 {$ELSE}
-    StrUtils, Classes, Contnrs, Forms,
+    SysUtils, Variants, Classes, Graphics, Controls, Dialogs, Buttons, Forms,
+    StdCtrls, StrUtils, Contnrs,
 {$ENDIF}
     RunningThread, SimpMath, Math3d, bounding_box_server;
 
@@ -125,7 +126,7 @@ begin
         until FindNext(SearchRec) <> 0;
     end;
 
-    BoundingBoxServerForm.DisplayListOfModels(ListOfFiles);
+    BoundingBoxForm.DisplayListOfModels(ListOfFiles);
 
     { For first load. }
     FReloadPointCloud := True;
@@ -219,7 +220,7 @@ begin
               this method to release them. See below. }
             Handler :=
                 CreateHandler(StartAngles[1], StartAngles[2],
-                StartAngles[3], BoundingBoxServerForm.GetInitialAngleStep,
+                StartAngles[3], BoundingBoxForm.GetInitialAngleStep,
                 False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := DisplayGlobalMinVolume;
@@ -246,9 +247,9 @@ begin
     FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
-    BoundingBoxServerForm.DisplayPointCloud(PointCloud);
+    BoundingBoxForm.DisplayPointCloud(PointCloud);
     { Prints total computation time. }
-    BoundingBoxServerForm.DisplayComputationTime(FComputationTime);
+    BoundingBoxForm.DisplayComputationTime(FComputationTime);
     { Releases model data. }
     FreePointCloud(PointCloud);
 end;
@@ -315,8 +316,8 @@ function TOptimizingApp.CreateHandler(Alpha, Beta, Gamma: Double;
 var
     FinalTolerance, ExitDerivate: double;
 begin
-    FinalTolerance := BoundingBoxServerForm.GetFinalTolerance;
-    ExitDerivate := BoundingBoxServerForm.GetEditExitDerivate;
+    FinalTolerance := BoundingBoxForm.GetFinalTolerance;
+    ExitDerivate := BoundingBoxForm.GetEditExitDerivate;
 
     Result := TBoundingBoxServer.Create(self, Alpha, Beta,
         Gamma, InitialAngleStep, FinalTolerance, ExitDerivate,
@@ -378,7 +379,7 @@ type
         FreePointCloud(PointCloudCache);
         PointCloudCache := TPointCloud.Create(0, 0, 0);
 
-        FileName := FFilePath + BoundingBoxServerForm.GetModelFileName;
+        FileName := FFilePath + BoundingBoxForm.GetModelFileName;
         if FileExists(FileName) then
         begin
             { Data are loaded in original position. }
@@ -421,7 +422,7 @@ begin
         FReloadPointCloud := False;
     end;
 
-    BoundingBoxServerForm.DisplayInitialAngles(Alpha, Beta, Gamma, ShowDetails);
+    BoundingBoxForm.DisplayInitialAngles(Alpha, Beta, Gamma, ShowDetails);
 
     Matr := GetRotationMatrix(Alpha, Beta, Gamma);
 
@@ -486,7 +487,7 @@ begin
         FOptiResultBoxMaxCoords := BoxMaxCoords;
         FOptiResultBoxMinCoords := BoxMinCoords;
 
-        BoundingBoxServerForm.DisplayCurrentMinVolume(Handler);
+        BoundingBoxForm.DisplayCurrentMinVolume(Handler);
     end;
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -530,7 +531,7 @@ begin
                     FMinBoxSizes[3]);
             end;
 
-            BoundingBoxServerForm.DisplayBruteForceResult(
+            BoundingBoxForm.DisplayBruteForceResult(
                 Handler, DeltaVolume, BoxSizes);
         end;
     end;
@@ -555,7 +556,7 @@ begin
         BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
         SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
 
-        BoundingBoxServerForm.DisplayGlobalMinVolume(Handler, BoxSizes);
+        BoundingBoxForm.DisplayGlobalMinVolume(Handler, BoxSizes);
     end;
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -586,11 +587,11 @@ begin
     FRunner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
-    Handler := CreateHandler(0, 0, 0, BoundingBoxServerForm.GetInitialAngleStep,
+    Handler := CreateHandler(0, 0, 0, BoundingBoxForm.GetInitialAngleStep,
         True, 1, PointCloud, True);
     { Displays initial box volume. }
     InitialBoxVolume := Handler.GetBoxVolume;
-    BoundingBoxServerForm.DisplayInitialBoxVolume(InitialBoxVolume);
+    BoundingBoxForm.DisplayInitialBoxVolume(InitialBoxVolume);
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := DisplayCurrentMinVolume;
     { Assign runner procedures. }
@@ -644,7 +645,7 @@ begin
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
                     Handler :=
-                        CreateHandler(0, 0, 0, BoundingBoxServerForm.GetInitialAngleStep,
+                        CreateHandler(0, 0, 0, BoundingBoxForm.GetInitialAngleStep,
                         False, RunId, PointCloud, True);
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
@@ -695,7 +696,7 @@ begin
             Gamma := Random * 180;
 
             PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
-            Handler := CreateHandler(0, 0, 0, BoundingBoxServerForm.GetInitialAngleStep,
+            Handler := CreateHandler(0, 0, 0, BoundingBoxForm.GetInitialAngleStep,
                 False, x, PointCloud, True);
             { Computes minimum volume directly in the calling thread.
               It could be refactored to use thread pool as it was done
@@ -728,7 +729,7 @@ begin
                         SortUp(FMinBoxSizes[1], FMinBoxSizes[2], FMinBoxSizes[3]);
                     end;
 
-                    BoundingBoxServerForm.DisplayBruteForceResult(
+                    BoundingBoxForm.DisplayBruteForceResult(
                       Handler, DeltaVolume, BoxSizes);
                 end;
             end;

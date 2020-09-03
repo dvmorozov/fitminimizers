@@ -81,7 +81,7 @@ type
 procedure SortUp(var S1, S2, S3: Double);
 
 var
-    BoundingBoxServerForm: TBoundingBoxForm;
+    BoundingBoxForm: TBoundingBoxForm;
 
 implementation
 
