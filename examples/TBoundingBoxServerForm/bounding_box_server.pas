@@ -224,7 +224,7 @@ end;
 
 procedure DisplayDetails(iString: string);
 begin
-    BoundingBoxServerForm.Memo2.Lines.Add(iString);
+    BoundingBoxForm.Memo2.Lines.Add(iString);
 end;
 
 //-----------------------------------------------------------------------------

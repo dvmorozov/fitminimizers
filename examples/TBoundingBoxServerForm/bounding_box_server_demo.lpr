@@ -14,7 +14,7 @@ begin
     RequireDerivedFormResource := True;
 
     Application.Initialize;
-    Application.CreateForm(TBoundingBoxForm, BoundingBoxServerForm);
+    Application.CreateForm(TBoundingBoxForm, BoundingBoxForm);
     { Must be after form creation. }
     OptimizingApp := TOptimizingApp.Create(nil);
     Application.Run;
