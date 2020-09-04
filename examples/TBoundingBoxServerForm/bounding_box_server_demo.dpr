@@ -10,6 +10,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TBoundingBoxForm, BoundingBoxServerForm);
+  Application.CreateForm(TBoundingBoxForm, BoundingBoxForm);
   Application.Run;
 end.
