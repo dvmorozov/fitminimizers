@@ -1,4 +1,4 @@
-object BoundingBoxServerForm: TBoundingBoxServerForm
+object BoundingBoxForm: TBoundingBoxForm
   Left = 3
   Height = 400
   Top = 2
