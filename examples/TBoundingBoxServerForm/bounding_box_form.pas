@@ -87,7 +87,7 @@ implementation
 
 uses optimizing_app;
 
-{$R *.lfm}
+{$R *.dfm}
 
 procedure SortUp(var S1, S2, S3: Double);
 var
