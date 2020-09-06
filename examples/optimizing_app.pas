@@ -105,6 +105,8 @@ var
     Ext: string;
 begin
     inherited;
+    Assert(Assigned(BoundingBoxForm));
+
     { Must be created before inherited constructor which causes initializing
       other components. Keeps ownership and destroys all collection items. }
     FHandlers := TComponentList.Create(True);
@@ -190,6 +192,7 @@ var
     Runners: TComponentList;
     PointCloud: TPointCloud;
 begin
+    Assert(Assigned(BoundingBoxForm));
     { Loads model data in original orientation. }
     { Data are accessed from different threads.
       That's ok until data aren't changed. }
@@ -316,6 +319,8 @@ function TOptimizingApp.CreateHandler(Alpha, Beta, Gamma: Double;
 var
     FinalTolerance, ExitDerivate: double;
 begin
+    Assert(Assigned(BoundingBoxForm));
+
     FinalTolerance := BoundingBoxForm.GetFinalTolerance;
     ExitDerivate := BoundingBoxForm.GetEditExitDerivate;
 
@@ -376,6 +381,8 @@ type
         Coord: TOBJCoord;
         Vector: T3Vector;
     begin
+        Assert(Assigned(BoundingBoxForm));
+
         FreePointCloud(PointCloudCache);
         PointCloudCache := TPointCloud.Create(0, 0, 0);
 
@@ -416,6 +423,8 @@ var
     Vector: T3Vector;
     i: LongInt;
 begin
+    Assert(Assigned(BoundingBoxForm));
+
     if FReloadPointCloud then
     begin
         LoadDataFromFile;
@@ -483,6 +492,8 @@ procedure TOptimizingApp.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
 begin
     with Handler do
     begin
+        Assert(Assigned(BoundingBoxForm));
+
         FOptiResultBoxVolume := BoxVolume;
         FOptiResultBoxMaxCoords := BoxMaxCoords;
         FOptiResultBoxMinCoords := BoxMinCoords;
@@ -504,6 +515,8 @@ begin
           for original and rotated orientation. }
         with Handler do
         begin
+            Assert(Assigned(BoundingBoxForm));
+
             DeltaVolume := (BoxVolume - FGlobalMinVolume);
             { Computes lengths of edges of bounding box. }
             BoxSizes[1] := BoxMaxCoords[1] - BoxMinCoords[1];
@@ -545,6 +558,8 @@ var
 begin
     with Handler do
     begin
+        Assert(Assigned(BoundingBoxForm));
+
         if BoxVolume < FGlobalMinVolume then
         begin
             FGlobalMinVolume := BoxVolume;
@@ -570,6 +585,8 @@ var
     PointCloud: TPointCloud;
     InitialBoxVolume: Double;
 begin
+    Assert(Assigned(BoundingBoxForm));
+
     FStop := False;
 
     if RandomData then
@@ -620,6 +637,8 @@ var
     Runner: TRunner;
     ThreadPool: TRunnerPool;
 begin
+    Assert(Assigned(BoundingBoxForm));
+
     FStop := False;
     { Initializes global minimum parameters. }
     FMaxDeltaVolume := -1.0e20;
@@ -677,6 +696,8 @@ var
     Handler: TBoundingBoxServer;
     PointCloud: TPointCloud;
 begin
+    Assert(Assigned(BoundingBoxForm));
+
     FStop := False;
     { Initializes global minimum parameters. }
     FMaxDeltaVolume := -1.0e20;
