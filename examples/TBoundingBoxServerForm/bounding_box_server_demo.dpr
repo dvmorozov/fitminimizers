@@ -13,6 +13,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TBoundingBoxForm, BoundingBoxForm);
+  { Must be after form creation. }
   OptimizingApp := TOptimizingApp.Create(nil);
   Application.Run;
 end.

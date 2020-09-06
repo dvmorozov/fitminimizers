@@ -144,11 +144,15 @@ end;
 
 procedure TBoundingBoxForm.FormDestroy(Sender: TObject);
 begin
+    Assert(Assigned(OptimizingApp));
+
     OptimizingApp.StopComputing;
 end;
 
 procedure TBoundingBoxForm.ComboBoxFilesChange(Sender: TObject);
 begin
+    Assert(Assigned(OptimizingApp));
+
     OptimizingApp.ReloadPointCloud := True;
 end;
 
@@ -177,6 +181,8 @@ end;
 
 procedure TBoundingBoxForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 begin
+    Assert(Assigned(OptimizingApp));
+
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
 
@@ -200,6 +206,8 @@ var
     StringList: TStringList;
     Passed: Boolean;
 begin
+    Assert(Assigned(OptimizingApp));
+
     MinVolume := 1e20;
     { Gets optimized MinVolume. }
     for i := 0 to Memo2.Lines.Count - 1 do
@@ -375,6 +383,7 @@ procedure TBoundingBoxForm.DisplayBruteForceResult(
 var
     Line: string;
 begin
+    Assert(Assigned(OptimizingApp));
     { Computes difference in volumes calculated
       for original and rotated orientation. }
     with Handler do
@@ -401,6 +410,7 @@ end;
 
 procedure TBoundingBoxForm.ButtonBruteForceClick(Sender: TObject);
 begin
+    Assert(Assigned(OptimizingApp));
     { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
@@ -412,6 +422,7 @@ end;
 
 procedure TBoundingBoxForm.ButtonRandomTestClick(Sender: TObject);
 begin
+    Assert(Assigned(OptimizingApp));
     { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
@@ -422,6 +433,8 @@ end;
 
 procedure TBoundingBoxForm.ButtonStopClick(Sender: TObject);
 begin
+    Assert(Assigned(OptimizingApp));
+
     OptimizingApp.StopComputing;
 end;
 
@@ -446,6 +459,8 @@ procedure TBoundingBoxForm.DisplayPointCloud(PointCloud: TList);
 var
     BoxSizes: TDoubleVector3;
 begin
+    Assert(Assigned(OptimizingApp));
+
     Memo1.Lines.Add('');
     if CheckBoxRandomData.Checked then
         Memo1.Lines.Add('Random Points')
