@@ -108,30 +108,6 @@ implementation
 
 {$R *.dfm}
 
-procedure SortUp(var iS1, iS2, iS3: double);
-var
-    fTmp: double;
-begin
-    if iS2 < iS1 then
-    begin
-        fTmp := iS1;
-        iS1 := iS2;
-        iS2 := fTmp;
-    end;
-    if iS3 < iS2 then
-    begin
-        fTmp := iS2;
-        iS2 := iS3;
-        iS3 := fTmp;
-        if iS2 < iS1 then
-        begin
-            fTmp := iS1;
-            iS1 := iS2;
-            iS2 := fTmp;
-        end;
-    end;
-end;
-
 function ConvertValue(iConvStr: String; var iValue: double): Boolean;
 var
     fCode: Integer;

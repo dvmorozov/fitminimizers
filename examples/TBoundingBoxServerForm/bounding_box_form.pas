@@ -78,8 +78,6 @@ type
         procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
     end;
 
-procedure SortUp(var S1, S2, S3: Double);
-
 var
     BoundingBoxForm: TBoundingBoxForm;
 

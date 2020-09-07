@@ -12,7 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Dialogs, Buttons, Forms,
     StdCtrls, StrUtils, Contnrs,
 {$ENDIF}
-    RunningThread, SimpMath, Math3d, bounding_box_server;
+    RunningThread, SimpMath, Math3d, bounding_box_server, int_user_interaction;
 
 type
     { Contains all application objects. }
@@ -46,6 +46,7 @@ type
         FComputationTime: TComputationTime;
         { Single pass runner. }
         FRunner: TRunner;
+        FUserInteraction: IUserInteraction;
 
         procedure DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
         procedure DisplayBruteForceResult(Handler: TBoundingBoxServer);
@@ -73,7 +74,7 @@ type
 
     public
         { Creates FHanlders before other operations. }
-        constructor Create(AOwner: TComponent); override;
+        constructor Create(UserInteraction: IUserInteraction); overload;
         destructor Destroy; override;
 
         procedure FindMinimumBoundingBox(RandomData: Boolean);
@@ -96,16 +97,15 @@ var
 
 implementation
 
-uses bounding_box_form;
-
-constructor TOptimizingApp.Create(AOwner: TComponent);
+constructor TOptimizingApp.Create(UserInteraction: IUserInteraction);
 var
     SearchRec: TSearchRec;
     ListOfFiles: TStringList;
     Ext: string;
 begin
-    inherited;
-    Assert(Assigned(BoundingBoxForm));
+    inherited Create(nil);
+    Assert(Assigned(UserInteraction));
+    FUserInteraction := UserInteraction;
 
     { Must be created before inherited constructor which causes initializing
       other components. Keeps ownership and destroys all collection items. }
@@ -128,7 +128,7 @@ begin
         until FindNext(SearchRec) <> 0;
     end;
 
-    BoundingBoxForm.DisplayListOfModels(ListOfFiles);
+    FUserInteraction.DisplayListOfModels(ListOfFiles);
 
     { For first load. }
     FReloadPointCloud := True;
@@ -192,7 +192,7 @@ var
     Runners: TComponentList;
     PointCloud: TPointCloud;
 begin
-    Assert(Assigned(BoundingBoxForm));
+    Assert(Assigned(FUserInteraction));
     { Loads model data in original orientation. }
     { Data are accessed from different threads.
       That's ok until data aren't changed. }
@@ -223,7 +223,7 @@ begin
               this method to release them. See below. }
             Handler :=
                 CreateHandler(StartAngles[1], StartAngles[2],
-                StartAngles[3], BoundingBoxForm.GetInitialAngleStep,
+                StartAngles[3], FUserInteraction.GetInitialAngleStep,
                 False, i + 1, PointCloud, False);
             { OuputGlobalMinVolume removes hanlder from FHandlers list. }
             Handler.HandlerOutputProcedure := DisplayGlobalMinVolume;
@@ -250,9 +250,9 @@ begin
     FOptiResultBoxVolume := FGlobalMinVolume;
     FOptiResultBoxMaxCoords := FMaxCoords;
     FOptiResultBoxMinCoords := FMinCoords;
-    BoundingBoxForm.DisplayPointCloud(PointCloud);
+    FUserInteraction.DisplayPointCloud(PointCloud);
     { Prints total computation time. }
-    BoundingBoxForm.DisplayComputationTime(FComputationTime);
+    FUserInteraction.DisplayComputationTime(FComputationTime);
     { Releases model data. }
     FreePointCloud(PointCloud);
 end;
@@ -319,10 +319,10 @@ function TOptimizingApp.CreateHandler(Alpha, Beta, Gamma: Double;
 var
     FinalTolerance, ExitDerivate: double;
 begin
-    Assert(Assigned(BoundingBoxForm));
+    Assert(Assigned(FUserInteraction));
 
-    FinalTolerance := BoundingBoxForm.GetFinalTolerance;
-    ExitDerivate := BoundingBoxForm.GetEditExitDerivate;
+    FinalTolerance := FUserInteraction.GetFinalTolerance;
+    ExitDerivate := FUserInteraction.GetEditExitDerivate;
 
     Result := TBoundingBoxServer.Create(self, Alpha, Beta,
         Gamma, InitialAngleStep, FinalTolerance, ExitDerivate,
@@ -381,12 +381,12 @@ type
         Coord: TOBJCoord;
         Vector: T3Vector;
     begin
-        Assert(Assigned(BoundingBoxForm));
+        Assert(Assigned(FUserInteraction));
 
         FreePointCloud(PointCloudCache);
         PointCloudCache := TPointCloud.Create(0, 0, 0);
 
-        FileName := FFilePath + BoundingBoxForm.GetModelFileName;
+        FileName := FFilePath + FUserInteraction.GetModelFileName;
         if FileExists(FileName) then
         begin
             { Data are loaded in original position. }
@@ -423,7 +423,7 @@ var
     Vector: T3Vector;
     i: LongInt;
 begin
-    Assert(Assigned(BoundingBoxForm));
+    Assert(Assigned(FUserInteraction));
 
     if FReloadPointCloud then
     begin
@@ -431,7 +431,7 @@ begin
         FReloadPointCloud := False;
     end;
 
-    BoundingBoxForm.DisplayInitialAngles(Alpha, Beta, Gamma, ShowDetails);
+    FUserInteraction.DisplayInitialAngles(Alpha, Beta, Gamma, ShowDetails);
 
     Matr := GetRotationMatrix(Alpha, Beta, Gamma);
 
@@ -492,13 +492,13 @@ procedure TOptimizingApp.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
 begin
     with Handler do
     begin
-        Assert(Assigned(BoundingBoxForm));
+        Assert(Assigned(FUserInteraction));
 
         FOptiResultBoxVolume := BoxVolume;
         FOptiResultBoxMaxCoords := BoxMaxCoords;
         FOptiResultBoxMinCoords := BoxMinCoords;
 
-        BoundingBoxForm.DisplayCurrentMinVolume(Handler);
+        FUserInteraction.DisplayCurrentMinVolume(Handler);
     end;
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -515,7 +515,7 @@ begin
           for original and rotated orientation. }
         with Handler do
         begin
-            Assert(Assigned(BoundingBoxForm));
+            Assert(Assigned(FUserInteraction));
 
             DeltaVolume := (BoxVolume - FGlobalMinVolume);
             { Computes lengths of edges of bounding box. }
@@ -544,7 +544,7 @@ begin
                     FMinBoxSizes[3]);
             end;
 
-            BoundingBoxForm.DisplayBruteForceResult(
+            FUserInteraction.DisplayBruteForceResult(
                 Handler, DeltaVolume, BoxSizes);
         end;
     end;
@@ -558,7 +558,7 @@ var
 begin
     with Handler do
     begin
-        Assert(Assigned(BoundingBoxForm));
+        Assert(Assigned(FUserInteraction));
 
         if BoxVolume < FGlobalMinVolume then
         begin
@@ -571,7 +571,7 @@ begin
         BoxSizes[3] := BoxMaxCoords[3] - BoxMinCoords[3];
         SortUp(BoxSizes[1], BoxSizes[2], BoxSizes[3]);
 
-        BoundingBoxForm.DisplayGlobalMinVolume(Handler, BoxSizes);
+        FUserInteraction.DisplayGlobalMinVolume(Handler, BoxSizes);
     end;
     { Removes and frees container. }
     FHandlers.Remove(Handler);
@@ -585,7 +585,7 @@ var
     PointCloud: TPointCloud;
     InitialBoxVolume: Double;
 begin
-    Assert(Assigned(BoundingBoxForm));
+    Assert(Assigned(FUserInteraction));
 
     FStop := False;
 
@@ -604,11 +604,11 @@ begin
     FRunner := TRunner.Create(nil);
     { Creates optimization container, which will be executed by separated thread.
       Handler owns point cloud, don't release it! }
-    Handler := CreateHandler(0, 0, 0, BoundingBoxForm.GetInitialAngleStep,
+    Handler := CreateHandler(0, 0, 0, FUserInteraction.GetInitialAngleStep,
         True, 1, PointCloud, True);
     { Displays initial box volume. }
     InitialBoxVolume := Handler.GetBoxVolume;
-    BoundingBoxForm.DisplayInitialBoxVolume(InitialBoxVolume);
+    FUserInteraction.DisplayInitialBoxVolume(InitialBoxVolume);
     { OuputMinVolume removes hanlder from FHandlers list. }
     Handler.HandlerOutputProcedure := DisplayCurrentMinVolume;
     { Assign runner procedures. }
@@ -637,7 +637,7 @@ var
     Runner: TRunner;
     ThreadPool: TRunnerPool;
 begin
-    Assert(Assigned(BoundingBoxForm));
+    Assert(Assigned(FUserInteraction));
 
     FStop := False;
     { Initializes global minimum parameters. }
@@ -664,7 +664,7 @@ begin
                     { Creates optimization container, which will be executed by separated thread.
                       Handler owns point cloud, don't release it! }
                     Handler :=
-                        CreateHandler(0, 0, 0, BoundingBoxForm.GetInitialAngleStep,
+                        CreateHandler(0, 0, 0, FUserInteraction.GetInitialAngleStep,
                         False, RunId, PointCloud, True);
                     { Searches for free runner. Synchronous calls are processed internally. }
                     Runner := ThreadPool.GetFreeRunner;
@@ -696,7 +696,7 @@ var
     Handler: TBoundingBoxServer;
     PointCloud: TPointCloud;
 begin
-    Assert(Assigned(BoundingBoxForm));
+    Assert(Assigned(FUserInteraction));
 
     FStop := False;
     { Initializes global minimum parameters. }
@@ -717,7 +717,7 @@ begin
             Gamma := Random * 180;
 
             PointCloud := LoadPointCloud(Alpha, Beta, Gamma, False);
-            Handler := CreateHandler(0, 0, 0, BoundingBoxForm.GetInitialAngleStep,
+            Handler := CreateHandler(0, 0, 0, FUserInteraction.GetInitialAngleStep,
                 False, x, PointCloud, True);
             { Computes minimum volume directly in the calling thread.
               It could be refactored to use thread pool as it was done
@@ -750,7 +750,7 @@ begin
                         SortUp(FMinBoxSizes[1], FMinBoxSizes[2], FMinBoxSizes[3]);
                     end;
 
-                    BoundingBoxForm.DisplayBruteForceResult(
+                    FUserInteraction.DisplayBruteForceResult(
                       Handler, DeltaVolume, BoxSizes);
                 end;
             end;

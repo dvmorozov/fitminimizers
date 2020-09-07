@@ -221,6 +221,8 @@ procedure TwoBranchesPseudoVoigt(PointsArray: TwoDimArray;
     const A, Sigma, Eta, SigmaRight, EtaRight, x0: Double);
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;
 
+procedure SortUp(var iS1, iS2, iS3: double);
+
 implementation
 
 //  Auxiliary functions to work with vectors.
@@ -948,6 +950,30 @@ end;
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;
 begin
     Result := A * Sqr(x0 - x) + B * (x0 - x) + C;
+end;
+
+procedure SortUp(var iS1, iS2, iS3: double);
+var
+    fTmp: double;
+begin
+    if iS2 < iS1 then
+    begin
+        fTmp := iS1;
+        iS1 := iS2;
+        iS2 := fTmp;
+    end;
+    if iS3 < iS2 then
+    begin
+        fTmp := iS2;
+        iS2 := iS3;
+        iS3 := fTmp;
+        if iS2 < iS1 then
+        begin
+            fTmp := iS1;
+            iS1 := iS2;
+            iS2 := fTmp;
+        end;
+    end;
 end;
 
 initialization
