@@ -8,8 +8,9 @@
       <Unit0>
         <Filename Value="bounding_box_server_demo.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <CursorPos X="77" Y="19"/>
+        <CursorPos X="61" Y="19"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -24,7 +25,6 @@
         <CursorPos X="43" Y="24"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit1>
       <Unit2>
@@ -40,7 +40,6 @@
       <Unit3>
         <Filename Value="..\optimizing_app.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="95"/>
         <CursorPos Y="108"/>
@@ -125,7 +124,7 @@
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit13>
       <Unit14>
-        <Filename Value="\\VBOXSVR\04_-_github\fitminimizers\package\RunningThread.pas"/>
+        <Filename Value="VBOXSVR\04_-_github\fitminimizers\package\RunningThread.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="31"/>
         <CursorPos X="56" Y="87"/>
