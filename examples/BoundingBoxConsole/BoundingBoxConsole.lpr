@@ -6,8 +6,7 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
     cthreads, {$ENDIF} {$ENDIF}
     Classes,
     SysUtils,
-    CustApp,
-    int_user_interaction;
+    CustApp;
 
 type
 
