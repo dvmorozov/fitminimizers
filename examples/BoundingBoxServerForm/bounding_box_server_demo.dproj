@@ -110,9 +110,10 @@
         <DCCReference Include="bounding_box_form.pas">
             <Form>Form1</Form>
         </DCCReference>
-        <DCCReference Include="bounding_box_server.pas"/>
-        <DCCReference Include="..\optimizing_app.pas"/>
-        <DCCReference Include="..\int_user_interaction.pas"/>
+        <DCCReference Include="..\Common\bounding_box_server.pas"/>
+        <DCCReference Include="..\Common\int_user_interaction.pas"/>
+        <DCCReference Include="..\Common\Math3d.pas"/>
+        <DCCReference Include="..\Common\optimizing_app.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -512,7 +513,7 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
@@ -520,7 +521,7 @@
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <ModelSupport>False</ModelSupport>
         </BorlandProject>
