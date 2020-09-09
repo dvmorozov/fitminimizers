@@ -25,7 +25,12 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <Units Count="3">
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="FitMinimizers"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="4">
       <Unit0>
         <Filename Value="BoundingBoxConsole.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -38,6 +43,10 @@
         <Filename Value="..\optimizing_app.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="..\bounding_box_server.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
