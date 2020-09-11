@@ -12,8 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
 {$ENDIF}
-    SimpMath, Math3d, bounding_box_server,
-    int_user_interaction;
+    SimpMath, Math3d, bounding_box_server, int_user_interaction;
 
 {$ASSERTIONS ON}
 
@@ -61,21 +60,22 @@ type
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayGlobalMinVolume(Handler: TBoundingBoxServer;
+        procedure DisplayGlobalMinVolume(Handler: TObject;
             BoxSizes: TDoubleVector3);
         { Displays computation results of single run.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
+        procedure DisplayCurrentMinVolume(Handler: TObject);
         { Displays computation results of single run of brute force search. }
-        procedure DisplayBruteForceResult(Handler: TBoundingBoxServer;
+        procedure DisplayBruteForceResult(Handler: TObject;
             DeltaVolume: Single;
             BoxSizes: TDoubleVector3);
         { TODO: Make ShowDetails private member. }
         procedure DisplayInitialAngles(Alpha, Beta, Gamma: Single; ShowDetails: Boolean);
         procedure DisplayListOfModels(ListOfFiles: TStringList);
-        procedure DisplayComputationTime(ComputationTime: TComputationTime);
+        procedure DisplayComputationTime(ComputationTime: TObject);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
+        procedure DisplayDetails(Line: string);
     end;
 
 var
@@ -154,12 +154,12 @@ begin
     OptimizingApp.ReloadPointCloud := True;
 end;
 
-procedure TBoundingBoxForm.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
+procedure TBoundingBoxForm.DisplayCurrentMinVolume(Handler: TObject);
 var
     Matr: TMatrix;
     Vector: T3Vector;
 begin
-    with Handler do
+    with Handler as TBoundingBoxServer do
     begin
         { Displays final angles. }
         Memo1.Lines.Add('Final angles       :' + Format(' %10.4f %10.4f %10.4f',
@@ -375,7 +375,7 @@ begin
 end;
 
 procedure TBoundingBoxForm.DisplayBruteForceResult(
-    Handler: TBoundingBoxServer;
+    Handler: TObject;
     DeltaVolume: Single;
     BoxSizes: TDoubleVector3);
 var
@@ -384,7 +384,7 @@ begin
     Assert(Assigned(OptimizingApp));
     { Computes difference in volumes calculated
       for original and rotated orientation. }
-    with Handler do
+    with Handler as TBoundingBoxServer do
     begin
         DeltaVolume := (BoxVolume - OptimizingApp.GlobalMinVolume);
         Line :=
@@ -437,11 +437,11 @@ begin
 end;
 
 procedure TBoundingBoxForm.DisplayGlobalMinVolume(
-    Handler: TBoundingBoxServer; BoxSizes: TDoubleVector3);
+    Handler: TObject; BoxSizes: TDoubleVector3);
 var
     Line: string;
 begin
-    with Handler do
+    with Handler as TBoundingBoxServer do
     begin
         Line := Format(
             ' Run %d: %10.2f (%6.3f %6.3f %6.3f) -- (%7.2f %7.2f %7.2f) --- %7.4f -- %4d -- %4d -- %2d',
@@ -511,9 +511,10 @@ begin
     ComboBoxFiles.ItemIndex := 0;
 end;
 
-procedure TBoundingBoxForm.DisplayComputationTime(ComputationTime: TComputationTime);
+procedure TBoundingBoxForm.DisplayComputationTime(ComputationTime: TObject);
 begin
-    Memo1.Lines.Add('Total Calc Time     : ' + Format(' %.4f', [ComputationTime.Time]));
+    with ComputationTime as TComputationTime do
+        Memo1.Lines.Add('Total Calc Time     : ' + Format(' %.4f', [Time]));
 end;
 
 procedure TBoundingBoxForm.DisplayInitialBoxVolume(InitialBoxVolume: Double);
@@ -536,6 +537,11 @@ function TBoundingBoxForm.GetEditExitDerivate: Double;
 begin
     Result := 0.5;      // default value
     StrToValue(EditExitDerivate.Text, Result);
+end;
+
+procedure TBoundingBoxForm.DisplayDetails(Line: string);
+begin
+    BoundingBoxForm.Memo2.Lines.Add(Line);
 end;
 
 end.
