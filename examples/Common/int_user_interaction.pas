@@ -3,7 +3,7 @@ unit int_user_interaction;
 interface
 
 uses
-    Classes, SysUtils, SimpMath, bounding_box_server;
+    Classes, SysUtils, SimpMath;
 
 type
     IUserInteraction = interface
@@ -16,20 +16,21 @@ type
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayGlobalMinVolume(Handler: TBoundingBoxServer;
+        procedure DisplayGlobalMinVolume(Handler: TObject;
             BoxSizes: TDoubleVector3);
         { Displays computation results of single run.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
+        procedure DisplayCurrentMinVolume(Handler: TObject);
         { Displays computation results of single run of brute force search. }
-        procedure DisplayBruteForceResult(Handler: TBoundingBoxServer;
+        procedure DisplayBruteForceResult(Handler: TObject;
             DeltaVolume: Single;
             BoxSizes: TDoubleVector3);
         procedure DisplayInitialAngles(Alpha, Beta, Gamma: Single; ShowDetails: Boolean);
         procedure DisplayListOfModels(ListOfFiles: TStringList);
-        procedure DisplayComputationTime(ComputationTime: TComputationTime);
+        procedure DisplayComputationTime(ComputationTime: TObject);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
+        procedure DisplayDetails(Line: string);
     end;
 
 implementation

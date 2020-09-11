@@ -324,7 +324,7 @@ begin
     FinalTolerance := FUserInteraction.GetFinalTolerance;
     ExitDerivate := FUserInteraction.GetEditExitDerivate;
 
-    Result := TBoundingBoxServer.Create(self, Alpha, Beta,
+    Result := TBoundingBoxServer.Create(FUserInteraction, Alpha, Beta,
         Gamma, InitialAngleStep, FinalTolerance, ExitDerivate,
         ShowDetails, RunId, PointCloud, OwnsPointCloud);
     { Adds to the list for asynchronous operations. }

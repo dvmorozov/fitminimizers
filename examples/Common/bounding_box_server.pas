@@ -12,7 +12,8 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls,
 {$ENDIF}
-    Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d;
+    Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d,
+    int_user_interaction;
 
 type
     P3DVector = ^T3DVector;
@@ -79,6 +80,7 @@ type
         FBoxMinCoords, FBoxMaxCoords: TDoubleVector3;
         { Unique container id. It is used only to reference results. }
         FRunId: Integer;
+        FUserInteraction: IUserInteraction;
 
         function GetCycleCount: Integer;
         function GetEvaluationCount: Integer;
@@ -107,7 +109,8 @@ type
           otherwise from the best point found during last optimization cycle.
           Handler doesn't copy point cloud, it either owns it or just keep
           reference to external object. }
-        constructor Create(AOwner: TComponent; AAlpha, ABeta, AGamma,
+        constructor Create(UserInteraction: IUserInteraction;
+            AAlpha, ABeta, AGamma,
             AInitialAngleStep: Double;
             AFinalTolerance, AExitDerivative: Double;
             AShowDetails: Boolean; ARunId: Integer;
@@ -145,8 +148,6 @@ type
     end;
 
 implementation
-
-uses bounding_box_form;
 
 procedure TComputationTime.StartMeasurement;
 begin
@@ -222,25 +223,22 @@ begin
     Result := A * B * C;
 end;
 
-procedure DisplayDetails(iString: string);
-begin
-    BoundingBoxForm.Memo2.Lines.Add(iString);
-end;
-
 //-----------------------------------------------------------------------------
 //-------------------------- TBoundingBoxServer --------------------------
 //-----------------------------------------------------------------------------
 
 constructor TBoundingBoxServer.Create(
-    AOwner: TComponent; AAlpha, ABeta, AGamma,
+    UserInteraction: IUserInteraction;
+    AAlpha, ABeta, AGamma,
     AInitialAngleStep: Double;
     AFinalTolerance, AExitDerivative: Double;
     AShowDetails: Boolean; ARunId: Integer;
     APointCloud: TPointCloud; AOwnsPointCloud: Boolean);
 begin
-    inherited Create(AOwner);
+    inherited Create(nil);
     FPointCloud := APointCloud;
     FOwnsPointCloud := AOwnsPointCloud;
+    FUserInteraction := UserInteraction;
 
     FDownhillSimplexAlgorithm := TDownhillSimplexAlgorithm.Create(
         Self, AFinalTolerance, False, AExitDerivative);
@@ -284,17 +282,20 @@ begin
     { Gets parameters of best solution. }
     if FShowDetails then
     begin
+        Assert(Assigned(FUserInteraction));
+
         Line := '  Result:' + sLineBreak;
         Line := Line + '     Modified parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
         Line := Line + '     Volume: ' + Format('%.4f', [FBoxVolume]) + sLineBreak;
-        DisplayDetails(Line);
+        FUserInteraction.DisplayDetails(Line);
     end;
 end;
 
 procedure TBoundingBoxServer.DisplayOutput;
 begin
+    { TODO: extend IUserInteraction to cover this. }
     if Assigned(FHandlerOutputProcedure) then
         FHandlerOutputProcedure(Self);
 end;
@@ -363,11 +364,13 @@ begin
 
     if FShowDetails then
     begin
+        Assert(Assigned(FUserInteraction));
+
         Line := '  StartDecision:' + sLineBreak;
         Line := Line + '     Start Parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
-        DisplayDetails(Line);
+        FUserInteraction.DisplayDetails(Line);
     end;
 end;
 
@@ -394,13 +397,15 @@ begin
 
     if FShowDetails then
     begin
+        Assert(Assigned(FUserInteraction));
+
         Line := '  EvaluateDecition:' + sLineBreak;
         Line := Line + '     Modified parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
         Line := Line + '     Volume: ' + Format('%.4f', [Decision.Evaluation]) +
             sLineBreak;
-        DisplayDetails(Line);
+        FUserInteraction.DisplayDetails(Line);
     end;
 end;
 
@@ -415,13 +420,15 @@ begin
 
     if FShowDetails then
     begin
+        Assert(Assigned(FUserInteraction));
+
         Line := 'UpdateResults:' + sLineBreak;
         Line := Line + '    Optimized parameters:' +
             Format('Alpha: %.4f Beta: %.4f Gamma: %.4f', [FAlpha, FBeta, FGamma]) +
             sLineBreak;
         Line := Line + '    Optimized Volume: ' +
             Format('%.4f', [Decision.Evaluation]) + sLineBreak;
-        DisplayDetails(Line);
+        FUserInteraction.DisplayDetails(Line);
     end;
 end;
 
