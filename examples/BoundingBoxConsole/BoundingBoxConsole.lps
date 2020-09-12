@@ -15,8 +15,7 @@
       <Unit1>
         <Filename Value="..\Common\bounding_box_server.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="206"/>
         <CursorPos X="20" Y="227"/>
         <UsageCount Value="21"/>
@@ -25,11 +24,11 @@
       <Unit2>
         <Filename Value="..\Common\int_user_interaction.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="14"/>
+        <CursorPos X="9" Y="33"/>
         <UsageCount Value="21"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\Common\Math3d.pas"/>
@@ -50,36 +49,38 @@
         <UsageCount Value="21"/>
       </Unit4>
       <Unit5>
+        <Filename Value="bounding_box_console.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="134"/>
+        <CursorPos X="29" Y="147"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
         <Filename Value="..\int_user_interaction.pas"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="43" Y="8"/>
         <UsageCount Value="21"/>
-      </Unit5>
-      <Unit6>
+      </Unit6>
+      <Unit7>
         <Filename Value="..\optimizing_app.pas"/>
         <EditorIndex Value="-1"/>
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
         <UsageCount Value="20"/>
-      </Unit6>
-      <Unit7>
+      </Unit7>
+      <Unit8>
         <Filename Value="..\bounding_box_server.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="126"/>
         <CursorPos X="6" Y="149"/>
         <UsageCount Value="20"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="bounding_box_console.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
-        <CursorPos X="34" Y="9"/>
-        <UsageCount Value="20"/>
-        <Loaded Value="True"/>
       </Unit8>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="BoundingBoxConsole.lpr"/>
         <Caret Line="139" Column="5" TopLine="82"/>
@@ -100,6 +101,46 @@
         <Filename Value="..\Common\bounding_box_server.pas"/>
         <Caret Line="227" Column="20" TopLine="206"/>
       </Position5>
+      <Position6>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="42" Column="66" TopLine="29"/>
+      </Position6>
+      <Position7>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="31" Column="58" TopLine="18"/>
+      </Position7>
+      <Position8>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="32" Column="23" TopLine="21"/>
+      </Position8>
+      <Position9>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="7" Column="23"/>
+      </Position9>
+      <Position10>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="29" Column="58" TopLine="21"/>
+      </Position10>
+      <Position11>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="7" Column="41"/>
+      </Position11>
+      <Position12>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="13" Column="57" TopLine="7"/>
+      </Position12>
+      <Position13>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="43" Column="40" TopLine="27"/>
+      </Position13>
+      <Position14>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="25" Column="29" TopLine="12"/>
+      </Position14>
+      <Position15>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="105" Column="5" TopLine="92"/>
+      </Position15>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
