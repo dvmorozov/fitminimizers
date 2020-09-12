@@ -4,9 +4,7 @@ interface
 
 uses {$IFDEF UNIX} {$IFDEF UseCThreads}
     cthreads, {$ENDIF} {$ENDIF}
-    Classes,
-    SysUtils,
-    CustApp, int_user_interaction;
+    Classes, SysUtils, CustApp, SimpMath, int_user_interaction;
 
 type
 
@@ -21,26 +19,29 @@ type
         procedure WriteHelp; virtual;
 
         { IUserInteraction }
-
-        function GetEditExitDerivate: double;
+        function GetInitialAngleStep: Double;
+        function GetModelFileName: string;
+        function GetFinalTolerance: Double;
+        function GetEditExitDerivate: Double;
         { Prints final results among a few runs. }
         procedure DisplayPointCloud(PointCloud: TList);
         { Displays computation results and removes container.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayGlobalMinVolume(Handler: TBoundingBoxServer;
+        procedure DisplayGlobalMinVolume(Handler: TObject;
             BoxSizes: TDoubleVector3);
         { Displays computation results of single run.
           Should be member of form because works with form controls.
           Removes handler from FHandlers list. }
-        procedure DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
+        procedure DisplayCurrentMinVolume(Handler: TObject);
         { Displays computation results of single run of brute force search. }
-        procedure DisplayBruteForceResult(Handler: TBoundingBoxServer;
+        procedure DisplayBruteForceResult(Handler: TObject;
             DeltaVolume: single; BoxSizes: TDoubleVector3);
         procedure DisplayInitialAngles(Alpha, Beta, Gamma: single; ShowDetails: boolean);
         procedure DisplayListOfModels(ListOfFiles: TStringList);
-        procedure DisplayComputationTime(ComputationTime: TComputationTime);
+        procedure DisplayComputationTime(ComputationTime: TObject);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: double);
+        procedure DisplayDetails(Line: string);
     end;
 
 implementation
@@ -89,6 +90,21 @@ begin
     writeln('Usage: ', ExeName, ' -h');
 end;
 
+function TBoundingBoxConsole.GetInitialAngleStep: Double;
+begin
+
+end;
+
+function TBoundingBoxConsole.GetModelFileName: string;
+begin
+
+end;
+
+function TBoundingBoxConsole.GetFinalTolerance: Double;
+begin
+
+end;
+
 function TBoundingBoxConsole.GetEditExitDerivate: double;
 begin
 
@@ -99,18 +115,18 @@ begin
 
 end;
 
-procedure TBoundingBoxConsole.DisplayGlobalMinVolume(Handler: TBoundingBoxServer;
+procedure TBoundingBoxConsole.DisplayGlobalMinVolume(Handler: TObject;
     BoxSizes: TDoubleVector3);
 begin
 
 end;
 
-procedure TBoundingBoxConsole.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
+procedure TBoundingBoxConsole.DisplayCurrentMinVolume(Handler: TObject);
 begin
 
 end;
 
-procedure TBoundingBoxConsole.DisplayBruteForceResult(Handler: TBoundingBoxServer;
+procedure TBoundingBoxConsole.DisplayBruteForceResult(Handler: TObject;
     DeltaVolume: single; BoxSizes: TDoubleVector3);
 begin
 
@@ -128,12 +144,17 @@ begin
 end;
 
 procedure TBoundingBoxConsole.DisplayComputationTime(
-    ComputationTime: TComputationTime);
+    ComputationTime: TObject);
 begin
 
 end;
 
 procedure TBoundingBoxConsole.DisplayInitialBoxVolume(InitialBoxVolume: double);
+begin
+
+end;
+
+procedure TBoundingBoxConsole.DisplayDetails(Line: string);
 begin
 
 end;
