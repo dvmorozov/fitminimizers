@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="9">
+      <Unit0>
+        <Filename Value="bounding_box_cli.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <CursorPos X="43" Y="9"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="..\Common\bounding_box_server.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="135"/>
+        <CursorPos X="53" Y="143"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\Common\int_user_interaction.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="14"/>
+        <CursorPos X="9" Y="33"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\Common\Math3d.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="21"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="209"/>
+        <CursorPos X="69" Y="229"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="bounding_box_console.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="138"/>
+        <CursorPos X="25" Y="118"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\int_user_interaction.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="43" Y="8"/>
+        <UsageCount Value="21"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\optimizing_app.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\bounding_box_server.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="126"/>
+        <CursorPos X="6" Y="149"/>
+        <UsageCount Value="20"/>
+      </Unit8>
+    </Units>
+    <JumpHistory Count="27" HistoryIndex="26">
+      <Position1>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="9" Column="34"/>
+      </Position1>
+      <Position2>
+        <Filename Value="..\Common\bounding_box_server.pas"/>
+        <Caret Line="186" Column="69" TopLine="175"/>
+      </Position2>
+      <Position3>
+        <Filename Value="..\Common\bounding_box_server.pas"/>
+        <Caret Line="227" Column="20" TopLine="206"/>
+      </Position3>
+      <Position4>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="42" Column="66" TopLine="29"/>
+      </Position4>
+      <Position5>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="31" Column="58" TopLine="18"/>
+      </Position5>
+      <Position6>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="32" Column="23" TopLine="21"/>
+      </Position6>
+      <Position7>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="7" Column="23"/>
+      </Position7>
+      <Position8>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="29" Column="58" TopLine="21"/>
+      </Position8>
+      <Position9>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="7" Column="41"/>
+      </Position9>
+      <Position10>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="13" Column="57" TopLine="7"/>
+      </Position10>
+      <Position11>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="43" Column="40" TopLine="27"/>
+      </Position11>
+      <Position12>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="25" Column="29" TopLine="12"/>
+      </Position12>
+      <Position13>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="105" Column="5" TopLine="92"/>
+      </Position13>
+      <Position14>
+        <Filename Value="bounding_box_cli.lpr"/>
+        <Caret Line="9" Column="43"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="229" Column="66" TopLine="216"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="7" Column="93"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="53" Column="41" TopLine="33"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="229" Column="69" TopLine="209"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="555" Column="48" TopLine="555"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="574" Column="48" TopLine="555"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="53" Column="23" TopLine="42"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="229" Column="57" TopLine="217"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="52" Column="35" TopLine="42"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="507" Column="49" TopLine="486"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="547" Column="53" TopLine="530"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="671" Column="44" TopLine="651"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="53" Column="34" TopLine="41"/>
+      </Position27>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="1">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="..\Common\optimizing_app.pas"/>
+        <Line Value="239"/>
+      </Item1>
+    </BreakPoints>
+  </Debugging>
+</CONFIG>
