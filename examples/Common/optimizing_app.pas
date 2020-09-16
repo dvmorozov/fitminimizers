@@ -132,6 +132,8 @@ begin
 
     { For first load. }
     FReloadPointCloud := True;
+
+    FUserInteraction.InitUI;
 end;
 
 destructor TOptimizingApp.Destroy;
