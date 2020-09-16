@@ -76,6 +76,7 @@ type
         procedure DisplayComputationTime(ComputationTime: TObject);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
         procedure DisplayDetails(Line: string);
+        procedure InitUI;
     end;
 
 var
@@ -542,6 +543,11 @@ end;
 procedure TBoundingBoxForm.DisplayDetails(Line: string);
 begin
     BoundingBoxForm.Memo2.Lines.Add(Line);
+end;
+
+procedure TBoundingBoxForm.InitUI;
+begin
+    { Does nothing because the framework takes care about it. }
 end;
 
 end.
