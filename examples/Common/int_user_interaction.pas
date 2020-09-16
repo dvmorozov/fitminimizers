@@ -31,7 +31,6 @@ type
         procedure DisplayComputationTime(ComputationTime: TObject);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: Double);
         procedure DisplayDetails(Line: string);
-        procedure InitUI;
     end;
 
 implementation
