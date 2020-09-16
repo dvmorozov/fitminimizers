@@ -8,8 +8,7 @@
       <Unit0>
         <Filename Value="bounding_box_cli.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos Y="13"/>
+        <CursorPos X="31" Y="9"/>
         <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -28,7 +27,7 @@
         <Filename Value="..\Common\int_user_interaction.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="16"/>
+        <TopLine Value="15"/>
         <CursorPos X="26" Y="34"/>
         <UsageCount Value="22"/>
         <Loaded Value="True"/>
@@ -57,8 +56,10 @@
       <Unit5>
         <Filename Value="bounding_box_console.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="42" Y="13"/>
+        <TopLine Value="46"/>
+        <CursorPos X="130" Y="56"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -91,132 +92,132 @@
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
         <UnitName Value="CustApp"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="325"/>
-        <CursorPos X="8" Y="343"/>
+        <TopLine Value="71"/>
+        <CursorPos X="18" Y="80"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit9>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="27">
       <Position1>
-        <Filename Value="bounding_box_cli.lpr"/>
-        <Caret Line="9" Column="43"/>
+        <Filename Value="..\Common\optimizing_app.pas"/>
+        <Caret Line="53" Column="41" TopLine="33"/>
       </Position1>
       <Position2>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="229" Column="66" TopLine="216"/>
+        <Caret Line="229" Column="69" TopLine="209"/>
       </Position2>
       <Position3>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="7" Column="93"/>
+        <Caret Line="555" Column="48" TopLine="555"/>
       </Position3>
       <Position4>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="53" Column="41" TopLine="33"/>
+        <Caret Line="574" Column="48" TopLine="555"/>
       </Position4>
       <Position5>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="229" Column="69" TopLine="209"/>
+        <Caret Line="53" Column="23" TopLine="42"/>
       </Position5>
       <Position6>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="555" Column="48" TopLine="555"/>
+        <Caret Line="229" Column="57" TopLine="217"/>
       </Position6>
       <Position7>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="574" Column="48" TopLine="555"/>
+        <Caret Line="52" Column="35" TopLine="42"/>
       </Position7>
       <Position8>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="53" Column="23" TopLine="42"/>
+        <Caret Line="507" Column="49" TopLine="486"/>
       </Position8>
       <Position9>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="229" Column="57" TopLine="217"/>
+        <Caret Line="547" Column="53" TopLine="530"/>
       </Position9>
       <Position10>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="52" Column="35" TopLine="42"/>
+        <Caret Line="671" Column="44" TopLine="651"/>
       </Position10>
       <Position11>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="507" Column="49" TopLine="486"/>
+        <Caret Line="53" Column="34" TopLine="41"/>
       </Position11>
       <Position12>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="547" Column="53" TopLine="530"/>
+        <Caret Line="229" Column="69" TopLine="209"/>
       </Position12>
       <Position13>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="671" Column="44" TopLine="651"/>
+        <Caret Line="225" Column="28" TopLine="217"/>
       </Position13>
       <Position14>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="53" Column="34" TopLine="41"/>
+        <Caret Line="224" Column="16" TopLine="217"/>
       </Position14>
       <Position15>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="229" Column="69" TopLine="209"/>
+        <Caret Line="53" Column="19" TopLine="43"/>
       </Position15>
       <Position16>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="225" Column="28" TopLine="217"/>
+        <Caret Line="57" Column="57" TopLine="40"/>
       </Position16>
       <Position17>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="224" Column="16" TopLine="217"/>
+        <Caret Line="491" Column="26" TopLine="479"/>
       </Position17>
       <Position18>
-        <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="53" Column="19" TopLine="43"/>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="27" Column="37" TopLine="8"/>
       </Position18>
       <Position19>
         <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="57" Column="57" TopLine="40"/>
+        <Caret Line="229" Column="47"/>
       </Position19>
       <Position20>
-        <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="491" Column="26" TopLine="479"/>
+        <Filename Value="bounding_box_cli.lpr"/>
+        <Caret Line="12" Column="31"/>
       </Position20>
       <Position21>
-        <Filename Value="bounding_box_console.pas"/>
-        <Caret Line="27" Column="37" TopLine="8"/>
+        <Filename Value="bounding_box_cli.lpr"/>
+        <Caret Line="7" Column="32"/>
       </Position21>
       <Position22>
-        <Filename Value="..\Common\optimizing_app.pas"/>
-        <Caret Line="229" Column="47"/>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="45" Column="26" TopLine="24"/>
       </Position22>
       <Position23>
         <Filename Value="bounding_box_cli.lpr"/>
-        <Caret Line="12" Column="31"/>
+        <Caret Line="7" Column="30"/>
       </Position23>
       <Position24>
-        <Filename Value="bounding_box_cli.lpr"/>
-        <Caret Line="7" Column="32"/>
-      </Position24>
-      <Position25>
-        <Filename Value="bounding_box_console.pas"/>
-        <Caret Line="45" Column="26" TopLine="24"/>
-      </Position25>
-      <Position26>
-        <Filename Value="bounding_box_cli.lpr"/>
-        <Caret Line="7" Column="30"/>
-      </Position26>
-      <Position27>
         <Filename Value="bounding_box_console.pas"/>
         <Caret Line="13" Column="42"/>
-      </Position27>
-      <Position28>
+      </Position24>
+      <Position25>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
         <Caret Line="65" Column="16" TopLine="51"/>
+      </Position25>
+      <Position26>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
+        <Caret Line="343" Column="8" TopLine="326"/>
+      </Position26>
+      <Position27>
+        <Filename Value="bounding_box_cli.lpr"/>
+        <Caret Line="9" Column="31"/>
+      </Position27>
+      <Position28>
+        <Filename Value="bounding_box_console.pas"/>
+        <Caret Line="55" Column="23" TopLine="46"/>
       </Position28>
       <Position29>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
-        <Caret Line="343" Column="8" TopLine="326"/>
+        <Caret Line="80" Column="18" TopLine="69"/>
       </Position29>
       <Position30>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\packages\fcl-base\src\custapp.pp"/>
-        <Caret Line="55" Column="17" TopLine="43"/>
+        <Caret Line="532" Column="41" TopLine="520"/>
       </Position30>
     </JumpHistory>
     <RunParams>

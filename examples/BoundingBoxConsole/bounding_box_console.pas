@@ -42,7 +42,6 @@ type
         procedure DisplayComputationTime(ComputationTime: TObject);
         procedure DisplayInitialBoxVolume(InitialBoxVolume: double);
         procedure DisplayDetails(Line: string);
-        procedure InitUI;
     end;
 
 implementation
@@ -156,11 +155,6 @@ begin
 end;
 
 procedure TBoundingBoxConsole.DisplayDetails(Line: string);
-begin
-
-end;
-
-procedure TBoundingBoxConsole.InitUI;
 begin
 
 end;
