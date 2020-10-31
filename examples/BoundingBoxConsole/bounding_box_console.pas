@@ -69,8 +69,7 @@ begin
 
     { add your program here }
 
-    // stop program loop
-    Terminate;
+    WriteHelp;
 end;
 
 constructor TBoundingBoxConsole.Create(TheOwner: TComponent);
