@@ -58,8 +58,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="46"/>
-        <CursorPos X="130" Y="56"/>
+        <TopLine Value="53"/>
+        <CursorPos X="15" Y="72"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -94,7 +94,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="71"/>
         <CursorPos X="18" Y="80"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit9>
     </Units>
