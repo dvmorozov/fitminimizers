@@ -12,3 +12,5 @@
 *.~4~
 i386-linux
 /Examples
+*.tmp
+lib/
