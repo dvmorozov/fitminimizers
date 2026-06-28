@@ -12,3 +12,7 @@
 *.~4~
 i386-linux
 /Examples
+*.lps
+*.res
+*.tmp
+lib/
