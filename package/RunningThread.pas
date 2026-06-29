@@ -15,12 +15,14 @@ Facebook: https://www.facebook.com/dmitry.v.morozov)
 unit RunningThread;
 
 interface
-uses Classes, Tools, Forms,
+uses Classes, Tools,
 {$IF NOT DEFINED(FPC)}
     //TODO: set up proper module name for Delhpi build.
     //DesignIntf;
 {$ELSE}
+{$IFDEF RT_DESIGNTIME}
     PropEdits,
+{$ENDIF}
 {$ENDIF}
 {$IFDEF LINUX}
 {$linklib c}
@@ -93,15 +95,25 @@ type
 
 procedure Register;
 
+type
+    { Optional hook a GUI host sets (typically to Application.ProcessMessages) to keep
+      the UI responsive during long runs. When nil only thread Synchronize calls are
+      pumped, so this unit no longer depends on the LCL. }
+    TIdleHook = procedure;
+var
+    OnProcessMessages: TIdleHook = nil;
+
 implementation
 
 procedure Register;
 begin
 {$IF DEFINED(FPC)}
+{$IFDEF RT_DESIGNTIME}
     RegisterComponents('Fit', [TRunner]);
     RegisterPropertyEditor(TypeInfo(TComputingProcedure),TRunner,'OnCompute',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TOutputProcedure),TRunner,'OnOutput',TMethodProperty);
     RegisterPropertyEditor(TypeInfo(TCreatingProcedure),TRunner,'OnCreate',TMethodProperty);
+{$ENDIF}
 {$ENDIF}
 end;
 
@@ -220,7 +232,8 @@ begin
             { This must be called to process synchronous calls of output methods,
               using any waiting method here can cause deadlock because waiting
               will never finish because synchronous call will be never processed. }
-            Application.ProcessMessages;
+            CheckSynchronize(0);
+            if Assigned(OnProcessMessages) then OnProcessMessages;
         end;
     end;
 end;
