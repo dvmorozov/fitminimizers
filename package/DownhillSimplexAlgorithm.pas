@@ -49,6 +49,14 @@ type
 
     EDownhillSimplexAlgorithm = class(Exception);
 
+const
+    { Longest stagnation window, in cycles. Comfortably more than the largest
+      well-posed problem needs for a full pass over its simplex, and small enough
+      that a degenerate one still terminates. }
+    MAX_STAGNATION_WINDOW = 600;
+
+type
+
     TDownhillSimplexAlgorithm = class(TAlgorithm)
     protected
         FDownhillSimplexServer: IDownhillSimplexServer;
@@ -67,6 +75,47 @@ type
         { If difference in evaluation of best decision for the cycle
           is less than given value then exit. }
         FExitDerivative: Double;
+        { CONVERGENCE BY SPEED, not by the spread of the goal function's values.
+
+          FFinalTolerance compares that spread against the function's own
+          MAGNITUDE. That only works when the magnitude is set by the thing being
+          fitted. When the goal function carries a large constant term - a model
+          that covers part of the data, a normalisation that does not subtract a
+          baseline - the useful variation is a tiny fraction of the value and the
+          test reports convergence while the fit has barely started. Observed:
+          a fit stopping after two cycles with eleven of twelve parameters still
+          at their initial values.
+
+          These two ask a question that constant cannot distort: is the best
+          decision still IMPROVING? Three details are load-bearing, and each was
+          learned by getting it wrong:
+
+          * Progress is measured over a WINDOW, not cycle by cycle. A simplex
+            routinely spends several cycles contracting without bettering its
+            best vertex, so a per-cycle test reads normal operation as
+            convergence - it cut a diffraction fit off after twelve cycles,
+            leaving a residual 19% below the unfitted baseline where that fit
+            reaches 95%.
+
+          * The window is counted in PASSES over the simplex, capped at
+            MAX_STAGNATION_WINDOW. One cycle replaces one vertex, so N + 1 cycles
+            pass before every parameter has been touched, and a shorter window
+            cannot tell "has not started" from "has finished". Uncapped it does
+            not survive a degenerate model: the automatic path builds one pattern
+            per data point, which on a 100-point profile is ~1200 parameters and
+            a 14000-cycle window, and that fit ran without end.
+
+          * Improvement is judged against the gain the fit has ALREADY made, not
+            only against the current value. Against the current value alone the
+            test cannot terminate on a model that fits almost exactly: as the
+            goal function approaches zero so does the threshold, so a millionth
+            of it stays reachable forever. A synthetic impulse - which the
+            Elliott pack reproduces to 1e-20 - hung on precisely that.
+
+          FStagnationLimit = 0 disables the test, so existing callers are
+          unaffected. }
+        FMinRelImprovement: Double;
+        FStagnationLimit: Integer;
         FParametersNumber: LongInt;
         FSimplexStartStepRandomEnabled: Boolean;
         FSimplexDirectionChangingEnabled: Boolean;
@@ -117,6 +166,13 @@ type
         property RestartCount: Integer read FRestartCount;
         property MaxCycles: Integer read FMaxCycles write FMaxCycles;
         property MaxRestarts: Integer read FMaxRestarts write FMaxRestarts;
+        //  Stop when the best decision has gained less than this fraction over
+        //  a whole window - see FMinRelImprovement for what it is a fraction of.
+        property MinRelImprovement: Double
+            read FMinRelImprovement write FMinRelImprovement;
+        //  Window length, in passes over the simplex. 0 disables the test.
+        property StagnationLimit: Integer
+            read FStagnationLimit write FStagnationLimit;
 
         property DownhillSimplexServer: IDownhillSimplexServer
             read FDownhillSimplexServer write FDownhillSimplexServer;
@@ -307,6 +363,32 @@ begin
 
             EvaluateDecision(Self, Decision);
             Inc(FEvaluationCount);
+
+            //  IF THE STEP WAS REFUSED, TRY THE OTHER WAY.
+            //
+            //  A parameter already sitting against a limit cannot move in the
+            //  direction the basis vector points, so this vertex came back
+            //  identical to the starting one - a simplex with no extent along
+            //  that axis, which no amount of reflecting or contracting can ever
+            //  recover. It is not a rare corner: a curve width capped at the edge
+            //  of the data, an amplitude held non-negative at zero, a position on
+            //  the last point all land there, whatever the curve type.
+            //
+            //  Stepping the opposite way costs one evaluation and is always
+            //  available, because a limit binds on one side only. If both are
+            //  refused the parameter genuinely cannot move, and the vertex is
+            //  left as it is.
+            if Decision.Parameters[i] = StartDecision.Parameters[i] then
+            begin
+                Decision.Parameters[i] := StartDecision.Parameters[i] -
+                    SimplexStartStepRandom *
+                    SimplexStartStepDirection *
+                    FSimplexStartStepMultiplier *
+                    GetVariationStep(Self, i);
+                EvaluateDecision(Self, Decision);
+                Inc(FEvaluationCount);
+            end;
+
             FSimplex.Add(Decision);
         end;    //  for i := 0 to StartDecision.ParametersNumber - 1 do...
     end;    //  with DownhillSimplexServer do...
@@ -568,6 +650,8 @@ var
     Tolerance, PrevTolerance: Double;
     EvalHi, EvalLo: Double;
     SavedLoEval, CurLoEval: Double;
+    WindowStartBest, CurBest, InitialBest: Double;
+    CyclesInWindow, StagnationWindow: LongInt;
     PrevTolDefined: Boolean;
 begin
     if not Assigned(DownhillSimplexServer) then
@@ -579,6 +663,12 @@ begin
 
     PrevTolDefined := False;
     PrevTolerance := 0;
+    WindowStartBest := SavedLoEval;
+    InitialBest := SavedLoEval;
+    CyclesInWindow := 0;
+    StagnationWindow := FStagnationLimit * (ParametersNumber + 1);
+    if StagnationWindow > MAX_STAGNATION_WINDOW then
+        StagnationWindow := MAX_STAGNATION_WINDOW;
 
     with DownhillSimplexServer do
     begin
@@ -638,6 +728,24 @@ begin
             PrevTolDefined := True;
 
             BasicCalcCycle(Highest, NextHighest, Lowest);
+
+            //  HAS THE SEARCH STOPPED IMPROVING? Measured against the best
+            //  decision's own value, so it is scale-free, and over a whole
+            //  window of cycles, because individual unproductive cycles are
+            //  normal in a simplex - see the field comment.
+            if FStagnationLimit > 0 then
+            begin
+                Inc(CyclesInWindow);
+                if CyclesInWindow >= StagnationWindow then
+                begin
+                    CurBest := GetBestDecision.Evaluation;
+                    if Abs(WindowStartBest - CurBest) <= FMinRelImprovement *
+                        (Abs(InitialBest - CurBest) + Abs(CurBest) + TINY) then
+                        Break;
+                    WindowStartBest := CurBest;
+                    CyclesInWindow := 0;
+                end;
+            end;
         end;
         //  Set up parameters of best solution.
         EvaluateDecision(Self, FBestDecision);
@@ -730,6 +838,10 @@ begin
     end;
     FRestartDisabled := ARestartDisabled;
     FExitDerivative := AExitDerivative;
+    //  Off by default: an existing caller must opt in and get exactly the
+    //  behaviour it had before.
+    FMinRelImprovement := 0;
+    FStagnationLimit := 0;
 end;
 
 procedure TDownhillSimplexAlgorithm.SetParametersNumber(AParametersNumber: LongInt);

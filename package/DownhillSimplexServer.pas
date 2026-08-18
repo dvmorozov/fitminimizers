@@ -86,6 +86,14 @@ type
         FFinalTolerance: Double;
         FRestartDisabled: Boolean;
         FExitDerivative: Double;
+        { Passed straight through to the algorithm - see the comment on
+          TDownhillSimplexAlgorithm.FMinRelImprovement. Both default to 0, which
+          leaves the algorithm's own convergence test the only one. }
+        FMinRelImprovement: Double;
+        FStagnationLimit: Integer;
+        FMaxRestarts: Integer;
+        FSimplexDirectionChangingEnabled: Boolean;
+        FMaxCycles: Integer;
 
         FEndOfCalculation: Boolean;
         FMessage: string;
@@ -152,6 +160,18 @@ type
           calculation process algorithm object can be created a few times. }
         property FinalTolerance: Double write FFinalTolerance;
         property RestartDisabled: Boolean write FRestartDisabled;
+        property MinRelImprovement: Double write FMinRelImprovement;
+        property StagnationLimit: Integer write FStagnationLimit;
+        { 0 leaves the algorithm's own default (unlimited). }
+        property MaxRestarts: Integer write FMaxRestarts;
+        { On restart, flip the direction each initial step is taken in. This is
+          what gives a parameter sitting against a bound - where the default
+          upward step is refused and its simplex vertex duplicates the starting
+          one - a vertex it can actually move from. }
+        property SimplexDirectionChangingEnabled: Boolean
+            write FSimplexDirectionChangingEnabled;
+        { 0 leaves the algorithm's own default (effectively unlimited). }
+        property MaxCycles: Integer write FMaxCycles;
         { Stops calculation if minimal value changed less than on this value for optimization cycle. }
         property ExitDerivative: Double write FExitDerivative;
     end;
@@ -224,6 +244,23 @@ begin
                 PutValueIntoInterval(MinLimit, MaxLimit, Value);
 
         Parameter[i] := CurParameter;
+
+        //  WHAT THE PARAMETER ACTUALLY BECAME, written back into the decision.
+        //
+        //  The application is entitled to refuse or clamp a value - a width that
+        //  would run past the data, an amplitude held non-negative, a position
+        //  pinned to a data point. Until now the decision kept the value it
+        //  ASKED for, so the algorithm believed a vertex sat at base + step while
+        //  the goal function had been evaluated at base. Every distance,
+        //  reflection and contraction it then computed used geometry that did not
+        //  exist, and a vertex whose step was refused silently duplicated the
+        //  starting point - collapsing the simplex in that direction with no way
+        //  to notice, let alone recover.
+        //
+        //  Recording the truth costs one read and makes a refused step visible to
+        //  the caller, which is what CreateSimplexVertices needs in order to try
+        //  the other direction.
+        Decision.Parameters[i] := Parameter[i].Value;
     end;
 
     //  Notifies underlying components about CurParameter changing.
@@ -359,6 +396,13 @@ begin
         //    with Algorithm as TDownhillSimplexSAAlgorithm do
     begin
         DownhillSimplexServer := Self;
+        MinRelImprovement := FMinRelImprovement;
+        StagnationLimit := FStagnationLimit;
+        SimplexDirectionChangingEnabled := FSimplexDirectionChangingEnabled;
+        if FMaxRestarts > 0 then
+            MaxRestarts := FMaxRestarts;
+        if FMaxCycles > 0 then
+            MaxCycles := FMaxCycles;
         //  Temperature := 1;     //  for TDownhillSimplexSAAlgorithm
     end;
 end;
