@@ -66,6 +66,11 @@ type
         { Calls OnCreate if assigned. }
         procedure Loaded; override;
         function Finished: Boolean;
+        { NOT published: on macOS TThreadID is a pointer (pthread_t), and a
+          pointer-typed property cannot be published - the compiler rejects the
+          declaration outright. Nothing streams a read-only thread handle
+          anyway, so public is what it should always have been. }
+        property Handle: TThreadID read GetHandle;
 
     published
         { Main computing procedure, it is not synchronized with VCL thread. }
@@ -76,7 +81,6 @@ type
             read FOutput write FOutput;
         property OnCreate: TCreatingProcedure
             read FCreate write FCreate;
-        property Handle: TThreadID read GetHandle;
     end;
 
     TRunnerPool = class(TObject)
