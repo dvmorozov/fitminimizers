@@ -54,7 +54,7 @@ type
         FOutput: TOutputProcedure;
         FCreate: TCreatingProcedure;
         FRunningThread: TRunningThread;
-        function GetHandle: THandle;
+        function GetHandle: TThreadID;
 
     public
         { Waits for finishing execution and terminates the thread. }
@@ -76,7 +76,7 @@ type
             read FOutput write FOutput;
         property OnCreate: TCreatingProcedure
             read FCreate write FCreate;
-        property Handle: THandle read GetHandle;
+        property Handle: TThreadID read GetHandle;
     end;
 
     TRunnerPool = class(TObject)
@@ -161,9 +161,16 @@ begin
     end;
 end;
 
-function TRunner.GetHandle: THandle;
+{ TThreadID, not THandle.
+
+  TThread.Handle IS a TThreadID on every FPC platform. The two happen to be the
+  same width on Windows and Linux, so declaring THandle here compiled there and
+  hid the mismatch; on macOS TThreadID is a pointer (pthread_t) and the
+  assignment does not compile at all. That is why every release built on Linux
+  and Windows and failed on macOS. }
+function TRunner.GetHandle: TThreadID;
 begin
-    Result:= FRunningThread.Handle;
+    Result := FRunningThread.Handle;
 end;
 
 function TRunner.Finished: Boolean;
