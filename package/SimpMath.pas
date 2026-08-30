@@ -565,7 +565,13 @@ procedure Gauss(PointsArray: TwoDimArray; const A, Sigma, x0: Double);
 var
     i: LongInt;
 begin
-    Assert(Length(PointsArray) > 0);
+    //  The same refusal as its four siblings below. This was an Assert, which
+    //  made Gauss the odd one out twice over: it reported a nil array as an
+    //  assertion failure rather than by name, and with assertions compiled out
+    //  - which is every build but the test binaries - it did nothing at all
+    //  where Lorentz and the pseudo-Voigts raised.
+    if not Assigned(PointsArray) then
+        raise EPointsArrayIsNotAssigned.Create('Points array is not assigned...');
 
     for i := 0 to Length(PointsArray) - 1 do
         PointsArray[i][2] := GaussPoint(A, Sigma, x0, PointsArray[i][1]);
