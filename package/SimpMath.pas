@@ -13,7 +13,7 @@ unit SimpMath;
 interface
 
 uses
-    Math, Classes, SysUtils;
+    Math, SysUtils;
 
 const
     TINY = 1e-6;
@@ -24,88 +24,6 @@ type
 
 type
     TDoubleVector3 = array[1..3] of Double;
-
-    IVector = interface;
-
-    //  Vector space.
-    ISpace = interface
-        //  Return scalar (inner) product of vectors.
-        function GetScalarMul(const Vect1, Vect2: IVector): Double;
-    end;
-
-    //  Vector of arbitrary number of dimensions containing real numbers.
-    IVector = interface
-        function GetSpace: ISpace;
-        procedure SetSpace(const ASpace: ISpace);
-        function GetNorma: Double;
-        function GetCompsNumber: LongInt;
-        function GetComp(index: LongInt): Double;
-        procedure SetComp(index: LongInt; AComp: Double);
-        function GetNormComp(index: LongInt): Double;
-
-        property Space: ISpace read GetSpace write SetSpace;
-        property Norma: Double read GetNorma;
-        //  Returns number of vector coordinates (dimensions).
-        property CompsNumber: LongInt read GetCompsNumber;
-        //  Gets/sets value of vector coordinate. Index is zero-based.
-        property Comps[index: LongInt]: Double read GetComp write SetComp;
-        property NormComps[index: LongInt]: Double read GetNormComp;
-    end;
-
-    //  Vector of arbitrary number of dimensions containing complex number.
-    IComplexVector = interface(IVector)
-        function GetImComp(index: LongInt): Double;
-        procedure SetImComp(index: LongInt; AImComp: Double);
-        function GetNormImComp(index: LongInt): Double;
-
-        //  Imaginary parts of vector components.
-        property ImComps[index: LongInt]: Double read GetImComp write SetImComp;
-        //  Imaginary parts of normalized vector components.
-        property NormImComps[index: LongInt]: Double read GetNormImComp;
-    end;
-
-    E3DVector = class(Exception);
-
-    //  Vector of 3D space.
-    T3DVector = class(TComponent, IVector)
-    protected
-        FSpace: ISpace;
-        FVector: TDoubleVector3;
-        FNormalizedVector: TDoubleVector3;
-        FNorma: Double;
-
-        function GetSpace: ISpace;
-        procedure SetSpace(const ASpace: ISpace);
-        function GetNorma: Double;
-        procedure SetNorma(const ANorma: Double); virtual; abstract;
-        function GetCompsNumber: LongInt;
-        function GetComp(index: LongInt): Double;
-        //  TODO: normalized vector should be recomputed.
-        procedure SetComp(index: LongInt; AComp: Double);
-        function GetNormComp(index: LongInt): Double;
-        function GetVector: TDoubleVector3;
-        procedure SetVector(Vector: TDoubleVector3);
-
-    public
-        property Space: ISpace read GetSpace write SetSpace;
-        property Norma: Double read GetNorma;
-        property CompsNumber: LongInt read GetCompsNumber;
-        property Comps[index: LongInt]: Double read GetComp write SetComp;
-        property NormComps[index: LongInt]: Double read GetNormComp;
-        property Vector: TDoubleVector3 read GetVector write SetVector;
-    end;
-
-    T3DComplexVector = class(T3DVector, IComplexVector)
-    protected
-        FImVector: TDoubleVector3;  //  Imaginary part.
-
-        function GetImComp(index: LongInt): Double; virtual; abstract;
-        procedure SetImComp(index: LongInt; AImComp: Double); virtual; abstract;
-        function GetNormImComp(index: LongInt): Double; virtual; abstract;
-    public
-        property ImComps[index: LongInt]: Double read GetImComp write SetImComp;
-        property NormImComps[index: LongInt]: Double read GetNormImComp;
-    end;
 
 //  Theta must be in interval from 0 to pi; Phi - in interval from -pi to pi.
 procedure ConvertSphericalToDekart(Theta, Phi, R: Double; var x, y, z: Double);
@@ -890,67 +808,6 @@ begin
     Result[2] := V1[2] + V2[2] + V3[2];
     Result[3] := V1[3] + V2[3] + V3[3];
     Result := MulVectByValue(Result, GetVolume(A, B, C, Alpha, Beta, Gamma));
-end;
-
-function T3DVector.GetSpace: ISpace;
-begin
-    if Assigned(FSpace) then
-        Result := FSpace
-    else
-        raise E3DVector.Create('Space is not assigned...');
-end;
-
-procedure T3DVector.SetSpace(const ASpace: ISpace);
-begin
-    FSpace := ASpace;
-end;
-
-function T3DVector.GetNorma: Double;
-begin
-    Result := FNorma;
-end;
-
-function T3DVector.GetCompsNumber: LongInt;
-begin
-    Result := 3;
-end;
-
-function T3DVector.GetVector: TDoubleVector3;
-begin
-    Result[1] := Comps[0];
-    Result[2] := Comps[1];
-    Result[3] := Comps[2];
-end;
-
-procedure T3DVector.SetVector(Vector: TDoubleVector3);
-begin
-    Comps[0] := Vector[1];
-    Comps[1] := Vector[2];
-    Comps[2] := Vector[3];
-end;
-
-function T3DVector.GetComp(index: LongInt): Double;
-begin
-    if (Index < 0) or (index >= CompsNumber) then
-        raise E3DVector.Create('Invalid index...')
-    else
-        Result := FVector[index + 1];
-end;
-
-procedure T3DVector.SetComp(index: LongInt; AComp: Double);
-begin
-    if (Index < 0) or (index >= CompsNumber) then
-        raise E3DVector.Create('Invalid index...')
-    else
-        FVector[index + 1] := AComp;
-end;
-
-function T3DVector.GetNormComp(index: LongInt): Double;
-begin
-    if (Index < 0) or (index >= CompsNumber) then
-        raise E3DVector.Create('Invalid index...')
-    else
-        Result := FNormalizedVector[index + 1];
 end;
 
 function CalcPolinom2(const A, B, C, x0, x: Double): Double;
