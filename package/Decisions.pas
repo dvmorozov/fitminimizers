@@ -411,7 +411,11 @@ begin
 
     TempByte := Self[ParamNum];
     Self[ParamNum] := TByteDecision(Decision)[ParamNum];
-    TFloatDecision(Decision)[ParamNum] := TempByte;
+    //  TByteDecision, not TFloatDecision. The guard above has already proved
+    //  which type this is; casting it to the other one wrote a Double through
+    //  a setter indexing a one-byte array, which corrupts the heap rather than
+    //  failing. The line beside it, two above, always had the right cast.
+    TByteDecision(Decision)[ParamNum] := TempByte;
 end;
 
 procedure TByteDecision.CopyParameter(const ParamNum, NewParamNum: LongInt);
