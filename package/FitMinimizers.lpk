@@ -8,7 +8,7 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <Libraries Value="lib\i386-win32"/>
+        <Libraries Value="lib\$(TargetCPU)-$(TargetOS)"/>
         <OtherUnitFiles Value="."/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
