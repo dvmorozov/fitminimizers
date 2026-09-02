@@ -43,12 +43,26 @@ type
   that. `MyExceptions` is already linked into everything here and already owns
   the question "which kind of error is this", so the answer belongs with it.
 
-  WHAT THEY DO NOT DO, and the difference is deliberate: they raise but do not
-  log. The consuming application's `Common/checks.pas` logs at the point of
-  failure first, because an exception can be reworded or swallowed several layers
-  up while a log entry cannot. This package has no logger and must not acquire
-  one, so the raise is all there is - and the description below is therefore the
-  whole record of what went wrong.
+  THEY LOG THROUGH THE HOST, NOT THROUGH A LOGGER OF THEIR OWN. Logging matters
+  for the same reason the consuming application's `Common/checks.pas` does it: an
+  exception can be caught and reworded several layers up, or swallowed by a
+  handler written for a different failure, whereas a line written at the point of
+  failure is the record that reaches a bug report.
+
+  But WHERE diagnostics go is the host's decision, not a library's, and a copied
+  logger would be the wrong answer twice over. Two loggers in one process means
+  two independent size limits and two rotation policies: aimed at one file that
+  is interleaved writes and doubled rotation dropping lines, and aimed at two it
+  splits a single fault's trace across both - the worst outcome for the one
+  reader who matters. It would also duplicate several hundred lines that then
+  have to be maintained twice, and drag a platform dependency into a package
+  whose whole appeal is that it is plain Pascal.
+
+  So `OnCheckFailed` is a seam. The host assigns it once and every check here
+  reaches the host's log, with the host's severity, file and rotation. Left nil -
+  which is what a standalone build of this package leaves it - the raise is all
+  there is and the package still compiles with nothing beside it. That property
+  is what makes this a package rather than part of an application.
 
   WHAT THEY ARE NOT FOR. Not invalid input, and not conditions this code is
   expected to meet - those are ordinary outcomes and get `EUserException`. These
@@ -57,6 +71,21 @@ type
   THE DESCRIPTION SAYS WHAT WAS EXPECTED, in terms of the domain rather than of
   the expression: 'an amplitude is never negative' is useful in a report, 'A >= 0'
   is what the next line of code already says. }
+
+var
+    { Called with the description at the moment a check fails, BEFORE the raise,
+      so the record survives a caller that catches and rewords the exception.
+
+      The host assigns it once - the consuming application does so from the
+      initialization of the unit that owns the same policy for its own checks, so
+      that every binary linking this package is wired by the act of linking it,
+      rather than by each program remembering. Nil is a supported state and means
+      "raise only".
+
+      It must not raise, and it must not assume a thread: a check can fail on a
+      worker thread, and a sink that throws would replace the defect being
+      reported with one of its own. }
+    OnCheckFailed: procedure(const AMessage: string) = nil;
 
 { Fails unless ACondition holds. }
 procedure CheckThat(ACondition: boolean; const ADescription: string);
@@ -72,9 +101,14 @@ procedure CheckIndex(AIndex, ACount: longint; const AWhat: string);
 
 implementation
 
-{ One place that raises, so the three cannot drift apart. }
+{ One place that reports and raises, so the three cannot drift apart. }
 procedure Fail(const AMessage: string);
 begin
+    //  REPORTED FIRST. A caller may catch this and reword it, or a handler
+    //  written for something else may swallow it; the sink is called before
+    //  either can happen.
+    if Assigned(OnCheckFailed) then
+        OnCheckFailed(AMessage);
     raise EInternalCheckFailed.Create(AMessage);
 end;
 
