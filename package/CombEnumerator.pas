@@ -16,7 +16,7 @@ unit CombEnumerator;
 
 interface
 
-uses SysUtils;
+uses SysUtils, MyExceptions;
 
 type
     { Enumerates all possible combinations of a set of discrete values.
@@ -142,7 +142,7 @@ var
     TempCurrentComb, TempCombNumber: LongInt;
     i: LongInt;
 begin
-    Assert(not ((ACurrentComb < 0) or (ACurrentComb >= CombNumber)));
+    CheckIndex(ACurrentComb, CombNumber, 'the combinations this enumerator can select');
     { Algorithm selecting entity combination by through index. }
     TempCurrentComb := ACurrentComb;
     FCurrentComb := ACurrentComb;
@@ -158,8 +158,9 @@ end;
 
 function TCombEnumerator.GetValueIndex(index: LongInt): LongInt;
 begin
-    Assert(FIsCombDefined);
-    Assert(not ((index < 0) or (index >= ValuesNumber)));
+    CheckThat(FIsCombDefined,
+        'a combination must be selected before one of its values is read');
+    CheckIndex(index, ValuesNumber, 'the values in the selected combination');
     Result := ValuesIndexes[index];
 end;
 

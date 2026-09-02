@@ -12,9 +12,7 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Forms, Dialogs, Buttons,
     StdCtrls, StrUtils,
 {$ENDIF}
-    SimpMath, Math3d, bounding_box_server, int_user_interaction;
-
-{$ASSERTIONS ON}
+    SimpMath, Math3d, bounding_box_server, int_user_interaction, MyExceptions;
 
 type
     { TBoundingBoxForm }
@@ -142,14 +140,14 @@ end;
 
 procedure TBoundingBoxForm.FormDestroy(Sender: TObject);
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
 
     OptimizingApp.StopComputing;
 end;
 
 procedure TBoundingBoxForm.ComboBoxFilesChange(Sender: TObject);
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
 
     OptimizingApp.ReloadPointCloud := True;
 end;
@@ -179,7 +177,7 @@ end;
 
 procedure TBoundingBoxForm.BitBtnFindMinimumBoundingBoxClick(Sender: TObject);
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
 
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
@@ -204,7 +202,7 @@ var
     StringList: TStringList;
     Passed: Boolean;
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
 
     MinVolume := 1e20;
     { Gets optimized MinVolume. }
@@ -381,7 +379,7 @@ procedure TBoundingBoxForm.DisplayBruteForceResult(
 var
     Line: string;
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
     { Computes difference in volumes calculated
       for original and rotated orientation. }
     with Handler as TBoundingBoxServer do
@@ -408,7 +406,7 @@ end;
 
 procedure TBoundingBoxForm.ButtonBruteForceClick(Sender: TObject);
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
     { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
@@ -420,7 +418,7 @@ end;
 
 procedure TBoundingBoxForm.ButtonRandomTestClick(Sender: TObject);
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
     { Adds space. }
     Memo1.Lines.Clear;
     Memo2.Lines.Clear;
@@ -431,7 +429,7 @@ end;
 
 procedure TBoundingBoxForm.ButtonStopClick(Sender: TObject);
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
 
     OptimizingApp.StopComputing;
 end;
@@ -457,7 +455,7 @@ procedure TBoundingBoxForm.DisplayPointCloud(PointCloud: TList);
 var
     BoxSizes: TDoubleVector3;
 begin
-    Assert(Assigned(OptimizingApp));
+    CheckAssigned(OptimizingApp, 'the optimizing application behind this form');
 
     Memo1.Lines.Add('');
     if CheckBoxRandomData.Checked then

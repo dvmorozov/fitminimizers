@@ -14,8 +14,6 @@ uses
   {$ENDIF}
     Contnrs, RunningThread, SimpMath, Math3d, downhill_simplex_handler;
 
-{$ASSERTIONS ON}
-
 type
     p3DVector = ^T3DVector;
 

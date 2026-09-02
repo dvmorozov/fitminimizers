@@ -8,12 +8,10 @@
 ------------------------------------------------------------------------------------------------------------------------}
 unit SimpMath;
 
-{$ASSERTIONS ON}
-
 interface
 
 uses
-    Math, SysUtils;
+    Math, SysUtils, MyExceptions;
 
 const
     TINY = 1e-6;
@@ -393,8 +391,8 @@ end;
 function GaussPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 begin
-    Assert(A >= 0);
-    Assert(Sigma >= 0);
+    CheckThat(A >= 0, 'a lineshape amplitude is never negative');
+    CheckThat(Sigma >= 0, 'a lineshape width is never negative');
     Result := (A / (Sigma * Sqrt(2 * pi))) * exp(-1 * Sqr(x0 - x) /
         (2 * Sqr(Sigma)));
 end;
@@ -403,8 +401,8 @@ end;
 function LorentzPoint(const A,    //  Integral of function by definition area.
     Sigma, x0, x: Double): Double;
 begin
-    Assert(A >= 0);
-    Assert(Sigma >= 0);
+    CheckThat(A >= 0, 'a lineshape amplitude is never negative');
+    CheckThat(Sigma >= 0, 'a lineshape width is never negative');
     (*
     Result := (A / (Sigma * Sqrt(2 * pi))) *
         exp(-1 * Abs(x0 - x) / (2 * Sqr(Sigma)));
@@ -415,9 +413,10 @@ end;
 
 function PseudoVoigtPoint(const A, Sigma, Eta, x0, x: Double): Double;
 begin
-    Assert(A >= 0);
-    Assert(Sigma >= 0);
-    Assert((Eta >= 0) and (Eta <= 1));
+    CheckThat(A >= 0, 'a lineshape amplitude is never negative');
+    CheckThat(Sigma >= 0, 'a lineshape width is never negative');
+    CheckThat((Eta >= 0) and (Eta <= 1),
+        'the Gaussian-to-Lorentzian mixing fraction lies in 0..1');
 
     Result := A * ((1 - Eta) * (2 * Sqrt(Ln(2)) / (Sigma * Sqrt(pi)) *
         exp(-4 * Ln(2) * Sqr(x0 - x) / Sqr(Sigma))) + Eta *
@@ -426,9 +425,10 @@ end;
 
 function AsymPseudoVoigtPoint(const A, Sigma, Eta, x0, x, DeltaSigma: Double): Double;
 begin
-    Assert(A >= 0);
-    Assert(Sigma >= 0);
-    Assert((Eta >= 0) and (Eta <= 1));
+    CheckThat(A >= 0, 'a lineshape amplitude is never negative');
+    CheckThat(Sigma >= 0, 'a lineshape width is never negative');
+    CheckThat((Eta >= 0) and (Eta <= 1),
+        'the Gaussian-to-Lorentzian mixing fraction lies in 0..1');
 
     if (x >= x0) then
     begin
@@ -447,11 +447,14 @@ end;
 function TwoBranchesPseudoVoigtPoint(
     const A, Sigma, Eta, SigmaRight, EtaRight, x0, x: Double): Double;
 begin
-    Assert(A >= 0);
-    Assert(Sigma >= 0);
-    Assert((Eta >= 0) and (Eta <= 1));
-    Assert(SigmaRight >= 0);
-    Assert((EtaRight >= 0) and (EtaRight <= 1));
+    CheckThat(A >= 0, 'a lineshape amplitude is never negative');
+    CheckThat(Sigma >= 0, 'a lineshape width is never negative');
+    CheckThat((Eta >= 0) and (Eta <= 1),
+        'the Gaussian-to-Lorentzian mixing fraction lies in 0..1');
+    CheckThat(SigmaRight >= 0,
+        'the right branch width is never negative');
+    CheckThat((EtaRight >= 0) and (EtaRight <= 1),
+        'the right branch mixing fraction lies in 0..1');
 
     if (x >= x0) then
     begin

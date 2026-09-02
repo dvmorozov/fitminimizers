@@ -12,7 +12,8 @@ uses
     SysUtils, Variants, Classes, Graphics, Controls, Dialogs, Buttons, Forms,
     StdCtrls, StrUtils, Contnrs,
 {$ENDIF}
-    RunningThread, SimpMath, Math3d, bounding_box_server, int_user_interaction;
+    RunningThread, SimpMath, Math3d, bounding_box_server, int_user_interaction,
+    MyExceptions;
 
 type
     { Contains all application objects. }
@@ -104,7 +105,8 @@ var
     Ext: string;
 begin
     inherited Create(nil);
-    Assert(Assigned(UserInteraction));
+    CheckThat(Assigned(UserInteraction),
+        'an optimizing application needs a way to report progress');
     FUserInteraction := UserInteraction;
 
     { Must be created before inherited constructor which causes initializing
@@ -192,7 +194,8 @@ var
     Runners: TComponentList;
     PointCloud: TPointCloud;
 begin
-    Assert(Assigned(FUserInteraction));
+    CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
     { Loads model data in original orientation. }
     { Data are accessed from different threads.
       That's ok until data aren't changed. }
@@ -244,7 +247,8 @@ begin
     { It is not necessarily to free separately all runners,
       because the list owns them and removes them itself. }
     Runners.Free;
-    Assert(FHandlers.Count = 0, 'All handlers should be freed by the output method.');
+    CheckThat(FHandlers.Count = 0,
+        'every runner handler must have been freed by the output method');
 
     FComputationTime.EndMeasurement;
     FOptiResultBoxVolume := FGlobalMinVolume;
@@ -319,7 +323,8 @@ function TOptimizingApp.CreateHandler(Alpha, Beta, Gamma: Double;
 var
     FinalTolerance, ExitDerivate: double;
 begin
-    Assert(Assigned(FUserInteraction));
+    CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
     FinalTolerance := FUserInteraction.GetFinalTolerance;
     ExitDerivate := FUserInteraction.GetEditExitDerivate;
@@ -381,7 +386,8 @@ type
         Coord: TOBJCoord;
         Vector: T3Vector;
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
         FreePointCloud(PointCloudCache);
         PointCloudCache := TPointCloud.Create(0, 0, 0);
@@ -423,7 +429,8 @@ var
     Vector: T3Vector;
     i: LongInt;
 begin
-    Assert(Assigned(FUserInteraction));
+    CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
     if FReloadPointCloud then
     begin
@@ -492,7 +499,8 @@ procedure TOptimizingApp.DisplayCurrentMinVolume(Handler: TBoundingBoxServer);
 begin
     with Handler do
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
         FOptiResultBoxVolume := BoxVolume;
         FOptiResultBoxMaxCoords := BoxMaxCoords;
@@ -515,7 +523,8 @@ begin
           for original and rotated orientation. }
         with Handler do
         begin
-            Assert(Assigned(FUserInteraction));
+            CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
             DeltaVolume := (BoxVolume - FGlobalMinVolume);
             { Computes lengths of edges of bounding box. }
@@ -558,7 +567,8 @@ var
 begin
     with Handler do
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
         if BoxVolume < FGlobalMinVolume then
         begin
@@ -585,7 +595,8 @@ var
     PointCloud: TPointCloud;
     InitialBoxVolume: Double;
 begin
-    Assert(Assigned(FUserInteraction));
+    CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
     FStop := False;
 
@@ -637,7 +648,8 @@ var
     Runner: TRunner;
     ThreadPool: TRunnerPool;
 begin
-    Assert(Assigned(FUserInteraction));
+    CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
     FStop := False;
     { Initializes global minimum parameters. }
@@ -696,7 +708,8 @@ var
     Handler: TBoundingBoxServer;
     PointCloud: TPointCloud;
 begin
-    Assert(Assigned(FUserInteraction));
+    CheckThat(Assigned(FUserInteraction),
+        'the way this application reports progress is missing');
 
     FStop := False;
     { Initializes global minimum parameters. }

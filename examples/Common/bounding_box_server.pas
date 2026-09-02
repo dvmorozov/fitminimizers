@@ -13,7 +13,7 @@ uses
     StdCtrls,
 {$ENDIF}
     Algorithm, DownhillSimplexAlgorithm, Decisions, SimpMath, Math3d,
-    int_user_interaction;
+    int_user_interaction, MyExceptions;
 
 type
     P3DVector = ^T3DVector;
@@ -282,7 +282,8 @@ begin
     { Gets parameters of best solution. }
     if FShowDetails then
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this server reports progress is missing');
 
         Line := '  Result:' + sLineBreak;
         Line := Line + '     Modified parameters:' +
@@ -364,7 +365,8 @@ begin
 
     if FShowDetails then
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this server reports progress is missing');
 
         Line := '  StartDecision:' + sLineBreak;
         Line := Line + '     Start Parameters:' +
@@ -397,7 +399,8 @@ begin
 
     if FShowDetails then
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this server reports progress is missing');
 
         Line := '  EvaluateDecition:' + sLineBreak;
         Line := Line + '     Modified parameters:' +
@@ -420,7 +423,8 @@ begin
 
     if FShowDetails then
     begin
-        Assert(Assigned(FUserInteraction));
+        CheckThat(Assigned(FUserInteraction),
+        'the way this server reports progress is missing');
 
         Line := 'UpdateResults:' + sLineBreak;
         Line := Line + '    Optimized parameters:' +
