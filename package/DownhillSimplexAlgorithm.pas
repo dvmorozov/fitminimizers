@@ -292,6 +292,21 @@ begin
     //  Searches for the best solution in FSimplex and stores it.
     UtilizeObject(FBestDecision);
     FBestDecision := TDownhillSimplexDecision(GetBestDecision.GetCopy);
+    //  REEVALUATED BEFORE IT IS REPORTED, to put the "server" into the state it
+    //  is being told about - Restart does the same, for the same reason.
+    //
+    //  Building the simplex evaluates every vertex in turn, so without this the
+    //  application was left holding the LAST vertex while the BEST one was
+    //  announced as a new minimum. An application that keeps the number it is
+    //  handed never noticed. One that recomputes its own goal function from the
+    //  parameters it is holding - which Fit does, because its automatic
+    //  algorithms move parameters behind the optimiser's back - recorded a value
+    //  belonging to a point the search never accepted, which on a live loss
+    //  chart is a spike of several decades at the start of every search and
+    //  after every restart, in a fit that was converging smoothly.
+    with DownhillSimplexServer do
+        EvaluateDecision(Self, FBestDecision);
+    Inc(FEvaluationCount);
     DownhillSimplexServer.UpdateResults(Self, FBestDecision);
 end;
 
