@@ -21,7 +21,8 @@ Written for [Fit](https://dvmorozov.github.io/fit/), and used by
 
 ## License
 
-GPL-3.0-or-later - see [LICENSE](LICENSE). Same terms as
-[fit](https://github.com/dvmorozov/fit), the application this package was written
-for; a repository with no license file grants no rights at all, which is not what
-publishing it was for.
+MPL-2.0 - see [LICENSE](LICENSE). Every source file has said so since 2019.
+The Mozilla Public License is file-level: a program under any licence, free or
+commercial, may use this package, and changes to its own files stay under MPL-2.0
+with their source available. [Fit](https://github.com/dvmorozov/fit), the
+application it was written for, is licensed separately, under GPL-3.0-or-later.
