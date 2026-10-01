@@ -21,6 +21,7 @@
         <CustomOptions Value="-dUseCThreads"/>
       </Other>
     </CompilerOptions>
+    <License Value="MPL-2.0 (Mozilla Public License 2.0); see LICENSE"/>
     <Version Minor="1" Release="10" Build="12"/>
     <Files Count="10">
       <Item1>
