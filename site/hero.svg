@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="Contour lines of an error landscape and a downhill simplex closing in on its minimum">
+<defs>
+<linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14b8a6" stop-opacity=".55"/><stop offset="1" stop-color="#14b8a6" stop-opacity=".04"/></linearGradient>
+<linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38bdf8" stop-opacity=".5"/><stop offset="1" stop-color="#38bdf8" stop-opacity=".04"/></linearGradient>
+<linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a78bfa" stop-opacity=".5"/><stop offset="1" stop-color="#a78bfa" stop-opacity=".04"/></linearGradient>
+<linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f59e0b" stop-opacity=".45"/><stop offset="1" stop-color="#f59e0b" stop-opacity=".04"/></linearGradient>
+<filter id="glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<clipPath id="panel"><rect x="1" y="1" width="638" height="398" rx="17"/></clipPath>
+</defs>
+<rect x="0.5" y="0.5" width="639" height="399" rx="18" fill="#0d2440" fill-opacity=".72" stroke="#5eead4" stroke-opacity=".22"/>
+<g clip-path="url(#panel)">
+<g stroke="#94bde6" stroke-opacity=".12" stroke-width="1"><line x1="40.0" y1="40.0" x2="40.0" y2="370.0"/><line x1="90.9" y1="40.0" x2="90.9" y2="370.0"/><line x1="141.8" y1="40.0" x2="141.8" y2="370.0"/><line x1="192.7" y1="40.0" x2="192.7" y2="370.0"/><line x1="243.6" y1="40.0" x2="243.6" y2="370.0"/><line x1="294.5" y1="40.0" x2="294.5" y2="370.0"/><line x1="345.5" y1="40.0" x2="345.5" y2="370.0"/><line x1="396.4" y1="40.0" x2="396.4" y2="370.0"/><line x1="447.3" y1="40.0" x2="447.3" y2="370.0"/><line x1="498.2" y1="40.0" x2="498.2" y2="370.0"/><line x1="549.1" y1="40.0" x2="549.1" y2="370.0"/><line x1="600.0" y1="40.0" x2="600.0" y2="370.0"/><line x1="40.0" y1="40.0" x2="600.0" y2="40.0"/><line x1="40.0" y1="95.0" x2="600.0" y2="95.0"/><line x1="40.0" y1="150.0" x2="600.0" y2="150.0"/><line x1="40.0" y1="205.0" x2="600.0" y2="205.0"/><line x1="40.0" y1="260.0" x2="600.0" y2="260.0"/><line x1="40.0" y1="315.0" x2="600.0" y2="315.0"/><line x1="40.0" y1="370.0" x2="600.0" y2="370.0"/></g>
+<ellipse cx="400" cy="215" rx="25.2" ry="14.7" transform="rotate(-24 400 215)" fill="none" stroke="#38bdf8" stroke-opacity="0.51" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="53.0" ry="30.6" transform="rotate(-24 400 215)" fill="none" stroke="#14b8a6" stroke-opacity="0.46" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="83.2" ry="47.9" transform="rotate(-24 400 215)" fill="none" stroke="#38bdf8" stroke-opacity="0.42" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="116.0" ry="66.4" transform="rotate(-24 400 215)" fill="none" stroke="#14b8a6" stroke-opacity="0.37" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="151.2" ry="86.2" transform="rotate(-24 400 215)" fill="none" stroke="#38bdf8" stroke-opacity="0.33" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="189.0" ry="107.4" transform="rotate(-24 400 215)" fill="none" stroke="#14b8a6" stroke-opacity="0.28" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="229.2" ry="129.8" transform="rotate(-24 400 215)" fill="none" stroke="#38bdf8" stroke-opacity="0.24" stroke-width="1.4"/>
+<ellipse cx="400" cy="215" rx="272.0" ry="153.6" transform="rotate(-24 400 215)" fill="none" stroke="#14b8a6" stroke-opacity="0.19" stroke-width="1.4"/>
+<polygon points="110.0,320.0 175.0,300.0 140.0,255.0" fill="#f59e0b" fill-opacity="0.06" stroke="#fbbf24" stroke-opacity="0.59" stroke-width="2"/>
+<polygon points="200.5,284.6 241.5,272.1 219.4,243.7" fill="#f59e0b" fill-opacity="0.07" stroke="#fbbf24" stroke-opacity="0.63" stroke-width="2"/>
+<polygon points="264.6,260.4 290.4,252.5 276.5,234.6" fill="#f59e0b" fill-opacity="0.09" stroke="#fbbf24" stroke-opacity="0.68" stroke-width="2"/>
+<polygon points="309.6,243.9 325.9,238.9 317.1,227.6" fill="#f59e0b" fill-opacity="0.11" stroke="#fbbf24" stroke-opacity="0.73" stroke-width="2"/>
+<polygon points="341.1,232.7 351.4,229.5 345.9,222.4" fill="#f59e0b" fill-opacity="0.13" stroke="#fbbf24" stroke-opacity="0.77" stroke-width="2"/>
+<polygon points="363.0,225.1 369.4,223.2 366.0,218.7" fill="#f59e0b" fill-opacity="0.15" stroke="#fbbf24" stroke-opacity="0.82" stroke-width="2"/>
+<polygon points="378.0,220.2 382.0,218.9 379.8,216.1" fill="#f59e0b" fill-opacity="0.17" stroke="#fbbf24" stroke-opacity="0.86" stroke-width="2"/>
+<polygon points="388.1,217.0 390.6,216.2 389.2,214.4" fill="#f59e0b" fill-opacity="0.18" stroke="#fbbf24" stroke-opacity="0.91" stroke-width="2"/>
+<polygon points="394.7,215.0 396.3,214.5 395.5,213.4" fill="#f59e0b" fill-opacity="0.20" stroke="#fbbf24" stroke-opacity="0.95" stroke-width="2"/>
+<path d="M141.7 291.7 L220.5 266.8 L277.2 249.2 L317.6 236.8 L346.1 228.2 L366.1 222.3 L379.9 218.4 L389.3 215.9 L395.5 214.3 L400.0 215.0" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-dasharray="3 4" stroke-opacity=".8"/>
+<circle cx="400" cy="215" r="7" fill="#5eead4" filter="url(#glow)"/>
+<text x="412" y="205" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" fill="#e6eef7">minimum</text>
+<text x="40" y="30" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" fill="#a9bbd0">downhill simplex on an error landscape</text>
+</g>
+</svg>
