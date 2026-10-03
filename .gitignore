@@ -16,3 +16,5 @@ i386-linux
 *.res
 *.tmp
 lib/
+# macOS Finder metadata, never part of the project
+.DS_Store
