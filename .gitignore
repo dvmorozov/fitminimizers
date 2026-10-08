@@ -1,0 +1,20 @@
+*.o
+*.ppu
+*.compiled
+*.bak
+*.dcu
+*.exe
+*.local
+*.~1~
+*.identcache
+*.~2~
+*.~3~
+*.~4~
+i386-linux
+/Examples
+*.lps
+*.res
+*.tmp
+lib/
+# macOS Finder metadata, never part of the project
+.DS_Store

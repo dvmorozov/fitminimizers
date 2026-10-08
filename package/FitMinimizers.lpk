@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="FitMinimizers"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <Libraries Value="lib\$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="."/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+        </SyntaxOptions>
+      </Parsing>
+      <Other>
+        <CustomOptions Value="-dUseCThreads"/>
+      </Other>
+    </CompilerOptions>
+    <License Value="MPL-2.0 (Mozilla Public License 2.0); see LICENSE"/>
+    <Version Minor="1" Release="10" Build="12"/>
+    <Files Count="10">
+      <Item1>
+        <Filename Value="Tools.pas"/>
+        <UnitName Value="Tools"/>
+      </Item1>
+      <Item2>
+        <Filename Value="SimpMath.pas"/>
+        <UnitName Value="SimpMath"/>
+      </Item2>
+      <Item3>
+        <Filename Value="MyExceptions.pas"/>
+        <UnitName Value="MyExceptions"/>
+      </Item3>
+      <Item4>
+        <Filename Value="Algorithm.pas"/>
+        <UnitName Value="Algorithm"/>
+      </Item4>
+      <Item5>
+        <Filename Value="Decisions.pas"/>
+        <UnitName Value="Decisions"/>
+      </Item5>
+      <Item6>
+        <Filename Value="DownhillSimplexAlgorithm.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="DownhillSimplexAlgorithm"/>
+      </Item6>
+      <Item7>
+        <Filename Value="AlgorithmContainer.pas"/>
+        <UnitName Value="AlgorithmContainer"/>
+      </Item7>
+      <Item8>
+        <Filename Value="RunningThread.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="RunningThread"/>
+      </Item8>
+      <Item9>
+        <Filename Value="CombEnumerator.pas"/>
+        <UnitName Value="CombEnumerator"/>
+      </Item9>
+      <Item10>
+        <Filename Value="DownhillSimplexServer.pas"/>
+        <UnitName Value="DownhillSimplexServer"/>
+      </Item10>
+    </Files>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="IDEIntf"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
